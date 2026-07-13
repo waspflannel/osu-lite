@@ -12,7 +12,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.IPC;
-using osu.Game.Tournament;
 using SDL;
 using Velopack;
 
@@ -75,7 +74,6 @@ namespace osu.Desktop
             string cwd = Environment.CurrentDirectory;
 
             string gameName = base_game_name;
-            bool tournamentClient = false;
 
             foreach (string arg in args)
             {
@@ -86,10 +84,6 @@ namespace osu.Desktop
 
                 switch (key)
                 {
-                    case "--tournament":
-                        tournamentClient = true;
-                        break;
-
                     case "--debug-client-id":
                         if (!DebugUtils.IsDebugBuild)
                             throw new InvalidOperationException("Cannot use this argument in a non-debug build.");
@@ -104,7 +98,7 @@ namespace osu.Desktop
 
             var hostOptions = new HostOptions
             {
-                IPCPipeName = !tournamentClient ? OsuGame.IPC_PIPE_NAME : null,
+                IPCPipeName = OsuGame.IPC_PIPE_NAME,
                 FriendlyGameName = OsuGameBase.GAME_NAME,
             };
 
@@ -137,16 +131,11 @@ namespace osu.Desktop
                     }
                 }
 
-                if (tournamentClient)
-                    host.Run(new TournamentGame());
-                else
+                host.Run(new OsuGameDesktop(args)
                 {
-                    host.Run(new OsuGameDesktop(args)
-                    {
-                        IsFirstRun = isFirstRun,
-                        EnableWebSocketServer = Environment.GetEnvironmentVariable("OSU_WEBSOCKET_SERVER") == "1",
-                    });
-                }
+                    IsFirstRun = isFirstRun,
+                    EnableWebSocketServer = Environment.GetEnvironmentVariable("OSU_WEBSOCKET_SERVER") == "1",
+                });
             }
         }
 
@@ -180,10 +169,9 @@ namespace osu.Desktop
 
         private static void setupVelopack(string[] args)
         {
-            // Arguments being present indicate the user is either starting the game in a special (aka tournament) mode,
-            // or is running with pending imports via file association or otherwise.
+            // Arguments being present indicate the user is running with pending imports via file association or otherwise.
             //
-            // In both these scenarios, we'd hope the game does not attempt to update.
+            // In this scenario, we'd hope the game does not attempt to update.
             //
             // Special consideration for velopack startup arguments, which must be handled during update.
             // See https://docs.velopack.io/integrating/hooks#command-line-hooks.
