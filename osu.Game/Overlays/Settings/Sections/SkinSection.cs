@@ -23,7 +23,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.SkinEditor;
 using osu.Game.Skinning;
 using osuTK;
 using Realms;
@@ -54,8 +53,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private IDisposable realmSubscription;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] SkinEditorOverlay skinEditor)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Children = new Drawable[]
             {
@@ -79,11 +78,6 @@ namespace osu.Game.Overlays.Settings.Sections
                         new ExportSkinButton { Padding = new MarginPadding { Horizontal = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
                         new DeleteSkinButton { Padding = new MarginPadding { Left = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
                     }
-                },
-                new SettingsButtonV2
-                {
-                    Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.ToggleVisibility(),
                 },
             };
         }

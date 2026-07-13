@@ -10,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Screens.Edit.Timing;
 using osuTK;
 
 namespace osu.Game.Screens.Play.PlayerSettings

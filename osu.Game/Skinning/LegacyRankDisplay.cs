@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
-using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osuTK;
@@ -53,16 +52,13 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinEditor? skinEditor, SessionStatics statics)
+        private void load(SessionStatics statics)
         {
             AddRangeInternal(new Drawable[]
             {
                 rankDownSample = new SkinnableSound(new SampleInfo("Gameplay/rank-down")),
                 rankUpSample = new SkinnableSound(new SampleInfo("Gameplay/rank-up")),
             });
-
-            if (skinEditor != null)
-                PlaySamples.Value = false;
 
             lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }

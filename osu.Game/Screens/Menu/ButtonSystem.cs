@@ -40,8 +40,6 @@ namespace osu.Game.Screens.Menu
 
         public event Action<ButtonSystemState>? StateChanged;
 
-        public Action? OnEditBeatmap;
-        public Action? OnEditSkin;
         public Action<UIEvent>? OnExit;
         public Action? OnBeatmapListing;
         public Action? OnSolo;
@@ -88,7 +86,6 @@ namespace osu.Game.Screens.Menu
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsMulti = new List<MainMenuButton>();
-        private readonly List<MainMenuButton> buttonsEdit = new List<MainMenuButton>();
 
         private Sample? sampleBackToLogo;
         private Sample? sampleLogoSwoosh;
@@ -167,20 +164,11 @@ namespace osu.Game.Screens.Menu
             // buttonsMulti.Add(new MainMenuButton(ButtonSystemStrings.QuickPlay, @"button-daily-select", FontAwesome.Solid.Bolt, new Color4(94, 63, 186, 255), onQuickPlay, Key.Q));
             buttonsMulti.ForEach(b => b.VisibleState = ButtonSystemState.Multi);
 
-            buttonsEdit.Add(new MainMenuButton(EditorStrings.BeatmapEditor.ToLower(), @"button-default-select", OsuIcon.Beatmap, new Color4(238, 170, 0, 255), (_, _) => OnEditBeatmap?.Invoke(), Key.B,
-                Key.E)
-            {
-                Padding = new MarginPadding { Left = WEDGE_WIDTH },
-            });
-            buttonsEdit.Add(new MainMenuButton(SkinEditorStrings.SkinEditor.ToLower(), @"button-default-select", OsuIcon.SkinB, new Color4(220, 160, 0, 255), (_, _) => OnEditSkin?.Invoke(), Key.S));
-            buttonsEdit.ForEach(b => b.VisibleState = ButtonSystemState.Edit);
-
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), (_, _) => State = ButtonSystemState.Play, Key.P, Key.M,
                 Key.L)
             {
                 Padding = new MarginPadding { Left = WEDGE_WIDTH },
             });
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-play-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), (_, _) => State = ButtonSystemState.Edit, Key.E));
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-default-select", OsuIcon.Beatmap, new Color4(165, 204, 0, 255), (_, _) => OnBeatmapListing?.Invoke(), Key.B,
                 Key.D));
 
@@ -189,7 +177,6 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(buttonsMulti);
             buttonArea.AddRange(buttonsPlay);
-            buttonArea.AddRange(buttonsEdit);
             buttonArea.AddRange(buttonsTopLevel);
 
             buttonArea.ForEach(b =>
@@ -367,7 +354,6 @@ namespace osu.Game.Screens.Menu
 
                     return true;
 
-                case ButtonSystemState.Edit:
                 case ButtonSystemState.Play:
                 case ButtonSystemState.Multi:
                     StopSamplePlayback();
@@ -408,10 +394,6 @@ namespace osu.Game.Screens.Menu
 
                 case ButtonSystemState.Multi:
                     buttonsMulti.First().TriggerClick();
-                    return false;
-
-                case ButtonSystemState.Edit:
-                    buttonsEdit.First().TriggerClick();
                     return false;
             }
         }

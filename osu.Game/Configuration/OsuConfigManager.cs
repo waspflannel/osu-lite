@@ -19,7 +19,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -197,16 +196,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 1f, 0.25f);
-            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
-            SetDefault(OsuSetting.EditorShowHitMarkers, true);
-            SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
-            SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
-            SetDefault(OsuSetting.EditorShowSpeedChanges, false);
-            SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
-            SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
-            SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
-
             SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
@@ -217,18 +206,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
             SetDefault(OsuSetting.UserOnlineStatus, UserStatus.Online);
 
-            SetDefault(OsuSetting.EditorTimelineShowTimingChanges, true);
-            SetDefault(OsuSetting.EditorTimelineShowBreaks, true);
-            SetDefault(OsuSetting.EditorTimelineShowTicks, true);
-
-            SetDefault(OsuSetting.EditorContractSidebars, false);
-
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
-            SetDefault(OsuSetting.EditorShowStoryboard, true);
-
-            SetDefault(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, true);
-            SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
 
             SetDefault(OsuSetting.WasSupporter, false);
 
@@ -333,7 +312,6 @@ namespace osu.Game.Configuration
         GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
-        EditorDim,
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
@@ -414,9 +392,6 @@ namespace osu.Game.Configuration
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
-        EditorWaveformOpacity,
-        EditorShowHitMarkers,
-        EditorAutoSeekOnPlacement,
         DiscordRichPresence,
 
         ShowOnlineExplicitContent,
@@ -424,11 +399,9 @@ namespace osu.Game.Configuration
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
         ProfileCoverExpanded,
-        EditorLimitedDistanceSnap,
         ReplaySettingsOverlay,
         ReplayPlaybackControlsExpanded,
         AutomaticallyDownloadMissingBeatmaps,
-        EditorShowSpeedChanges,
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
 
@@ -439,21 +412,11 @@ namespace osu.Game.Configuration
 
         MultiplayerRoomFilter,
         HideCountryFlags,
-        EditorTimelineShowTimingChanges,
-        EditorTimelineShowTicks,
         AlwaysShowHoldForMenuButton,
-        EditorContractSidebars,
-        EditorScaleOrigin,
-        EditorRotationOrigin,
-        EditorTimelineShowBreaks,
-        EditorAdjustExistingObjectsOnTimingChanges,
         AlwaysRequireHoldingForPause,
         MultiplayerShowInProgressFilter,
         BeatmapListingFeaturedArtistFilter,
         ShowMobileDisclaimer,
-        EditorShowStoryboard,
-        EditorSubmissionNotifyOnDiscussionReplies,
-        EditorSubmissionLoadInBrowserAfterSubmission,
 
         /// <summary>
         /// Cached state of whether local user is a supporter.

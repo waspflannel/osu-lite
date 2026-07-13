@@ -17,7 +17,6 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -63,7 +62,6 @@ namespace osu.Game.Screens.Select
         public override IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
             yield return new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart)) { Icon = FontAwesome.Solid.Check };
-            yield return new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(beatmap)) { Icon = FontAwesome.Solid.PencilAlt };
 
             yield return new OsuMenuItemSpacer();
 
@@ -143,14 +141,6 @@ namespace osu.Game.Screens.Select
 
                 return player;
             }
-        }
-
-        public void Edit(BeatmapInfo beatmap)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            SelectAndRun(beatmap, () => this.Push(new EditorLoader()));
         }
 
         public override void OnResuming(ScreenTransitionEvent e)

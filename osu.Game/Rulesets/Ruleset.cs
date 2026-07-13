@@ -22,14 +22,12 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -277,10 +275,6 @@ namespace osu.Game.Rulesets
         /// <returns>A performance calculator instance for the provided score.</returns>
         public virtual PerformanceCalculator? CreatePerformanceCalculator() => null;
 
-        public virtual HitObjectComposer? CreateHitObjectComposer() => null;
-
-        public virtual IBeatmapVerifier? CreateBeatmapVerifier() => null;
-
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
         public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly), @"Resources");
@@ -445,37 +439,5 @@ namespace osu.Game.Rulesets
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
         /// </summary>
         public virtual IRulesetFilterCriteria? CreateRulesetFilterCriteria() => null;
-
-        /// <summary>
-        /// Can be overridden to add ruleset-specific sections to the editor beatmap setup screen.
-        /// </summary>
-        public virtual IEnumerable<Drawable> CreateEditorSetupSections() =>
-        [
-            new MetadataSection(),
-            new DifficultySection(),
-            new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(25),
-                Children = new Drawable[]
-                {
-                    new ResourcesSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                    },
-                    new ColoursSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                    }
-                }
-            },
-            new DesignSection(),
-        ];
-
-        /// <summary>
-        /// Can be overridden to avoid showing scroll speed changes in the editor.
-        /// </summary>
-        public virtual bool EditorShowScrollSpeed => true;
     }
 }

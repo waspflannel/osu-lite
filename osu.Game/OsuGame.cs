@@ -58,13 +58,11 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
-using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
@@ -143,7 +141,6 @@ namespace osu.Game
 
         private ChangelogOverlay changelogOverlay;
 
-        private SkinEditorOverlay skinEditor;
 
         private Container overlayContent;
 
@@ -515,10 +512,6 @@ namespace osu.Game
                     FilterBeatmapSetLanguage((SearchLanguage)link.Argument);
                     break;
 
-                case LinkAction.OpenEditorTimestamp:
-                    HandleTimestamp(argString);
-                    break;
-
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
                     {
@@ -649,25 +642,6 @@ namespace osu.Game
                 }
             };
             API.Queue(request);
-        }
-
-        /// <summary>
-        /// Seeks to the provided <paramref name="timestamp"/> if the editor is currently open.
-        /// Can also select objects as indicated by the <paramref name="timestamp"/> (depends on ruleset implementation).
-        /// </summary>
-        public void HandleTimestamp(string timestamp)
-        {
-            if (ScreenStack.CurrentScreen is not Editor editor)
-            {
-                Schedule(() => Notifications.Post(new SimpleErrorNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.MustBeInEditorToHandleLinks
-                }));
-                return;
-            }
-
-            editor.HandleTimestamp(timestamp, notifyOnError: true);
         }
 
         /// <summary>
@@ -1229,7 +1203,6 @@ namespace osu.Game
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -1612,10 +1585,6 @@ namespace osu.Game
                     fpsCounter.ToggleVisibility();
                     return true;
 
-                case GlobalAction.ToggleSkinEditor:
-                    skinEditor.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ResetInputSettings:
                     Host.ResetInputHandlers();
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
@@ -1633,29 +1602,6 @@ namespace osu.Game
                         ShowUser(API.LocalUser.Value);
                     return true;
 
-                case GlobalAction.RandomSkin:
-                    // Don't allow random skin selection while in the skin editor.
-                    // This is mainly to stop many "osu! default (modified)" skins being created via the SkinManager.EnsureMutableSkin() path.
-                    // If people want this to work we can potentially avoid selecting default skins when the editor is open, or allow a maximum of one mutable skin somehow.
-                    if (skinEditor.State.Value == Visibility.Visible)
-                        return false;
-
-                    SkinManager.SelectRandomSkin();
-                    return true;
-
-                case GlobalAction.NextSkin:
-                    if (skinEditor.State.Value == Visibility.Visible)
-                        return false;
-
-                    SkinManager.SelectNextSkin();
-                    return true;
-
-                case GlobalAction.PreviousSkin:
-                    if (skinEditor.State.Value == Visibility.Visible)
-                        return false;
-
-                    SkinManager.SelectPreviousSkin();
-                    return true;
             }
 
             return false;
@@ -1813,8 +1759,6 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
-
-                skinEditor.SetTarget(newOsuScreen);
             }
         }
 

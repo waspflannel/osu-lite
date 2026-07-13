@@ -25,7 +25,6 @@ using osu.Game.Localisation;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
-using osu.Game.Screens.Edit.Setup;
 using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup

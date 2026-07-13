@@ -9,7 +9,6 @@ using System.Web;
 using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Online.Chat
 {
@@ -310,9 +309,6 @@ namespace osu.Game.Online.Chat
 
             // handle bare links
             handleAdvanced(advanced_link_regex, result, startIndex);
-
-            // handle editor times
-            handleMatches(EditorTimestampParser.TIME_REGEX_STRICT, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
 
             // handle channels
             handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);

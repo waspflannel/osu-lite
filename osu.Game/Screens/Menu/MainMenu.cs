@@ -32,11 +32,9 @@ using osu.Game.Online.API;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -113,9 +111,6 @@ namespace osu.Game.Screens.Menu
 
         private Sample reappearSampleSwoosh;
 
-        [Resolved(canBeNull: true)]
-        private SkinEditorOverlay skinEditor { get; set; }
-
         [CanBeNull]
         private IDisposable logoProxy;
 
@@ -149,15 +144,6 @@ namespace osu.Game.Screens.Menu
                     {
                         Buttons = new ButtonSystem
                         {
-                            OnEditBeatmap = () =>
-                            {
-                                Beatmap.SetDefault();
-                                this.Push(new EditorLoader());
-                            },
-                            OnEditSkin = () =>
-                            {
-                                skinEditor?.Show();
-                            },
                             OnSolo = loadSongSelect,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnQuickPlay = loadQuickPlay,

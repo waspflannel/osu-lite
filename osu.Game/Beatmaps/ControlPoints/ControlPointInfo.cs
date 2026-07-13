@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Framework.Utils;
-using osu.Game.Screens.Edit;
 using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -207,7 +206,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                 time += offsetBeats * timingPoint.BeatLength;
             }
 
-            foreach (int divisor in BindableBeatDivisor.PREDEFINED_DIVISORS)
+            foreach (int divisor in BeatDivisor.PREDEFINED_DIVISORS)
             {
                 double distanceFromSnap = Math.Abs(time - getClosestPositiveSnappedTime(timingPoint, time, divisor));
 

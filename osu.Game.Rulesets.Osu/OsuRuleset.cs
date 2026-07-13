@@ -19,14 +19,11 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Osu.Edit.Setup;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
@@ -41,7 +38,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -248,10 +244,6 @@ namespace osu.Game.Rulesets.Osu
 
         public override PerformanceCalculator CreatePerformanceCalculator() => new OsuPerformanceCalculator();
 
-        public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
-
-        public override IBeatmapVerifier CreateBeatmapVerifier() => new OsuBeatmapVerifier();
-
         public override string Description => "osu!";
 
         public override string ShortName => SHORT_NAME;
@@ -356,30 +348,6 @@ namespace osu.Game.Rulesets.Osu
             };
         }
 
-        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
-        [
-            new MetadataSection(),
-            new OsuDifficultySection(),
-            new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(SetupScreen.SPACING),
-                Children = new Drawable[]
-                {
-                    new ResourcesSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                    },
-                    new ColoursSection
-                    {
-                        RelativeSizeAxes = Axes.X,
-                    }
-                }
-            },
-            new DesignSection(),
-        ];
-
         /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
         /// <seealso cref="OsuHitWindows"/>
         public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo difficulty, IReadOnlyCollection<Mod> mods)
@@ -459,7 +427,5 @@ namespace osu.Game.Rulesets.Osu
                 Description = "Affects the harshness of health drain and the health penalties for missing."
             };
         }
-
-        public override bool EditorShowScrollSpeed => false;
     }
 }
