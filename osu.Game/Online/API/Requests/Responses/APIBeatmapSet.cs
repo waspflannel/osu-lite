@@ -84,7 +84,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// The creator of this beatmap set.
         /// </summary>
         /// <remarks>
-        /// This property is set differently depending on the API endpoint. When retrieved via <see cref="SearchBeatmapSetsRequest"/>,
+        /// This property is set differently depending on the API endpoint. When retrieved via <c>SearchBeatmapSetsRequest</c>,
         /// detailed user info is not included and the creator's ID and username are filled from the <see cref="AuthorID"/> and
         /// <see cref="AuthorString"/> properties. For other API endpoints, this property is set by the <see cref="author"/> setter.
         /// </remarks>

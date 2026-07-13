@@ -12,12 +12,12 @@ using osu.Framework.Statistics;
 using osu.Game.Graphics;
 using osu.Game.IO;
 using osu.Game.Localisation;
-using osu.Game.Online.Chat;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers.Zip;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {

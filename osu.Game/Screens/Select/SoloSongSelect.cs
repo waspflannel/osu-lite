@@ -32,9 +32,6 @@ namespace osu.Game.Screens.Select
         private IReadOnlyList<Mod>? modsAtGameplayStart;
 
         [Resolved]
-        private BeatmapSetOverlay? beatmapOverlay { get; set; }
-
-        [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
@@ -64,16 +61,6 @@ namespace osu.Game.Screens.Select
             yield return new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart)) { Icon = FontAwesome.Solid.Check };
 
             yield return new OsuMenuItemSpacer();
-
-            if (beatmap.OnlineID > 0)
-            {
-                yield return new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
-
-                if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
-                    yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url));
-
-                yield return new OsuMenuItemSpacer();
-            }
 
             foreach (var i in CreateCollectionMenuActions(beatmap))
                 yield return i;

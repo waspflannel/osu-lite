@@ -117,8 +117,6 @@ namespace osu.Game.Overlays.Mods
         private Container aboveColumnsContent = null!;
         private ModCustomisationPanel customisationPanel = null!;
 
-        protected virtual SelectAllModsButton? SelectAllModsButton => null;
-
         private Sample? columnAppearSample;
 
         public readonly Bindable<WorkingBeatmap?> Beatmap = new Bindable<WorkingBeatmap?>();
@@ -648,14 +646,7 @@ namespace osu.Game.Overlays.Mods
         /// Attempting to handle this action locally in both places leads to a possible scenario
         /// wherein activating the "select all" platform binding will both select all text in the search box and select all mods.
         /// </remarks>
-        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
-        {
-            if (e.Repeat || e.Action != PlatformAction.SelectAll || SelectAllModsButton == null)
-                return false;
-
-            SelectAllModsButton.TriggerClick();
-            return true;
-        }
+        public bool OnPressed(KeyBindingPressEvent<PlatformAction> e) => false;
 
         public void OnReleased(KeyBindingReleaseEvent<PlatformAction> e)
         {

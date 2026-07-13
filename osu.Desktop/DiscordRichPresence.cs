@@ -18,8 +18,6 @@ using osu.Game.Extensions;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -41,15 +39,6 @@ namespace osu.Desktop
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
-
-        [Resolved]
-        private LoginOverlay? login { get; set; }
-
-        [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; } = null!;
-
-        [Resolved]
-        private LocalUserStatisticsProvider statisticsProvider { get; set; } = null!;
 
         private IBindable<DiscordRichPresenceMode> privacyMode = null!;
         private IBindable<UserStatus> userStatus = null!;
@@ -113,9 +102,6 @@ namespace osu.Desktop
             userStatus.BindValueChanged(_ => schedulePresenceUpdate());
             userActivity.BindValueChanged(_ => schedulePresenceUpdate());
             privacyMode.BindValueChanged(_ => schedulePresenceUpdate());
-
-            multiplayerClient.RoomUpdated += onRoomUpdated;
-            statisticsProvider.StatisticsUpdated += onStatisticsUpdated;
         }
 
         private void onReady(object _, ReadyMessage __)
@@ -128,10 +114,6 @@ namespace osu.Desktop
 
             schedulePresenceUpdate();
         }
-
-        private void onRoomUpdated() => schedulePresenceUpdate();
-
-        private void onStatisticsUpdated(UserStatisticsUpdate _) => schedulePresenceUpdate();
 
         private ScheduledDelegate? presenceUpdateDelegate;
 
@@ -189,49 +171,13 @@ namespace osu.Desktop
                 presence.Details = string.Empty;
             }
 
-            // user party
-            if (!hideIdentifiableInformation && multiplayerClient.Room != null && !multiplayerClient.Room.Settings.MatchType.IsMatchmakingType())
-            {
-                MultiplayerRoom room = multiplayerClient.Room;
-
-                presence.Party = new Party
-                {
-                    Privacy = string.IsNullOrEmpty(room.Settings.Password) ? Party.PrivacySetting.Public : Party.PrivacySetting.Private,
-                    ID = room.RoomID.ToString(),
-                    // technically lobbies can have infinite users, but Discord needs this to be set to something.
-                    // to make party display sensible, assign a powers of two above participants count (8 at minimum).
-                    Max = (int)Math.Max(8, Math.Pow(2, Math.Ceiling(Math.Log2(room.Users.Count)))),
-                    Size = room.Users.Count,
-                };
-
-                RoomSecret roomSecret = new RoomSecret
-                {
-                    RoomID = room.RoomID,
-                    Password = room.Settings.Password,
-                };
-
-                if (client.HasRegisteredUriScheme)
-                    presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
-
-                // discord cannot handle both secrets and buttons at the same time, so we need to choose something.
-                // the multiplayer room seems more important.
-                presence.Buttons = null;
-            }
-            else
-            {
-                presence.Party = null;
-                presence.Secrets.JoinSecret = null;
-            }
+            // osu! lite is offline: no multiplayer party.
+            presence.Party = null;
+            presence.Secrets.JoinSecret = null;
 
             // game images:
             // large image tooltip
-            if (privacyMode.Value == DiscordRichPresenceMode.Limited)
-                presence.Assets.LargeImageText = string.Empty;
-            else
-            {
-                var statistics = statisticsProvider.GetStatisticsFor(ruleset.Value);
-                presence.Assets.LargeImageText = $"{user.Value.Username}" + (statistics?.GlobalRank > 0 ? $" (rank #{statistics.GlobalRank:N0})" : string.Empty);
-            }
+            presence.Assets.LargeImageText = privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : $"{user.Value.Username}";
 
             // small image
             presence.Assets.SmallImageKey = ruleset.Value.IsLegacyRuleset() ? $"mode_{ruleset.Value.OnlineID}" : "mode_custom";
@@ -240,31 +186,8 @@ namespace osu.Desktop
 
         private void onJoin(object sender, JoinMessage args) => Scheduler.AddOnce(() =>
         {
+            // osu! lite is offline: joining multiplayer rooms is not supported.
             game.Window?.Raise();
-
-            if (!api.IsLoggedIn)
-            {
-                login?.Show();
-                return;
-            }
-
-            Logger.Log($"Received room secret from Discord RPC Client: \"{args.Secret}\"", LoggingTarget.Network, LogLevel.Debug);
-
-            // Stable and lazer share the same Discord client ID, meaning they can accept join requests from each other.
-            // Since they aren't compatible in multi, see if stable's format is being used and log to avoid confusion.
-            if (args.Secret[0] != '{' || !tryParseRoomSecret(args.Secret, out long roomId, out string? password))
-            {
-                Logger.Log("Could not join multiplayer room, invitation is invalid or incompatible.", LoggingTarget.Network, LogLevel.Important);
-                return;
-            }
-
-            var request = new GetRoomRequest(roomId);
-            request.Success += room => Schedule(() =>
-            {
-                game.PresentMultiplayerMatch(room, password);
-            });
-            request.Failure += _ => Logger.Log($"Could not join multiplayer room, room could not be found (room ID: {roomId}).", LoggingTarget.Network, LogLevel.Important);
-            api.Queue(request);
         });
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
@@ -327,12 +250,6 @@ namespace osu.Desktop
 
         protected override void Dispose(bool isDisposing)
         {
-            if (multiplayerClient.IsNotNull())
-                multiplayerClient.RoomUpdated -= onRoomUpdated;
-
-            if (statisticsProvider.IsNotNull())
-                statisticsProvider.StatisticsUpdated -= onStatisticsUpdated;
-
             client.Dispose();
             base.Dispose(isDisposing);
         }

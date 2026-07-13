@@ -12,9 +12,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.IPC;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Extensions;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace osu.Desktop.IPC

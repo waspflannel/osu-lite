@@ -141,9 +141,6 @@ namespace osu.Game.Screens.Select
         private OsuLogo? logo { get; set; }
 
         [Resolved]
-        private BeatmapSetOverlay? beatmapOverlay { get; set; }
-
-        [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
@@ -320,11 +317,6 @@ namespace osu.Game.Screens.Select
 
             showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
-
-        // osu! lite has no mod selection UI. This factory is retained only so the
-        // (unreachable) online-play song-select subclasses continue to compile; it is
-        // never instantiated by the base song select.
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay();
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
@@ -1177,16 +1169,6 @@ namespace osu.Game.Screens.Select
             {
                 Icon = FontAwesome.Solid.Check
             };
-
-            yield return new OsuMenuItemSpacer();
-
-            if (beatmap.OnlineID > 0)
-            {
-                yield return new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
-
-                if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
-                    yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => (game as OsuGame)?.CopyToClipboard(url));
-            }
 
             yield return new OsuMenuItemSpacer();
 

@@ -10,16 +10,12 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Skinning;
@@ -41,7 +37,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
-            SetDefault(OsuSetting.BeatmapLeaderboardSortMode, LeaderboardSortMode.Score);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
@@ -55,9 +50,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
             SetDefault(OsuSetting.ModSelectTextSearchStartsActive, true);
 
-            SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f, 0.01f);
 
-            SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
             SetDefault(OsuSetting.BeatmapListingFeaturedArtistFilter, true);
 
             SetDefault(OsuSetting.ProfileCoverExpanded, true);
@@ -198,8 +191,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
-            SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
-            SetDefault(OsuSetting.MultiplayerShowInProgressFilter, true);
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
@@ -214,7 +205,6 @@ namespace osu.Game.Configuration
             // intentionally uses `DateTime?` and not `DateTimeOffset?` because the latter fails due to `DateTimeOffset` not implementing `IConvertible`
             SetDefault(OsuSetting.LastOnlineTagsPopulation, (DateTime?)null);
 
-            SetDefault(OsuSetting.DashboardSortMode, UserSortCriteria.LastVisit);
             SetDefault(OsuSetting.DashboardDisplayStyle, OverlayPanelDisplayStyle.Card);
         }
 
@@ -329,7 +319,6 @@ namespace osu.Game.Configuration
         MenuParallax,
         Prefer24HourTime,
         BeatmapDetailTab,
-        BeatmapLeaderboardSortMode,
         BeatmapDetailModsFilter,
         Username,
         ReleaseStream,
@@ -342,8 +331,6 @@ namespace osu.Game.Configuration
         RandomSelectAlgorithm,
         ModSelectHotkeyStyle,
         ShowFpsDisplay,
-        ChatDisplayHeight,
-        BeatmapListingCardSize,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
         Version,
@@ -394,11 +381,9 @@ namespace osu.Game.Configuration
         /// </summary>
         UserOnlineStatus,
 
-        MultiplayerRoomFilter,
         HideCountryFlags,
         AlwaysShowHoldForMenuButton,
         AlwaysRequireHoldingForPause,
-        MultiplayerShowInProgressFilter,
         BeatmapListingFeaturedArtistFilter,
         ShowMobileDisclaimer,
 

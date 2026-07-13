@@ -49,11 +49,7 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.Chat;
-using osu.Game.Online.Leaderboards;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
-using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -65,12 +61,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.OnlinePlay.DailyChallenge;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
-using osu.Game.Screens.OnlinePlay.Multiplayer;
-using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Seasonal;
@@ -82,7 +73,6 @@ using osuTK;
 using osuTK.Graphics;
 using Sentry;
 using IntroScreen = osu.Game.Screens.Menu.IntroScreen;
-using MatchType = osu.Game.Online.Rooms.MatchType;
 
 namespace osu.Game
 {
@@ -485,14 +475,6 @@ namespace osu.Game
 
                     break;
 
-                case LinkAction.FilterBeatmapSetGenre:
-                    FilterBeatmapSetGenre((SearchGenre)link.Argument);
-                    break;
-
-                case LinkAction.FilterBeatmapSetLanguage:
-                    FilterBeatmapSetLanguage((SearchLanguage)link.Argument);
-                    break;
-
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
                     {
@@ -522,11 +504,6 @@ namespace osu.Game
                         ShowChangelogBuild($"{changelogArgs[1]}-{changelogArgs[0]}");
                     }
 
-                    break;
-
-                case LinkAction.JoinRoom:
-                    if (long.TryParse(argString, out long roomId))
-                        JoinRoom(roomId);
                     break;
 
                 default:
@@ -565,14 +542,6 @@ namespace osu.Game
         {
         }
 
-        public void FilterBeatmapSetGenre(SearchGenre genre)
-        {
-        }
-
-        public void FilterBeatmapSetLanguage(SearchLanguage language)
-        {
-        }
-
         public void ShowWiki(string path)
         {
         }
@@ -583,28 +552,6 @@ namespace osu.Game
 
         public void ShowChangelogBuild(string version)
         {
-        }
-
-        /// <summary>
-        /// Joins a multiplayer or playlists room with the given <paramref name="id"/>.
-        /// </summary>
-        public void JoinRoom(long id)
-        {
-            var request = new GetRoomRequest(id);
-            request.Success += room =>
-            {
-                switch (room.Type)
-                {
-                    case MatchType.Playlists:
-                        PresentPlaylist(room);
-                        break;
-
-                    default:
-                        PresentMultiplayerMatch(room, string.Empty);
-                        break;
-                }
-            };
-            API.Queue(request);
         }
 
         /// <summary>
@@ -709,57 +656,6 @@ namespace osu.Game
         }
 
         /// <summary>
-        /// Join a multiplayer match immediately.
-        /// </summary>
-        /// <param name="room">The room to join.</param>
-        /// <param name="password">The password to join the room, if any is given.</param>
-        public void PresentMultiplayerMatch(Room room, string password)
-        {
-            if (room.HasEnded)
-            {
-                // TODO: Eventually it should be possible to display ended multiplayer rooms in game too,
-                // but it generally will require turning off the entirety of communication with spectator server which is currently embedded into multiplayer screens.
-                Notifications.Post(new SimpleNotification
-                {
-                    Text = NotificationsStrings.MultiplayerRoomEnded,
-                    Activated = () =>
-                    {
-                        OpenUrlExternally($@"/multiplayer/rooms/{room.RoomID}");
-                        return true;
-                    }
-                });
-                return;
-            }
-
-            PerformFromScreen(screen =>
-            {
-                if (!(screen is Multiplayer multiplayer))
-                    screen.Push(multiplayer = new Multiplayer());
-
-                multiplayer.Join(room, password);
-            });
-            // TODO: We should really be able to use `validScreens: new[] { typeof(Multiplayer) }` here
-            // but `PerformFromScreen` doesn't understand nested stacks.
-        }
-
-        /// <summary>
-        /// Join a playlist immediately.
-        /// </summary>
-        /// <param name="room">The playlist to join.</param>
-        public void PresentPlaylist(Room room)
-        {
-            PerformFromScreen(screen =>
-            {
-                if (!(screen is Playlists playlists))
-                    screen.Push(playlists = new Playlists());
-
-                playlists.Join(room);
-            });
-            // TODO: We should really be able to use `validScreens: new[] { typeof(Playlists) }` here
-            // but `PerformFromScreen` doesn't understand nested stacks.
-        }
-
-        /// <summary>
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -773,14 +669,9 @@ namespace osu.Game
             {
                 databasedScore = ScoreManager.GetScore(score);
             }
-            catch (LegacyScoreDecoder.BeatmapNotFoundException notFound)
+            catch (LegacyScoreDecoder.BeatmapNotFoundException)
             {
                 Logger.Log("The replay cannot be played because the beatmap is missing.", LoggingTarget.Information);
-
-                var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
-                req.Success += res => Notifications.Post(new MissingBeatmapNotification(res, notFound.Hash, null));
-                API.Queue(req);
-
                 return;
             }
 
@@ -807,7 +698,7 @@ namespace osu.Game
             // which may not match the score, and thus crash.
             IEnumerable<Type> validScreens =
                 Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
-                    ? new[] { typeof(SongSelect), typeof(DailyChallenge) }
+                    ? new[] { typeof(SongSelect) }
                     : Array.Empty<Type>();
 
             PerformFromScreen(screen =>
@@ -825,19 +716,6 @@ namespace osu.Game
 
                 if (!Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap))
                     Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-
-                var currentLeaderboard = LeaderboardManager.CurrentCriteria;
-
-                bool leaderboardBeatmapMatches = currentLeaderboard != null && databasedBeatmap.Equals(currentLeaderboard.Beatmap);
-                bool leaderboardRulesetMatches = currentLeaderboard != null && databasedScore.ScoreInfo.Ruleset.Equals(currentLeaderboard.Ruleset);
-
-                if (!leaderboardBeatmapMatches || !leaderboardRulesetMatches)
-                {
-                    var newLeaderboard = currentLeaderboard != null
-                        ? currentLeaderboard with { Beatmap = databasedBeatmap, Ruleset = databasedScore.ScoreInfo.Ruleset }
-                        : new LeaderboardCriteria(databasedBeatmap, databasedScore.ScoreInfo.Ruleset, BeatmapLeaderboardScope.Global, null);
-                    LeaderboardManager.FetchWithCriteria(newLeaderboard);
-                }
 
                 switch (presentType)
                 {
@@ -901,13 +779,8 @@ namespace osu.Game
                     break;
 
                 case UserActivity.InGame:
-                case UserActivity.TestingBeatmap:
                 case UserActivity.WatchingReplay:
                     newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
-                    break;
-
-                case UserActivity.EditingBeatmap:
-                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.Path ?? "new beatmap"}";
                     break;
             }
 
@@ -1008,17 +881,8 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
-            BeatmapDownloader.PostNotification = n => Notifications.Post(n);
-            ScoreDownloader.PostNotification = n => Notifications.Post(n);
-
             ScoreManager.PostNotification = n => Notifications.Post(n);
             ScoreManager.PresentImport = items => PresentScore(items.First().Value);
-
-            MultiplayerClient.PostNotification = n => Notifications.Post(n);
-            MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
-
-            if (API is APIAccess api)
-                api.PostNotification = n => Notifications.Post(n);
 
             ScreenFooter.BackReceptor backReceptor;
 
@@ -1113,11 +977,7 @@ namespace osu.Game
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
-            LocalUserStatisticsProvider statisticsProvider;
-
-            loadComponentSingleFile(statisticsProvider = new LocalUserStatisticsProvider(), Add, true);
-            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(statisticsProvider), Add, true);
-            loadComponentSingleFile(new UserStatisticsWatcher(statisticsProvider), Add, true);
+            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
@@ -1166,7 +1026,6 @@ namespace osu.Game
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
             loadComponentSingleFile<BeatmapStore>(detachedBeatmapStore = new RealmDetachedBeatmapStore(), Add, true);
-            loadComponentSingleFile(new QueueController(), Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());

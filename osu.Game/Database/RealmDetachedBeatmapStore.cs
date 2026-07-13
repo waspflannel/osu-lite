@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Extensions;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Multiplayer;
 using Realms;
 
 namespace osu.Game.Database

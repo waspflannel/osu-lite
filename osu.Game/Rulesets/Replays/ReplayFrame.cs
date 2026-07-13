@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using MessagePack;
-using osu.Game.Online.Spectator;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Replays
 {

@@ -20,10 +20,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.Placeholders;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Ranking.Statistics.User;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 using Realms;
 
@@ -37,7 +36,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         /// <summary>
         /// The score which was achieved by the local user.
-        /// If this is set to a non-null score, an <see cref="OverallRanking"/> component will be displayed showing changes to the local user's ranking and statistics
+        /// If this is set to a non-null score, an <c>OverallRanking</c> component will be displayed showing changes to the local user's ranking and statistics
         /// when a statistics update related to this score is received from spectator server.
         /// </summary>
         public ScoreInfo? AchievedScore { get; init; }
@@ -129,10 +128,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new MessagePlaceholder("Extended statistics are only available after watching a replay!"),
-                            new ReplayDownloadButton(newScore)
+                            new OsuSpriteText
                             {
-                                Scale = new Vector2(1.5f),
+                                Text = "Extended statistics are only available after watching a replay!",
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
@@ -190,10 +188,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Origin = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                new MessagePlaceholder("More statistics available after watching a replay!"),
-                                new ReplayDownloadButton(newScore)
+                                new OsuSpriteText
                                 {
-                                    Scale = new Vector2(1.5f),
+                                    Text = "More statistics available after watching a replay!",
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                 },
@@ -224,84 +221,6 @@ namespace osu.Game.Screens.Ranking.Statistics
             foreach (var statistic in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
                 yield return statistic;
 
-            if (AchievedScore != null
-                && newScore.UserID > 1
-                && newScore.UserID == AchievedScore.UserID
-                && newScore.OnlineID > 0
-                && newScore.OnlineID == AchievedScore.OnlineID)
-            {
-                yield return new StatisticItem("Overall Ranking", () => new OverallRanking(newScore)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                });
-            }
-
-            if (newScore.BeatmapInfo!.OnlineID > 0
-                && api.IsLoggedIn)
-            {
-                string? preventTaggingReason = null;
-
-                // We may want to iterate on the following conditions further in the future
-
-                var localUserScore = AchievedScore ?? realm.Run(r =>
-                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
-                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
-                     .AsEnumerable()
-                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
-                     .ThenByDescending(score => score.Rank)
-                     .FirstOrDefault());
-
-                if (localUserScore == null)
-                    preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
-                else if (localUserScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
-                    preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
-                else if (localUserScore.Rank < ScoreRank.C)
-                    preventTaggingReason = "Set a better score to contribute to beatmap tags!";
-                else if (localUserScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
-                    preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
-
-                if (preventTaggingReason == null)
-                {
-                    yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
-                    {
-                        Writable = true,
-                        RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    });
-                }
-                else
-                {
-                    yield return new StatisticItem("Tag the beatmap!", () => new FillFlowContainer<CompositeDrawable>
-                    {
-                        Children = new CompositeDrawable[]
-                        {
-                            new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                TextAnchor = Anchor.Centre,
-                                Text = preventTaggingReason,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
-                            new UserTagControl(newScore.BeatmapInfo)
-                            {
-                                Writable = false,
-                                RelativeSizeAxes = Axes.X,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            }
-                        },
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(4),
-                    });
-                }
-            }
         }
 
         protected override bool OnClick(ClickEvent e)

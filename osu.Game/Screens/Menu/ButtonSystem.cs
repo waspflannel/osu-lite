@@ -25,7 +25,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;

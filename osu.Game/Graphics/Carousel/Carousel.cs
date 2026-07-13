@@ -24,8 +24,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
+using osu.Game.Extensions;
 using osu.Game.Input.Bindings;
-using osu.Game.Online.Multiplayer;
 using osuTK;
 using osuTK.Input;
 
