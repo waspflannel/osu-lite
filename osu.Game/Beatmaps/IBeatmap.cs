@@ -85,7 +85,7 @@ namespace osu.Game.Beatmaps
         /// The most common method of understanding is that at a default value of 1.0, the time-to-distance ratio will match the slider velocity of the beatmap
         /// at the current point in time. Increasing this value will make hit objects more spaced apart when compared to the cursor movement required to track a slider.
         ///
-        /// This is only a hint property, used by the editor in <see cref="IDistanceSnapProvider"/> implementations. It does not directly affect the beatmap or gameplay.
+        /// This is only a hint property. It does not directly affect the beatmap or gameplay.
         /// </remarks>
         double DistanceSpacing { get; internal set; }
 
