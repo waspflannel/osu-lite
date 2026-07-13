@@ -2,15 +2,78 @@
 
 > Companion to `OSU_LITE_MAP.md`. Work top to bottom. **Do not skip the checkpoint at the end of each phase** — the whole point of this ordering is that you always have a running build to fall back to.
 
-## Execution status (as built)
+# ══════════════════════════════════════════════════════════════
+# AS-BUILT RECORD (this is the source of truth; the phase checklist below is historical)
+# ══════════════════════════════════════════════════════════════
 
-Phases 0–8 are **complete**. The game builds, launches to the main menu, and runs **fully offline** (verified: zero outbound requests to ppy servers). Result: single-ruleset (osu! standard), no editor, no skin editor, one fixed skin, no mod-select UI, trimmed menu/toolbar/settings, dummy offline API.
+**osu! lite is complete** on branch `osu-lite` (pushed to `origin/waspflannel/osu-lite`).
 
-Notable deviations from the original plan, and why:
-- **Skin-editor removal was merged into Phase 3** (the beatmap editor, skin editor, and Osu ruleset editor components share one blueprint/composer framework and could not be separated). Three genuinely reusable helpers were relocated out of the editor namespace rather than lost: `LabelledTextBoxWithPopover`, `RepeatingButtonBehaviour`, and a new `Beatmaps/BeatDivisor` helper.
-- **All test projects were removed up front (Phase 2)** rather than at the end, because they reference rulesets/online/mods that later phases gut — keeping them compiling through every cut would have been a large ongoing tax.
-- **Online layer: entry points removed + API neutered, classes retained.** Online overlays, online-play screens (multiplayer/playlists/daily/spectate), and chat backend are no longer reachable or instantiated, and `DummyAPIAccess` guarantees no network activity. The *classes* remain as dead code: the online subsystem (~30% of the codebase) is a tightly interconnected web where shared enums/components (e.g. `SearchBeatmapSetsRequest` filters, `KudosuTable`, `UpdateableFlag`) live inside online-overlay namespaces, so wholesale deletion cascades into core infrastructure. Deleting it safely is a dedicated follow-up effort, deliberately not attempted here to protect the working build.
-- **Phase 9** did the safe, isolated cleanups (orphaned toolbar buttons, dead login prompt). The deeper dead-online-code deletion is left as future work.
+**What it is:** a fully offline, single-mode osu! that imports and plays local beatmaps with one fixed skin. Nothing else.
+
+**Verified:** `osu.Desktop` builds with 0 errors; the game launches to the main menu, plays, and makes **zero network requests to any ppy server**. Confirmed by log inspection (no `Request to *.ppy.sh`, no exceptions beyond the benign `DummyAPIAccess cannot process this request`).
+
+**Solution now contains only 3 projects:** `osu.Game`, `osu.Game.Rulesets.Osu`, `osu.Desktop`.
+
+---
+
+## What was REMOVED
+
+**Rulesets & platforms**
+- Taiko, Catch, Mania rulesets (projects + all references)
+- Android/iOS application heads and every mobile test project
+- Tournament client, benchmark project, ruleset-scaffolding templates
+- **All test projects** and the in-`osu.Game` visual-test framework (`osu.Game/Tests/`)
+
+**Editing**
+- The beatmap editor (`Screens/Edit`), the skin editor (`Overlays/SkinEditor`), the shared editor blueprint/composer framework (`Rulesets/Edit`), and the Osu ruleset's editor components (`osu.Game.Rulesets.Osu/Edit`)
+- Editor hooks on the `Ruleset` base class and all editor-only config settings
+- Online beatmap submission (was editor-coupled)
+
+**Skinning**
+- Skin selection UI, skin import/export/delete, and the random/next/previous-skin hotkeys. The skin **engine** stays, locked to the default skin.
+
+**Mods**
+- The mod-**select** overlay and mods footer button are removed from song select; there is no way to choose mods. Gameplay-side mod handling (autoplay via Ctrl+Enter, scoring, difficulty) is intact.
+
+**The entire online subsystem** (this was the big cut — ~925 files deleted)
+- All online **overlays**: beatmap listing, beatmap set, changelog, chat, comments, dashboard, news, profile, rankings, wiki, login, account creation, medals
+- All online-play **screens**: multiplayer, playlists, daily challenge, matchmaking, spectator (`Screens/OnlinePlay`, `Screens/Spectate`, spectator/submitting players, gameplay-leaderboard/spectator HUD)
+- The online **backend**: `Online/{Chat, Multiplayer, Spectator, Rooms, Metadata, Matchmaking, RankedPlay, Solo, Leaderboards, Notifications}` plus hub/SignalR/persistent/polling infrastructure and download trackers
+- All online **API request classes** (`Online/API/Requests/*.cs`) — only the `Responses/` model types were kept
+- The real `APIAccess`/`OAuth` (replaced by `DummyAPIAccess`)
+- Online entry points: multiplayer/playlists/daily/browse main-menu buttons, the online toolbar buttons (news/chat/rankings/listing/changelog/wiki/social/user), the online menu banner, the first-run bundled-beatmap-download screen
+- 17 orphaned localisation string files (chat, multiplayer, online-play, editor, skin-editor, account creation, etc.)
+
+**Settings**: the Online and Ruleset settings sections (offline, single-ruleset).
+
+## What is STILL in the codebase (kept, working)
+
+- **osu! standard gameplay** — full hit/scoring/timing/replay engine
+- **Local beatmap import** (`.osz`) + Realm database + file store
+- **Song select → play → results** loop; results shows the just-played score **and local scores from the Realm DB** (`SoloResultsScreen` was reworked to query realm instead of an online leaderboard)
+- **Score import** (`.osr`) and local replays
+- **The skin engine**, locked to the default (Argon) skin
+- **Trimmed settings**: General, Input, User Interface, Gameplay, Audio, Graphics, Maintenance, Debug
+- **Minimal toolbar**: music, clock, notifications (import toasts)
+- **A minimal offline API surface** kept so DI still resolves: `DummyAPIAccess` (never contacts a server), `IAPIProvider`, `APIRequest`, `APIState`, `GuestUser`, `APIMod`, and the `Responses/` model types (used by scoring/beatmap models). `LocalUserState` is always a guest; user/beatmap lookup caches, `DifficultyRecommender`, and the online metadata sources are offline no-op stubs.
+- **Relocated shared types** pulled out of deleted online namespaces (do not recreate): `FrameHeader`→`Scoring`, `DrawableRank`/`UpdateableRank`→`Scoring/Drawables`, `MessageFormatter`/`LinkDetails`/`Link`/`ExternalLinkOpener`/`LinkWarnMode`/`DrawableLinkCompiler`→`Online`, `FireAndForget`→`Extensions/TaskExtensions`, `Beatmaps/BeatDivisor`, `Graphics/Containers/DependencyProvidingContainer`, plus the editor-phase relocations `LabelledTextBoxWithPopover`/`RepeatingButtonBehaviour`→`Graphics`.
+
+## Known residual (inert dead code — compiles, does nothing, safe to leave)
+
+- **`Overlays/Mods/`** — the mod-select overlay classes (`ModSelectOverlay`, `UserModSelectOverlay`, `ModColumn`, `ModPanel`, presets, etc.) still exist but are **unreachable** (no entry point creates them after the Phase-7 UI removal). Mod *display* classes are still used on results/song-select. This cluster could be deleted in a future pass; it was left because it's self-contained and harmless.
+- **Editor `GlobalAction` enum values** (F1–F5 editor hotkeys etc.) and `EditorStrings` — **cannot be safely removed** because a Realm keybinding **migration** and the settings keybinding UI reference them by name. They are inert (no handler, no default binding after cleanup attempts). Left intentionally to avoid touching a data migration.
+- A handful of unused `OsuSetting` enum entries for removed online settings, and some stale online `GlobalAction` values (ToggleChat/ToggleSocial/etc. still have default keybindings but no handlers). Cosmetic.
+
+## Commit history (this branch, newest first)
+
+`8b12c2e` remove orphaned localisation strings · `ab9e6eb` trim online refs from game/skins/desktop · `d9dd1ed` delete online overlays/screens/backend · `91c503c` stub API/components for offline · `f99ac46` relocate shared types · `ee17f1f` plan status · `4052901` remove dead login prompt · `efddfc0` remove orphaned toolbar buttons · `507c891` trim online/ruleset settings · `417f79a` remove mod-select UI · `b3785e8` fully offline dummy API · `eb43c3b` remove online menu/toolbar entry points · `3ce4f65` stop instantiating online overlays · `66cb6a1` lock skin selection · `cd4e199` remove beatmap + skin editors · `2c06be9` remove Taiko/Catch/Mania · `9b9321c` remove test projects · `b53e074` remove mobile/benchmarks/templates · `6e5c950` remove tournament client · `59f7398` add map + plan
+
+---
+
+## Original deviations from plan (for context)
+- **Skin-editor removal merged into Phase 3** — it shares the editor's blueprint/composer framework.
+- **All test projects removed up front (Phase 2)** — they reference everything later phases gut.
+- **Online layer: fully deleted** (relocate-then-delete + offline stubs), after an initial "neuter and defer" pass. The interconnected web (shared enums like `SearchBeatmapSetsRequest` filters, and shared drawables like `DrawableRank`, `UpdateableFlag`, `FrameHeader`) was untangled by relocating the shared pieces before deleting.
 
 ## Guiding principles
 
