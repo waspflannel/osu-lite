@@ -58,11 +58,37 @@
 - **A minimal offline API surface** kept so DI still resolves: `DummyAPIAccess` (never contacts a server), `IAPIProvider`, `APIRequest`, `APIState`, `GuestUser`, `APIMod`, and the `Responses/` model types (used by scoring/beatmap models). `LocalUserState` is always a guest; user/beatmap lookup caches, `DifficultyRecommender`, and the online metadata sources are offline no-op stubs.
 - **Relocated shared types** pulled out of deleted online namespaces (do not recreate): `FrameHeader`→`Scoring`, `DrawableRank`/`UpdateableRank`→`Scoring/Drawables`, `MessageFormatter`/`LinkDetails`/`Link`/`ExternalLinkOpener`/`LinkWarnMode`/`DrawableLinkCompiler`→`Online`, `FireAndForget`→`Extensions/TaskExtensions`, `Beatmaps/BeatDivisor`, `Graphics/Containers/DependencyProvidingContainer`, plus the editor-phase relocations `LabelledTextBoxWithPopover`/`RepeatingButtonBehaviour`→`Graphics`.
 
-## Known residual (inert dead code — compiles, does nothing, safe to leave)
+## FUTURE CLEANUP CANDIDATES (inert dead code — all compiles and runs; none block anything)
 
-- **`Overlays/Mods/`** — the mod-select overlay classes (`ModSelectOverlay`, `UserModSelectOverlay`, `ModColumn`, `ModPanel`, presets, etc.) still exist but are **unreachable** (no entry point creates them after the Phase-7 UI removal). Mod *display* classes are still used on results/song-select. This cluster could be deleted in a future pass; it was left because it's self-contained and harmless.
-- **Editor `GlobalAction` enum values** (F1–F5 editor hotkeys etc.) and `EditorStrings` — **cannot be safely removed** because a Realm keybinding **migration** and the settings keybinding UI reference them by name. They are inert (no handler, no default binding after cleanup attempts). Left intentionally to avoid touching a data migration.
-- A handful of unused `OsuSetting` enum entries for removed online settings, and some stale online `GlobalAction` values (ToggleChat/ToggleSocial/etc. still have default keybindings but no handlers). Cosmetic.
+This is the full known list, ranked roughly by value. Everything here is **safe to leave**; each item notes how safe it is to **remove**. Re-verify orphan status before deleting (a class may be referenced via serialization/reflection that a name grep misses).
+
+**1. Mod-select UI cluster — `Overlays/Mods/` (~30 files)** — HIGH value, self-contained.
+The mod *selection* overlay is unreachable after the Phase-7 UI removal (nothing constructs it). Delete candidates: `ModSelectOverlay`, `UserModSelectOverlay`, `ModColumn`, `ModPanel`, `ModSelectColumn`, `ModSelectPanel`, `ModSelectFooterContent`, `ModSearchContainer`, `AddPresetButton`/`AddPresetPopover`/`EditPresetPopover`, `ModPreset*` (Column/Panel/Row/Tooltip), `DeselectAllModsButton`, `DeleteModPresetDialog`, `ModCustomisation*`, `IncompatibilityDisplaying*`, `ModButtonTooltip`.
+⚠️ Keep the mod **display** pieces still used on results/song-select (`ModState`, and anything referenced by `ModDisplay`/`ModIcon` — check before deleting each file). Removal will also touch a few `OsuSetting`/`GlobalAction` mod entries (`ModSelectHotkeyStyle`, `ModSelectTextSearchStartsActive`, `ToggleModSelection`).
+
+**2. Orphaned online response models — `Online/API/Requests/Responses/` (17 of 45 files)** — MEDIUM value, low risk.
+Response DTOs whose requests were deleted. Confirmed orphaned: `APIChangelogIndex`, `APIKudosuHistory`, `APIMenuContent`, `APINewsSidebar`, `APINotificationsBundle`, `APIScoresCollection`, `APISpotlight`, `APITagCollection`, `APIUserContainer`, `APIUserMostPlayedBeatmap`, `APIUserScoreAggregate`, `APIWikiPage`, `ChatAckResponse`, `CommentBundle`, `GetMyFavouriteBeatmapSetsResponse`, `LivenessProbeResponse`, `PutBeatmapSetResponse`. (The other 28 responses — `APIUser`, `APIBeatmap`, `APIBeatmapSet`, `APIScore`, `APIMod`, etc. — are still used by scoring/beatmap models; keep those.)
+
+**3. Orphaned overlay-helper classes — `Overlays/`** — MEDIUM value.
+UI helpers only used by deleted online overlays: `OverlayView`, `OverlayHeaderBackground`, `OverlayPanelDisplayStyleControl`, `OverlaySidebar`, `OverlayStreamControl`, `BreadcrumbControlOverlayHeader`, `SortDirection`, `Settings/DangerousSettingsButton`, `Settings/Sections/SizeSlider`. (Verify each; some overlay base classes like `FullscreenOverlay`/`OverlayHeader` may still be referenced by kept overlays.)
+
+**4. Orphaned online notifications — `Overlays/Notifications/`** — LOW value, trivial.
+`OutageNotification`, `ScoreSubmissionFailureNotification`, `UserAvatarNotification` — online-only notifications, now unreferenced.
+
+**5. Orphaned user types — `Users/`** — LOW value.
+`CountryStatistics`, `Medal`, `Drawables/StatusIcon` — no longer referenced.
+
+**6. Orphaned auth — `Online/API/OAuthToken.cs`** — LOW value.
+Dead now that real auth (`APIAccess`/`OAuth`) is gone. (`RegistrationRequest.cs` is still referenced by the `DummyAPIAccess.CreateAccount` stub — keep or gut both together.)
+
+**7. Dead online `GlobalAction` values** — LOW value, easy.
+`ToggleChat`, `ToggleSocial`, `ToggleBeatmapListing`, `ToggleProfile` still have default keybindings (in `GlobalActionContainer`) but no handler. Remove the enum value + its default binding + its `GlobalActionKeyBindingStrings` entry together. (`ToggleNowPlaying`, `ToggleChatFocus` are still used — keep.)
+
+**8. Dead `OsuSetting` enum entries** — LOW value, cosmetic.
+Entries left after removing online settings (e.g. `DashboardSortMode`, `DashboardDisplayStyle`, `LastOnlineTagsPopulation`, `ChatDisplayHeight`, `BeatmapListingCardSize`, chat/notification toggles). Inert; only worth removing in a config-tidy pass. Watch enum ordering vs any persisted config.
+
+### ⛔ Do NOT remove (looks dead, but is load-bearing)
+- **Editor `GlobalAction` enum values** (F1–F5 editor hotkeys, nudge, seek, bookmark, etc.) and **`Localisation/EditorStrings.cs`** — a Realm keybinding **migration** (`Database/RealmAccess.cs`) and the settings keybinding UI (`GlobalKeyBindingsSection`) reference these by name. Removing them breaks the build and touches a data migration. They are inert (no handler) and must stay.
 
 ## Commit history (this branch, newest first)
 
