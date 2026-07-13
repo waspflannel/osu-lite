@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Chat;
-using osu.Game.Online.Notifications.WebSocket;
 
 namespace osu.Game.Online.API
 {
@@ -135,23 +133,6 @@ namespace osu.Game.Online.API
         /// Schedule a callback to run on the update thread.
         /// </summary>
         internal void Schedule(Action action);
-
-        /// <summary>
-        /// Constructs a new <see cref="IHubClientConnector"/>. May be null if not supported.
-        /// </summary>
-        /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
-        /// <param name="endpoint">The endpoint to the hub.</param>
-        IHubClientConnector? GetHubConnector(string clientName, string endpoint);
-
-        /// <summary>
-        /// Accesses the <see cref="INotificationsClient"/> used to receive asynchronous notifications from web.
-        /// </summary>
-        INotificationsClient NotificationsClient { get; }
-
-        /// <summary>
-        /// Creates a <see cref="IChatClient"/> instance to use in order to chat.
-        /// </summary>
-        IChatClient GetChatClient();
 
         /// <summary>
         /// Create a new user account. This is a blocking operation.

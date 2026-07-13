@@ -100,13 +100,8 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(InputKey.None, GlobalAction.ToggleFPSDisplay),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
-
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.E }, GlobalAction.PreviousSkin),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.T }, GlobalAction.NextSkin),
 
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
             new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
@@ -340,9 +335,6 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.HoldForHUD))]
         HoldForHUD,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.RandomSkin))]
-        RandomSkin,
-
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TogglePauseReplay))]
         TogglePauseReplay,
 
@@ -369,9 +361,6 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorNudgeRight))]
         EditorNudgeRight,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSkinEditor))]
-        ToggleSkinEditor,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PreviousVolumeMeter))]
         PreviousVolumeMeter,
@@ -525,12 +514,6 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleCurrentGroup))]
         ToggleCurrentGroup,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PreviousSkin))]
-        PreviousSkin,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextSkin))]
-        NextSkin,
 
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SubmitBeatmap))]
         EditorSubmitBeatmap,

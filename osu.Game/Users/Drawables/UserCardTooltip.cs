@@ -33,21 +33,12 @@ namespace osu.Game.Users.Drawables
 
             user = content;
 
-            if (user != null)
-            {
-                LoadComponentAsync(new UserGridPanel(user)
-                {
-                    Width = 300,
-                }, panel => Child = panel);
-            }
-            else
-            {
-                var tooltip = new OsuTooltipContainer.OsuTooltip();
-                tooltip.SetContent(ContextMenuStrings.ViewProfile);
-                tooltip.Show();
+            // osu! lite is offline, so there is no rich user card to show; fall back to a simple tooltip.
+            var tooltip = new OsuTooltipContainer.OsuTooltip();
+            tooltip.SetContent(ContextMenuStrings.ViewProfile);
+            tooltip.Show();
 
-                Child = tooltip;
-            }
+            Child = tooltip;
         }
     }
 }

@@ -105,7 +105,6 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public float TopPadding { get; init; }
 
-        private ModSelectOverlay modSelectOverlay = null!;
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         // Blue is the most neutral choice, so I'm using that for now.
@@ -142,9 +141,6 @@ namespace osu.Game.Screens.Select
         private OsuLogo? logo { get; set; }
 
         [Resolved]
-        private BeatmapSetOverlay? beatmapOverlay { get; set; }
-
-        [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
@@ -168,8 +164,6 @@ namespace osu.Game.Screens.Select
 
         private Bindable<bool> configBackgroundBlur = null!;
         private Bindable<bool> showConvertedBeatmaps = null!;
-
-        private IDisposable? modSelectOverlayRegistration;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -312,8 +306,6 @@ namespace osu.Game.Screens.Select
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler()
             });
 
-            LoadComponent(modSelectOverlay = CreateModSelectOverlay());
-
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
             {
@@ -325,13 +317,6 @@ namespace osu.Game.Screens.Select
 
             showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
-
-        // Colour scheme for mod overlay is left as default (green) to match mods button.
-        // Not sure about this, but we'll iterate based on feedback.
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
-        {
-            ShowPresets = true,
-        };
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
@@ -348,19 +333,6 @@ namespace osu.Game.Screens.Select
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
-            new FooterButtonMods(modSelectOverlay)
-            {
-                Hotkey = GlobalAction.ToggleModSelection,
-                Mods = Mods,
-                Ruleset = Ruleset,
-                RequestDeselectAllMods = () =>
-                {
-                    if (modSelectOverlay.State.Value == Visibility.Visible)
-                        modSelectOverlay.DeselectAll();
-                    else
-                        Mods.Value = Array.Empty<Mod>();
-                }
-            },
             new FooterButtonRandom
             {
                 NextRandom = () =>
@@ -384,20 +356,9 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            modSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(modSelectOverlay);
-
             inputManager = GetContainingInputManager()!;
 
             FilterControl.CriteriaChanged += criteriaChanged;
-
-            modSelectOverlay.State.BindValueChanged(v =>
-            {
-                if (!this.IsCurrentScreen())
-                    return;
-
-                if (ShowOsuLogo)
-                    logo?.FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
-            });
         }
 
         protected override void Update()
@@ -708,12 +669,6 @@ namespace osu.Game.Screens.Select
 
         private void onArrivingAtScreen()
         {
-            modSelectOverlay.Beatmap.BindTo(Beatmap);
-            modSelectOverlay.Ruleset.BindTo(Ruleset);
-            // required due to https://github.com/ppy/osu-framework/issues/3218
-            modSelectOverlay.SelectedMods.Disabled = false;
-            modSelectOverlay.SelectedMods.BindTo(Mods);
-
             carousel.VisuallyFocusSelected = false;
 
             if (ControlGlobalMusic)
@@ -755,10 +710,6 @@ namespace osu.Game.Screens.Select
             restoreBackground();
 
             Beatmap.ValueChanged -= updateVariousState;
-
-            modSelectOverlay.SelectedMods.UnbindFrom(Mods);
-            modSelectOverlay.Ruleset.UnbindFrom(Ruleset);
-            modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
 
             updateWedgeVisibility();
 
@@ -1221,16 +1172,6 @@ namespace osu.Game.Screens.Select
 
             yield return new OsuMenuItemSpacer();
 
-            if (beatmap.OnlineID > 0)
-            {
-                yield return new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
-
-                if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
-                    yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => (game as OsuGame)?.CopyToClipboard(url));
-            }
-
-            yield return new OsuMenuItemSpacer();
-
             foreach (var i in CreateCollectionMenuActions(beatmap))
                 yield return i;
         }
@@ -1286,7 +1227,6 @@ namespace osu.Game.Screens.Select
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            modSelectOverlayRegistration?.Dispose();
         }
     }
 }

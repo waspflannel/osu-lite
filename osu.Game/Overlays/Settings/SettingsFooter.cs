@@ -99,9 +99,8 @@ namespace osu.Game.Overlays.Settings
             }
 
             [BackgroundDependencyLoader]
-            private void load(ChangelogOverlay? changelog)
+            private void load()
             {
-                Action = () => changelog?.ShowBuild(version);
 
                 Add(new OsuSpriteText
                 {

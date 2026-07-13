@@ -22,7 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 using osu.Game.Localisation;
-using osu.Game.Online.Chat;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {

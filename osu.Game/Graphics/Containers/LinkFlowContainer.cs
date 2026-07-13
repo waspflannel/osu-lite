@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using osu.Game.Online.Chat;
 using System;
 using System.Linq;
 using osu.Framework.Allocation;

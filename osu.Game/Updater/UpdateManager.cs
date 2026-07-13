@@ -12,10 +12,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
@@ -239,7 +239,7 @@ namespace osu.Game.Updater
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
+        private void load(OsuColour colours, INotificationOverlay notificationOverlay)
         {
             Icon = FontAwesome.Solid.CheckSquare;
             IconContent.Colour = colours.BlueDark;
@@ -247,7 +247,6 @@ namespace osu.Game.Updater
             Activated = delegate
             {
                 notificationOverlay.Hide();
-                changelog.ShowBuild(version);
                 return true;
             };
         }

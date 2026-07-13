@@ -47,15 +47,11 @@ namespace osu.Game.Screens.Select
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
         private Drawable chevronIcon = null!;
-        private PanelUpdateBeatmapButton updateButton = null!;
         private BeatmapSetOnlineStatusPill statusPill = null!;
         private SpreadDisplay spreadDisplay = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
-        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
@@ -147,12 +143,6 @@ namespace osu.Game.Screens.Select
                                     Margin = new MarginPadding { Right = 5f },
                                     Animated = false,
                                 },
-                                updateButton = new PanelUpdateBeatmapButton
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 5f, Top = -2f },
-                                },
                                 spreadDisplay = new SpreadDisplay
                                 {
                                     Origin = Anchor.CentreLeft,
@@ -203,7 +193,6 @@ namespace osu.Game.Screens.Select
 
             titleText.Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title);
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);
-            updateButton.BeatmapSet = beatmapSet;
             statusPill.Status = beatmapSet.Status;
             spreadDisplay.BeatmapSet.Value = beatmapSet;
         }
@@ -215,7 +204,6 @@ namespace osu.Game.Screens.Select
             scheduledBackgroundRetrieval?.Cancel();
             scheduledBackgroundRetrieval = null;
             setBackground.Beatmap = null;
-            updateButton.BeatmapSet = null;
             spreadDisplay.BeatmapSet.Value = null;
         }
 
@@ -236,33 +224,12 @@ namespace osu.Game.Screens.Select
 
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Expanded.Value)
-                {
-                    if (songSelect is SoloSongSelect soloSongSelect)
-                    {
-                        // Assume the current set has one of its beatmaps selected since it is expanded.
-                        items.Add(new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => soloSongSelect.Edit(soloSongSelect.Beatmap.Value.BeatmapInfo))
-                        {
-                            Icon = FontAwesome.Solid.PencilAlt
-                        });
-                        items.Add(new OsuMenuItemSpacer());
-                    }
-                }
-                else
+                if (!Expanded.Value)
                 {
                     items.Add(new OsuMenuItem(WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick()));
                     items.Add(new OsuMenuItemSpacer());
                 }
 
-                if (beatmapSet.OnlineID > 0)
-                {
-                    items.Add(new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmapSet(beatmapSet.OnlineID)));
-
-                    if (beatmapSet.GetOnlineURL(api, ruleset.Value) is string url)
-                        items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url)));
-
-                    items.Add(new OsuMenuItemSpacer());
-                }
 
                 var collectionItems = realm.Realm.All<BeatmapCollection>()
                                            .OrderBy(c => c.Name)

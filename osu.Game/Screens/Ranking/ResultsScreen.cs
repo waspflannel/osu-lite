@@ -24,7 +24,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Volume;
 using osu.Game.Scoring;
@@ -32,6 +31,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
@@ -195,16 +195,7 @@ namespace osu.Game.Screens.Ranking
 
             if (AllowWatchingReplay)
             {
-                buttons.Add(new ReplayDownloadButton(SelectedScore.Value)
-                {
-                    Score = { BindTarget = SelectedScore },
-                    Width = 300
-                });
-
-                // for simplicity, only allow this when coming from a replay player where we know the replay is ready to be played.
-                //
-                // if we show it in all cases, consider the case where a user comes from song select and potentially has to download
-                // the replay before it can be played back. it wouldn't flow well with the quick retry in such a case.
+                // only allow the quick retry hotkey when coming from a replay player where we know the replay is ready to be played.
                 allowHotkeyRetry = player is ReplayPlayer;
             }
 
@@ -230,9 +221,6 @@ namespace osu.Game.Screens.Ranking
 
             if (Score?.BeatmapInfo != null)
                 buttons.Add(new CollectionButton(Score.BeatmapInfo));
-
-            if (Score?.BeatmapInfo?.BeatmapSet != null && Score.BeatmapInfo.BeatmapSet.OnlineID > 0)
-                buttons.Add(new FavouriteButton(Score.BeatmapInfo.BeatmapSet));
         }
 
         protected override void LoadComplete()
@@ -374,8 +362,12 @@ namespace osu.Game.Screens.Ranking
 
                 if (ScorePanelList.IsEmpty)
                 {
-                    // This can happen if for example a beatmap that is part of a playlist hasn't been played yet.
-                    VerticalScrollContent.Add(new MessagePlaceholder(LeaderboardStrings.NoRecordsYet));
+                    VerticalScrollContent.Add(new OsuSpriteText
+                    {
+                        Text = LeaderboardStrings.NoRecordsYet,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
                 }
 
                 OnScoresAdded(scores);

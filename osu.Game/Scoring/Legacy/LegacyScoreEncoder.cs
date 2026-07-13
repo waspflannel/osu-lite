@@ -12,7 +12,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.IO.Serialization;
-using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Replays;
@@ -29,7 +28,7 @@ namespace osu.Game.Scoring.Legacy
     /// <list type="bullet">
     /// <item><see cref="LATEST_VERSION"/> should be bumped accordingly,</item>
     /// <item>
-    /// changes need to be made to <see cref="SpectatorClient"/> so that spectator server receives the new data being stored,
+    /// changes need to be made to <c>SpectatorClient</c> so that spectator server receives the new data being stored,
     /// as <b><i>spectator server</i> is responsible for the content of server-stored replays, <i>NOT</i> the client</b>.
     /// </item>
     /// </list>

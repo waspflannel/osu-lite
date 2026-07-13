@@ -7,10 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Configuration;
-using osu.Game.Online.Leaderboards;
-using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Localisation;
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinEditor? skinEditor, SessionStatics statics)
+        private void load(SessionStatics statics)
         {
             InternalChildren = new Drawable[]
             {
@@ -56,9 +55,6 @@ namespace osu.Game.Screens.Play.HUD
                     RelativeSizeAxes = Axes.Both
                 },
             };
-
-            if (skinEditor != null)
-                PlaySamples.Value = false;
 
             lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }

@@ -73,35 +73,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 }
 
                                 var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
-                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
-                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
-
-                                Vector2 pos = new Vector2();
 
                                 if (combo != null)
                                 {
                                     combo.Anchor = Anchor.BottomLeft;
                                     combo.Origin = Anchor.BottomLeft;
                                     combo.Scale = new Vector2(1.28f);
-
-                                    pos += new Vector2(10, -(combo.DrawHeight * 1.56f + 20) * combo.Scale.X);
-                                }
-
-                                if (spectatorList != null)
-                                {
-                                    spectatorList.Anchor = Anchor.BottomLeft;
-                                    spectatorList.Origin = Anchor.BottomLeft;
-                                    spectatorList.Position = pos;
-
-                                    // maximum height of the spectator list is around ~172 units
-                                    pos += new Vector2(0, -185);
-                                }
-
-                                if (leaderboard != null)
-                                {
-                                    leaderboard.Anchor = Anchor.BottomLeft;
-                                    leaderboard.Origin = Anchor.BottomLeft;
-                                    leaderboard.Position = pos;
                                 }
 
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
@@ -112,8 +89,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 {
                                     new LegacyDefaultComboCounter(),
                                     new LegacyKeyCounterDisplay(),
-                                    new SpectatorList(),
-                                    new DrawableGameplayLeaderboard(),
                                 }
                             };
                     }

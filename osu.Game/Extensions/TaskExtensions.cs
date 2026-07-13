@@ -2,14 +2,42 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Logging;
 
 namespace osu.Game.Extensions
 {
     public static class TaskExtensions
     {
+        /// <summary>
+        /// Denote a task which is to be run without local error handling logic, where failure is not catastrophic.
+        /// Avoids unobserved exceptions from being fired.
+        /// </summary>
+        /// <param name="task">The task.</param>
+        /// <param name="onSuccess">An optional action to run on success.</param>
+        /// <param name="onError">An optional action to run on error.</param>
+        public static void FireAndForget(this Task task, Action? onSuccess = null, Action<Exception>? onError = null) =>
+            task.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    Debug.Assert(t.Exception != null);
+                    Exception exception = t.Exception.AsSingular();
+
+                    onError?.Invoke(exception);
+
+                    Logger.Error(exception, $"Unobserved exception occurred via {nameof(FireAndForget)} call: {exception.Message}");
+                }
+                else
+                {
+                    onSuccess?.Invoke();
+                }
+            });
+
         /// <summary>
         /// Add a continuation to be performed only after the attached task has completed.
         /// </summary>

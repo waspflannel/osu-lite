@@ -62,7 +62,6 @@ namespace osu.Game.Screens.Select
         internal string DisplayedArtist { get; private set; } = string.Empty;
 
         private StatisticPlayCount playCount = null!;
-        private FavouriteButton favouriteButton = null!;
         private Statistic lengthStatistic = null!;
         private Statistic bpmStatistic = null!;
 
@@ -157,7 +156,6 @@ namespace osu.Game.Screens.Select
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                favouriteButton = new FavouriteButton(),
                                 lengthStatistic = new Statistic(OsuIcon.Clock),
                                 bpmStatistic = new Statistic(OsuIcon.Metronome)
                                 {
@@ -296,13 +294,11 @@ namespace osu.Game.Screens.Select
             if (onlineLookupResult.Value?.Status != SongSelect.BeatmapSetLookupStatus.Completed)
             {
                 playCount.Value = null;
-                favouriteButton.SetLoading();
             }
             else
             {
                 var onlineBeatmap = onlineLookupResult.Value.Result?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
                 playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
-                favouriteButton.SetBeatmapSet(onlineLookupResult.Value.Result);
 
                 onlineDisplayCancellationSource = new CancellationTokenSource();
                 var token = onlineDisplayCancellationSource.Token;

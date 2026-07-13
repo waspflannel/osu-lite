@@ -22,11 +22,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
-using osu.Game.Online.Chat;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
-using osu.Game.Screens.Edit.Setup;
 using osuTK;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {

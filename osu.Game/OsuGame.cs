@@ -49,30 +49,19 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.Chat;
-using osu.Game.Online.Leaderboards;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
-using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
-using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.OnlinePlay.DailyChallenge;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
-using osu.Game.Screens.OnlinePlay.Multiplayer;
-using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Seasonal;
@@ -84,7 +73,6 @@ using osuTK;
 using osuTK.Graphics;
 using Sentry;
 using IntroScreen = osu.Game.Screens.Menu.IntroScreen;
-using MatchType = osu.Game.Online.Rooms.MatchType;
 
 namespace osu.Game
 {
@@ -122,28 +110,8 @@ namespace osu.Game
 
         public Toolbar Toolbar { get; private set; }
 
-        private ChatOverlay chatOverlay;
-
-        private ChannelManager channelManager;
-
         [NotNull]
         protected readonly NotificationOverlay Notifications = new NotificationOverlay();
-
-        private BeatmapListingOverlay beatmapListing;
-
-        private DashboardOverlay dashboard;
-
-        private NewsOverlay news;
-
-        private UserProfileOverlay userProfile;
-
-        private BeatmapSetOverlay beatmapSetOverlay;
-
-        private WikiOverlay wikiOverlay;
-
-        private ChangelogOverlay changelogOverlay;
-
-        private SkinEditorOverlay skinEditor;
 
         private Container overlayContent;
 
@@ -507,18 +475,6 @@ namespace osu.Game
 
                     break;
 
-                case LinkAction.FilterBeatmapSetGenre:
-                    FilterBeatmapSetGenre((SearchGenre)link.Argument);
-                    break;
-
-                case LinkAction.FilterBeatmapSetLanguage:
-                    FilterBeatmapSetLanguage((SearchLanguage)link.Argument);
-                    break;
-
-                case LinkAction.OpenEditorTimestamp:
-                    HandleTimestamp(argString);
-                    break;
-
                 case LinkAction.Spectate:
                     waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
                     {
@@ -550,11 +506,6 @@ namespace osu.Game
 
                     break;
 
-                case LinkAction.JoinRoom:
-                    if (long.TryParse(argString, out long roomId))
-                        JoinRoom(roomId);
-                    break;
-
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
@@ -568,106 +519,39 @@ namespace osu.Game
 
         public void OpenUrlExternally(string url, LinkWarnMode warnMode = LinkWarnMode.Default) => waitForReady(() => externalLinkOpener, _ => externalLinkOpener.OpenUrlExternally(url, warnMode));
 
-        /// <summary>
-        /// Open a specific channel in chat.
-        /// </summary>
-        /// <param name="channel">The channel to display.</param>
-        public void ShowChannel(string channel) => waitForReady(() => channelManager, _ =>
+        // The following overlay-display methods are part of ILinkHandler.
+        // osu! lite is offline and has no online overlays, so they are intentionally no-ops.
+
+        public void ShowChannel(string channel)
         {
-            try
-            {
-                channelManager.OpenChannel(channel);
-            }
-            catch (ChannelNotFoundException)
-            {
-                Logger.Log($"The requested channel \"{channel}\" does not exist");
-            }
-        });
-
-        /// <summary>
-        /// Show a beatmap set as an overlay.
-        /// </summary>
-        /// <param name="setId">The set to display.</param>
-        public void ShowBeatmapSet(int setId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
-
-        /// <summary>
-        /// Show a user's profile as an overlay.
-        /// </summary>
-        /// <param name="user">The user to display.</param>
-        public void ShowUser(IUser user) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user));
-
-        /// <summary>
-        /// Show a beatmap's set as an overlay, displaying the given beatmap.
-        /// </summary>
-        /// <param name="beatmapId">The beatmap to show.</param>
-        public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
-
-        /// <summary>
-        /// Shows the beatmap listing overlay, with the given <paramref name="query"/> in the search box.
-        /// </summary>
-        /// <param name="query">The query to search for.</param>
-        public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
-
-        public void FilterBeatmapSetGenre(SearchGenre genre) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithGenreFilter(genre));
-
-        public void FilterBeatmapSetLanguage(SearchLanguage language) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithLanguageFilter(language));
-
-        /// <summary>
-        /// Show a wiki's page as an overlay
-        /// </summary>
-        /// <param name="path">The wiki page to show</param>
-        public void ShowWiki(string path) => waitForReady(() => wikiOverlay, _ => wikiOverlay.ShowPage(path));
-
-        /// <summary>
-        /// Show changelog listing overlay
-        /// </summary>
-        public void ShowChangelogListing() => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowListing());
-
-        /// <summary>
-        /// Show changelog's build as an overlay
-        /// </summary>
-        /// <param name="version">The build version, including stream suffix.</param>
-        public void ShowChangelogBuild(string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(version));
-
-        /// <summary>
-        /// Joins a multiplayer or playlists room with the given <paramref name="id"/>.
-        /// </summary>
-        public void JoinRoom(long id)
-        {
-            var request = new GetRoomRequest(id);
-            request.Success += room =>
-            {
-                switch (room.Type)
-                {
-                    case MatchType.Playlists:
-                        PresentPlaylist(room);
-                        break;
-
-                    default:
-                        PresentMultiplayerMatch(room, string.Empty);
-                        break;
-                }
-            };
-            API.Queue(request);
         }
 
-        /// <summary>
-        /// Seeks to the provided <paramref name="timestamp"/> if the editor is currently open.
-        /// Can also select objects as indicated by the <paramref name="timestamp"/> (depends on ruleset implementation).
-        /// </summary>
-        public void HandleTimestamp(string timestamp)
+        public void ShowBeatmapSet(int setId)
         {
-            if (ScreenStack.CurrentScreen is not Editor editor)
-            {
-                Schedule(() => Notifications.Post(new SimpleErrorNotification
-                {
-                    Icon = FontAwesome.Solid.ExclamationTriangle,
-                    Text = EditorStrings.MustBeInEditorToHandleLinks
-                }));
-                return;
-            }
+        }
 
-            editor.HandleTimestamp(timestamp, notifyOnError: true);
+        public void ShowUser(IUser user)
+        {
+        }
+
+        public void ShowBeatmap(int beatmapId)
+        {
+        }
+
+        public void SearchBeatmapSet(string query)
+        {
+        }
+
+        public void ShowWiki(string path)
+        {
+        }
+
+        public void ShowChangelogListing()
+        {
+        }
+
+        public void ShowChangelogBuild(string version)
+        {
         }
 
         /// <summary>
@@ -772,57 +656,6 @@ namespace osu.Game
         }
 
         /// <summary>
-        /// Join a multiplayer match immediately.
-        /// </summary>
-        /// <param name="room">The room to join.</param>
-        /// <param name="password">The password to join the room, if any is given.</param>
-        public void PresentMultiplayerMatch(Room room, string password)
-        {
-            if (room.HasEnded)
-            {
-                // TODO: Eventually it should be possible to display ended multiplayer rooms in game too,
-                // but it generally will require turning off the entirety of communication with spectator server which is currently embedded into multiplayer screens.
-                Notifications.Post(new SimpleNotification
-                {
-                    Text = NotificationsStrings.MultiplayerRoomEnded,
-                    Activated = () =>
-                    {
-                        OpenUrlExternally($@"/multiplayer/rooms/{room.RoomID}");
-                        return true;
-                    }
-                });
-                return;
-            }
-
-            PerformFromScreen(screen =>
-            {
-                if (!(screen is Multiplayer multiplayer))
-                    screen.Push(multiplayer = new Multiplayer());
-
-                multiplayer.Join(room, password);
-            });
-            // TODO: We should really be able to use `validScreens: new[] { typeof(Multiplayer) }` here
-            // but `PerformFromScreen` doesn't understand nested stacks.
-        }
-
-        /// <summary>
-        /// Join a playlist immediately.
-        /// </summary>
-        /// <param name="room">The playlist to join.</param>
-        public void PresentPlaylist(Room room)
-        {
-            PerformFromScreen(screen =>
-            {
-                if (!(screen is Playlists playlists))
-                    screen.Push(playlists = new Playlists());
-
-                playlists.Join(room);
-            });
-            // TODO: We should really be able to use `validScreens: new[] { typeof(Playlists) }` here
-            // but `PerformFromScreen` doesn't understand nested stacks.
-        }
-
-        /// <summary>
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -836,14 +669,9 @@ namespace osu.Game
             {
                 databasedScore = ScoreManager.GetScore(score);
             }
-            catch (LegacyScoreDecoder.BeatmapNotFoundException notFound)
+            catch (LegacyScoreDecoder.BeatmapNotFoundException)
             {
                 Logger.Log("The replay cannot be played because the beatmap is missing.", LoggingTarget.Information);
-
-                var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
-                req.Success += res => Notifications.Post(new MissingBeatmapNotification(res, notFound.Hash, null));
-                API.Queue(req);
-
                 return;
             }
 
@@ -870,7 +698,7 @@ namespace osu.Game
             // which may not match the score, and thus crash.
             IEnumerable<Type> validScreens =
                 Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
-                    ? new[] { typeof(SongSelect), typeof(DailyChallenge) }
+                    ? new[] { typeof(SongSelect) }
                     : Array.Empty<Type>();
 
             PerformFromScreen(screen =>
@@ -888,19 +716,6 @@ namespace osu.Game
 
                 if (!Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap))
                     Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-
-                var currentLeaderboard = LeaderboardManager.CurrentCriteria;
-
-                bool leaderboardBeatmapMatches = currentLeaderboard != null && databasedBeatmap.Equals(currentLeaderboard.Beatmap);
-                bool leaderboardRulesetMatches = currentLeaderboard != null && databasedScore.ScoreInfo.Ruleset.Equals(currentLeaderboard.Ruleset);
-
-                if (!leaderboardBeatmapMatches || !leaderboardRulesetMatches)
-                {
-                    var newLeaderboard = currentLeaderboard != null
-                        ? currentLeaderboard with { Beatmap = databasedBeatmap, Ruleset = databasedScore.ScoreInfo.Ruleset }
-                        : new LeaderboardCriteria(databasedBeatmap, databasedScore.ScoreInfo.Ruleset, BeatmapLeaderboardScope.Global, null);
-                    LeaderboardManager.FetchWithCriteria(newLeaderboard);
-                }
 
                 switch (presentType)
                 {
@@ -964,13 +779,8 @@ namespace osu.Game
                     break;
 
                 case UserActivity.InGame:
-                case UserActivity.TestingBeatmap:
                 case UserActivity.WatchingReplay:
                     newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
-                    break;
-
-                case UserActivity.EditingBeatmap:
-                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.Path ?? "new beatmap"}";
                     break;
             }
 
@@ -1071,17 +881,8 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
-            BeatmapDownloader.PostNotification = n => Notifications.Post(n);
-            ScoreDownloader.PostNotification = n => Notifications.Post(n);
-
             ScoreManager.PostNotification = n => Notifications.Post(n);
             ScoreManager.PresentImport = items => PresentScore(items.First().Value);
-
-            MultiplayerClient.PostNotification = n => Notifications.Post(n);
-            MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
-
-            if (API is APIAccess api)
-                api.PostNotification = n => Notifications.Post(n);
 
             ScreenFooter.BackReceptor backReceptor;
 
@@ -1176,11 +977,7 @@ namespace osu.Game
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
-            LocalUserStatisticsProvider statisticsProvider;
-
-            loadComponentSingleFile(statisticsProvider = new LocalUserStatisticsProvider(), Add, true);
-            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(statisticsProvider), Add, true);
-            loadComponentSingleFile(new UserStatisticsWatcher(statisticsProvider), Add, true);
+            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
@@ -1217,25 +1014,7 @@ namespace osu.Game
             // overlay elements
             loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), footerBasedOverlayContent.Add, true);
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
-            loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(news = new NewsOverlay(), overlayContent.Add, true);
-            var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(channelManager = new ChannelManager(API), Add, true);
-            loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(new MessageNotifier(), Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
-            loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
-
-            loadComponentSingleFile(new LoginOverlay
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new NowPlayingOverlay
             {
@@ -1243,18 +1022,13 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
             loadComponentSingleFile<BeatmapStore>(detachedBeatmapStore = new RealmDetachedBeatmapStore(), Add, true);
-            loadComponentSingleFile(new QueueController(), Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
-            Add(new OnlineStatusNotifier(() => ScreenStack.CurrentScreen));
-            Add(new FriendPresenceNotifier());
 
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };
@@ -1266,33 +1040,6 @@ namespace osu.Game
                     if (state.NewValue == Visibility.Hidden) return;
 
                     singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
-                };
-            }
-
-            // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
-            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
-
-            foreach (var overlay in informationalOverlays)
-            {
-                overlay.State.ValueChanged += state =>
-                {
-                    if (state.NewValue != Visibility.Hidden)
-                        showOverlayAboveOthers(overlay, informationalOverlays);
-                };
-            }
-
-            // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, wikiOverlay };
-
-            foreach (var overlay in singleDisplayOverlays)
-            {
-                overlay.State.ValueChanged += state =>
-                {
-                    // informational overlays should be dismissed on a show or hide of a full overlay.
-                    informationalOverlays.ForEach(o => o.Hide());
-
-                    if (state.NewValue != Visibility.Hidden)
-                        showOverlayAboveOthers(overlay, singleDisplayOverlays);
                 };
             }
 
@@ -1612,10 +1359,6 @@ namespace osu.Game
                     fpsCounter.ToggleVisibility();
                     return true;
 
-                case GlobalAction.ToggleSkinEditor:
-                    skinEditor.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ResetInputSettings:
                     Host.ResetInputHandlers();
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
@@ -1624,37 +1367,6 @@ namespace osu.Game
                 case GlobalAction.ToggleGameplayMouseButtons:
                     var mouseDisableButtons = LocalConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons);
                     mouseDisableButtons.Value = !mouseDisableButtons.Value;
-                    return true;
-
-                case GlobalAction.ToggleProfile:
-                    if (userProfile.State.Value == Visibility.Visible)
-                        userProfile.Hide();
-                    else
-                        ShowUser(API.LocalUser.Value);
-                    return true;
-
-                case GlobalAction.RandomSkin:
-                    // Don't allow random skin selection while in the skin editor.
-                    // This is mainly to stop many "osu! default (modified)" skins being created via the SkinManager.EnsureMutableSkin() path.
-                    // If people want this to work we can potentially avoid selecting default skins when the editor is open, or allow a maximum of one mutable skin somehow.
-                    if (skinEditor.State.Value == Visibility.Visible)
-                        return false;
-
-                    SkinManager.SelectRandomSkin();
-                    return true;
-
-                case GlobalAction.NextSkin:
-                    if (skinEditor.State.Value == Visibility.Visible)
-                        return false;
-
-                    SkinManager.SelectNextSkin();
-                    return true;
-
-                case GlobalAction.PreviousSkin:
-                    if (skinEditor.State.Value == Visibility.Visible)
-                        return false;
-
-                    SkinManager.SelectPreviousSkin();
                     return true;
             }
 
@@ -1813,8 +1525,6 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
-
-                skinEditor.SetTarget(newOsuScreen);
             }
         }
 

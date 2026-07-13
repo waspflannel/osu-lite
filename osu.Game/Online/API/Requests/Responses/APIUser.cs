@@ -9,7 +9,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Extensions;
-using osu.Game.Online.Metadata;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -116,7 +115,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <summary>
         /// From osu-web's perspective, whether a user was recently online.
         /// This doesn't imply the user is online in a lazer client (may be updated from stable or web browser).
-        /// Use <see cref="MetadataClient.GetPresence"/> for real-time lazer online status checks.
+        /// Use <c>GetPresence</c> for real-time lazer online status checks.
         /// </summary>
         [JsonProperty(@"is_online")]
         public bool WasRecentlyOnline;
@@ -228,10 +227,10 @@ namespace osu.Game.Online.API.Requests.Responses
         private UserStatistics statistics;
 
         /// <summary>
-        /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> or <see cref="GetFriendsRequest"/> response).
+        /// User statistics for the requested ruleset (in the case of a <c>GetUserRequest</c> or <c>GetFriendsRequest</c> response).
         /// </summary>
         /// <remarks>
-        /// This returns null when accessed from <see cref="IAPIProvider.LocalUser"/>. Use <see cref="LocalUserStatisticsProvider"/> instead.
+        /// This returns null when accessed from <see cref="IAPIProvider.LocalUser"/>. Use <c>LocalUserStatisticsProvider</c> instead.
         /// </remarks>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
@@ -283,7 +282,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIUserHistoryCount[] ReplaysWatchedCounts;
 
         /// <summary>
-        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> or <see cref="GetMeRequest"/> response).
+        /// All user statistics per ruleset's short name (in the case of a <c>GetUsersRequest</c> or <c>GetMeRequest</c> response).
         /// Otherwise empty. Can be altered for testing purposes.
         /// </summary>
         // todo: this should likely be moved to a separate UserCompact class at some point.

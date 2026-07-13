@@ -79,14 +79,6 @@ namespace osu.Game.Users.Drawables
             if (team == null && hideOnNull)
                 return Empty();
 
-            if (isInteractive)
-            {
-                return new ClickableTeamFlag(team, showTooltipOnHover)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                };
-            }
-
             return new DrawableTeamFlag(team)
             {
                 RelativeSizeAxes = Axes.Both,

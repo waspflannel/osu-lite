@@ -29,17 +29,11 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Online.Matchmaking;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Edit;
-using osu.Game.Screens.OnlinePlay.DailyChallenge;
-using osu.Game.Screens.OnlinePlay.Multiplayer;
-using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osu.Game.Seasonal;
 using osuTK;
@@ -75,13 +69,7 @@ namespace osu.Game.Screens.Menu
         private MusicController musicController { get; set; }
 
         [Resolved]
-        private IAPIProvider api { get; set; }
-
-        [Resolved]
         private Storage storage { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private LoginOverlay login { get; set; }
 
         [Resolved(canBeNull: true)]
         private IDialogOverlay dialogOverlay { get; set; }
@@ -95,7 +83,6 @@ namespace osu.Game.Screens.Menu
         protected override bool PlayExitSound => false;
 
         private Bindable<double> holdDelay;
-        private Bindable<bool> loginDisplayed;
         private Bindable<bool> showMobileDisclaimer;
 
         private HoldToExitGameOverlay holdToExitGameOverlay;
@@ -106,24 +93,19 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
-        private OnlineMenuBanner onlineMenuBanner;
         private MenuTipDisplay menuTipDisplay;
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
 
         private Sample reappearSampleSwoosh;
 
-        [Resolved(canBeNull: true)]
-        private SkinEditorOverlay skinEditor { get; set; }
-
         [CanBeNull]
         private IDisposable logoProxy;
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
+        private void load(SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
-            loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
             showMobileDisclaimer = config.GetBindable<bool>(OsuSetting.ShowMobileDisclaimer);
 
             if (host.CanExit)
@@ -149,27 +131,7 @@ namespace osu.Game.Screens.Menu
                     {
                         Buttons = new ButtonSystem
                         {
-                            OnEditBeatmap = () =>
-                            {
-                                Beatmap.SetDefault();
-                                this.Push(new EditorLoader());
-                            },
-                            OnEditSkin = () =>
-                            {
-                                skinEditor?.Show();
-                            },
                             OnSolo = loadSongSelect,
-                            OnMultiplayer = () => this.Push(new Multiplayer()),
-                            OnQuickPlay = loadQuickPlay,
-                            OnRankedPlay = loadRankedPlay,
-                            OnPlaylists = () => this.Push(new Playlists()),
-                            OnDailyChallenge = room =>
-                            {
-                                if (statics.Get<bool>(Static.DailyChallengeIntroPlayed))
-                                    this.Push(new DailyChallenge(room));
-                                else
-                                    this.Push(new DailyChallengeIntro(room));
-                            },
                             OnExit = e =>
                             {
                                 exitConfirmedViaHoldOrClick = e is MouseEvent;
@@ -201,11 +163,6 @@ namespace osu.Game.Screens.Menu
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                        },
-                        onlineMenuBanner = new OnlineMenuBanner
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
                         }
                     }
                 },
@@ -227,18 +184,15 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
                         ApplyToBackground(b => b.FadeColour(OsuColour.Gray(baseDim), 500, Easing.OutSine));
-                        onlineMenuBanner.State.Value = Visibility.Hidden;
                         break;
 
                     default:
                         ApplyToBackground(b => b.FadeColour(OsuColour.Gray(baseDim * 0.8f), 500, Easing.OutSine));
-                        onlineMenuBanner.State.Value = Visibility.Visible;
                         break;
                 }
             };
 
             Buttons.OnSettings = () => settings?.ToggleVisibility();
-            Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
 
             reappearSampleSwoosh = audio.Samples.Get(@"Menu/reappear-swoosh");
         }
@@ -317,25 +271,11 @@ namespace osu.Game.Screens.Menu
                     dialogOverlay.Push(new MobileDisclaimerDialog(() =>
                     {
                         showMobileDisclaimer.Value = false;
-                        displayLoginIfApplicable();
                     }));
                 }, 500);
             }
-            else
-                displayLoginIfApplicable();
 
             return originalAction.Invoke();
-        }
-
-        private void displayLoginIfApplicable()
-        {
-            if (loginDisplayed.Value) return;
-
-            if (!api.IsLoggedIn || api.State.Value == APIState.RequiresSecondFactorAuth)
-            {
-                Scheduler.AddDelayed(() => login?.Show(), 500);
-                loginDisplayed.Value = true;
-            }
         }
 
         protected override void LogoSuspending(OsuLogo logo)
@@ -484,10 +424,6 @@ namespace osu.Game.Screens.Menu
         }
 
         private void loadSongSelect() => this.Push(new SoloSongSelect());
-
-        private void loadQuickPlay() => this.Push(new OnlinePlay.Matchmaking.Intro.ScreenIntro(MatchmakingPoolType.QuickPlay));
-
-        private void loadRankedPlay() => this.Push(new OnlinePlay.Matchmaking.Intro.ScreenIntro(MatchmakingPoolType.RankedPlay));
 
         private partial class MobileDisclaimerDialog : PopupDialog
         {

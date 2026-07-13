@@ -50,11 +50,6 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Online.Chat;
-using osu.Game.Online.Leaderboards;
-using osu.Game.Online.Metadata;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
@@ -154,11 +149,7 @@ namespace osu.Game
 
         protected BeatmapManager BeatmapManager { get; private set; }
 
-        protected BeatmapModelDownloader BeatmapDownloader { get; private set; }
-
         protected ScoreManager ScoreManager { get; private set; }
-
-        protected ScoreModelDownloader ScoreDownloader { get; private set; }
 
         protected SkinManager SkinManager { get; private set; }
 
@@ -210,17 +201,10 @@ namespace osu.Game
 
         private UserLookupCache userCache;
         private BeatmapLookupCache beatmapCache;
-        protected LeaderboardManager LeaderboardManager { get; private set; }
 
         private RulesetConfigCache rulesetConfigCache;
 
         private SessionAverageHitErrorTracker hitErrorTracker;
-
-        protected SpectatorClient SpectatorClient { get; private set; }
-
-        protected MultiplayerClient MultiplayerClient { get; private set; }
-
-        private MetadataClient metadataClient;
 
         private RealmAccess realm;
 
@@ -316,7 +300,8 @@ namespace osu.Game
 
             CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
 
-            dependencies.CacheAs(API ??= new APIAccess(this, LocalConfig, endpoints, VersionHash));
+            // osu! lite is fully offline: use a dummy API that never contacts any server.
+            dependencies.CacheAs(API ??= new DummyAPIAccess());
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -325,22 +310,14 @@ namespace osu.Game
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: false));
             dependencies.CacheAs<IWorkingBeatmapCache>(BeatmapManager);
-
-            dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
-            dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
 
             // Add after all the above cache operations as it depends on them.
             base.Content.Add(difficultyCache);
 
             // TODO: OsuGame or OsuGameBase?
             dependencies.CacheAs(beatmapUpdater = CreateBeatmapUpdater());
-            dependencies.CacheAs(SpectatorClient = new OnlineSpectatorClient(endpoints));
-            dependencies.CacheAs(MultiplayerClient = new OnlineMultiplayerClient(endpoints));
-            dependencies.CacheAs(metadataClient = new OnlineMetadataClient(endpoints));
-
-            base.Content.Add(new BeatmapOnlineChangeIngest(beatmapUpdater, realm, metadataClient));
 
             BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
 
@@ -374,16 +351,9 @@ namespace osu.Game
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
 
-            dependencies.Cache(LeaderboardManager = new LeaderboardManager());
-            base.Content.Add(LeaderboardManager);
-
             // add api components to hierarchy.
-            if (API is APIAccess apiAccess)
-                base.Content.Add(apiAccess);
-
-            base.Content.Add(SpectatorClient);
-            base.Content.Add(MultiplayerClient);
-            base.Content.Add(metadataClient);
+            if (API is Drawable apiDrawable)
+                base.Content.Add(apiDrawable);
 
             base.Content.Add(rulesetConfigCache);
 

@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Screens.Edit;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -41,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 double snapTime = d is DrawableSliderTail tail
                     ? tail.Slider.GetEndTime()
                     : d.HitObject.StartTime;
-                timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(snapTime), colours);
+                timingBasedColour = BeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(snapTime), colours);
             };
 
             // Need to set this every update to ensure it doesn't get overwritten by DrawableHitObject.OnApply() -> UpdateComboColour().

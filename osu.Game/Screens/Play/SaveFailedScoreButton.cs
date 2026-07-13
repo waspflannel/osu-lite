@@ -10,12 +10,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Extensions;
 using osu.Game.Database;
 using osu.Game.Scoring;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online;
-using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.Play

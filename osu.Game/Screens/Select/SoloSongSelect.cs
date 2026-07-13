@@ -17,7 +17,6 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -31,9 +30,6 @@ namespace osu.Game.Screens.Select
 
         private PlayerLoader? playerLoader;
         private IReadOnlyList<Mod>? modsAtGameplayStart;
-
-        [Resolved]
-        private BeatmapSetOverlay? beatmapOverlay { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
@@ -63,19 +59,8 @@ namespace osu.Game.Screens.Select
         public override IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
         {
             yield return new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart)) { Icon = FontAwesome.Solid.Check };
-            yield return new OsuMenuItem(ButtonSystemStrings.Edit.ToSentence(), MenuItemType.Standard, () => Edit(beatmap)) { Icon = FontAwesome.Solid.PencilAlt };
 
             yield return new OsuMenuItemSpacer();
-
-            if (beatmap.OnlineID > 0)
-            {
-                yield return new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
-
-                if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
-                    yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url));
-
-                yield return new OsuMenuItemSpacer();
-            }
 
             foreach (var i in CreateCollectionMenuActions(beatmap))
                 yield return i;
@@ -143,14 +128,6 @@ namespace osu.Game.Screens.Select
 
                 return player;
             }
-        }
-
-        public void Edit(BeatmapInfo beatmap)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            SelectAndRun(beatmap, () => this.Push(new EditorLoader()));
         }
 
         public override void OnResuming(ScreenTransitionEvent e)

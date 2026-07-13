@@ -14,7 +14,6 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -25,6 +24,7 @@ using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Scoring.Drawables;
 
 namespace osu.Game.Screens.Ranking.Contracted
 {

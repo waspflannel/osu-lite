@@ -12,9 +12,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
-using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osuTK;
+using osu.Game.Online;
 
 namespace osu.Game.Screens.Select
 {

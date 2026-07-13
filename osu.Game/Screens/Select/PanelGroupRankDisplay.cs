@@ -16,12 +16,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using osu.Game.Scoring.Drawables;
 
 namespace osu.Game.Screens.Select
 {

@@ -11,7 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Leaderboards;
+using osu.Game.Scoring.Drawables;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osuTK;

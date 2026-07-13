@@ -16,7 +16,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Screens.Edit;
 using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Formats
@@ -334,7 +333,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"BeatDivisor":
-                    beatmap.BeatmapInfo.BeatDivisor = Math.Clamp(Parsing.ParseInt(pair.Value), BindableBeatDivisor.MINIMUM_DIVISOR, BindableBeatDivisor.MAXIMUM_DIVISOR);
+                    beatmap.BeatmapInfo.BeatDivisor = Math.Clamp(Parsing.ParseInt(pair.Value), BeatDivisor.MINIMUM_DIVISOR, BeatDivisor.MAXIMUM_DIVISOR);
                     break;
 
                 case @"GridSize":

@@ -10,7 +10,6 @@ using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using Realms;
@@ -232,7 +231,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// The maximum achievable combo on this beatmap, populated for online info purposes only.
-        /// Todo: This should never be used nor exist, but is still relied on in <see cref="ScoresContainer.Scores"/> since <see cref="IBeatmapInfo"/> can't be used yet. For now this is obsoleted until it is removed.
+        /// Todo: This should never be used nor exist, but is still relied on in <c>ScoresContainer</c> since <see cref="IBeatmapInfo"/> can't be used yet. For now this is obsoleted until it is removed.
         /// </summary>
         [Ignored]
         [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]

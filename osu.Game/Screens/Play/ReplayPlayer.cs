@@ -18,7 +18,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
@@ -33,9 +32,6 @@ namespace osu.Game.Screens.Play
         public const double BASE_SEEK_AMOUNT = 1000;
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
-
-        [Cached(typeof(IGameplayLeaderboardProvider))]
-        private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
         protected override UserActivity? InitialActivity =>
             // score may be null if LoadedBeatmapSuccessfully is false.
@@ -92,8 +88,6 @@ namespace osu.Game.Screens.Play
         {
             if (!LoadedBeatmapSuccessfully)
                 return;
-
-            AddInternal(leaderboardProvider);
 
             GameplayClockContainer.Add(ReplayOverlay = new ReplayOverlay());
 

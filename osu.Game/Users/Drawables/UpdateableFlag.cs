@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
@@ -28,15 +27,11 @@ namespace osu.Game.Users.Drawables
         }
 
         /// <summary>
-        /// Perform an action in addition to showing the country ranking.
-        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
+        /// Perform an action when the flag is clicked.
         /// </summary>
         public Action? Action;
 
         private readonly Bindable<bool> hideFlags = new BindableBool();
-
-        [Resolved]
-        private RankingsOverlay? rankingsOverlay { get; set; }
 
         public UpdateableFlag(CountryCode countryCode = CountryCode.Unknown)
         {
@@ -69,7 +64,6 @@ namespace osu.Game.Users.Drawables
         protected override bool OnClick(ClickEvent e)
         {
             Action?.Invoke();
-            rankingsOverlay?.ShowCountry(CountryCode);
             return true;
         }
 

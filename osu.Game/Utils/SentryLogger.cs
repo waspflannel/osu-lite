@@ -261,7 +261,6 @@ namespace osu.Game.Utils
                     return false;
 
                 // stuff that should really never make it to sentry
-                case APIAccess.WebRequestFlushedException:
                 case TaskCanceledException:
                     return false;
             }
