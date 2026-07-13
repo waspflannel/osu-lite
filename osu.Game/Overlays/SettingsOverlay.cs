@@ -38,17 +38,15 @@ namespace osu.Game.Overlays
                 new InputSection(createSubPanel(new KeyBindingPanel())),
                 new UserInterfaceSection(),
                 new GameplaySection(),
-                new RulesetSection(),
                 new AudioSection(),
                 new GraphicsSection(),
-                new OnlineSection(),
                 new MaintenanceSection(),
                 new DebugSection()
             };
 
             var today = DateTimeOffset.Now;
             if (today.Month == 4 && today.Day == 1)
-                sections.Insert(9, new AfToggleSection());
+                sections.Insert(7, new AfToggleSection());
 
             return sections;
         }

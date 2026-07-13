@@ -82,10 +82,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                         // InputSection is intentionally omitted for now due to its sub-panel being a pain to set up.
                         new UserInterfaceSection(),
                         new GameplaySection(),
-                        new RulesetSection(),
                         new AudioSection(),
                         new GraphicsSection(),
-                        new OnlineSection(),
                         new MaintenanceSection(),
                         new DebugSection()
                     },
