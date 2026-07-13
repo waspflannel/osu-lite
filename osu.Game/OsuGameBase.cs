@@ -316,7 +316,8 @@ namespace osu.Game
 
             CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
 
-            dependencies.CacheAs(API ??= new APIAccess(this, LocalConfig, endpoints, VersionHash));
+            // osu! lite is fully offline: use a dummy API that never contacts any server.
+            dependencies.CacheAs(API ??= new DummyAPIAccess());
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -325,7 +326,7 @@ namespace osu.Game
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: false));
             dependencies.CacheAs<IWorkingBeatmapCache>(BeatmapManager);
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
@@ -378,8 +379,8 @@ namespace osu.Game
             base.Content.Add(LeaderboardManager);
 
             // add api components to hierarchy.
-            if (API is APIAccess apiAccess)
-                base.Content.Add(apiAccess);
+            if (API is Drawable apiDrawable)
+                base.Content.Add(apiDrawable);
 
             base.Content.Add(SpectatorClient);
             base.Content.Add(MultiplayerClient);
