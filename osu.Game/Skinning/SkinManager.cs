@@ -169,68 +169,6 @@ namespace osu.Game.Skinning
             return skins;
         }
 
-        public void SelectRandomSkin()
-        {
-            Realm.Run(r =>
-            {
-                // can be the case when the current skin is externally mounted for editing
-                if (CurrentSkinInfo.Disabled)
-                    return;
-
-                // Required local for iOS. Will cause runtime crash if inlined.
-                Guid currentSkinId = CurrentSkinInfo.Value.ID;
-
-                // choose from only user skins, removing the current selection to ensure a new one is chosen.
-                var randomChoices = r.All<SkinInfo>()
-                                     .Where(s => !s.DeletePending && s.ID != currentSkinId)
-                                     .ToArray();
-
-                if (randomChoices.Length == 0)
-                {
-                    CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged();
-                    return;
-                }
-
-                var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
-
-                CurrentSkinInfo.Value = chosen.ToLive(Realm);
-            });
-        }
-
-        private void cycleSkins(int direction)
-        {
-            Debug.Assert(direction != 0);
-
-            // don't change selection if current skin is externally disabled/mounted for editing.
-            if (CurrentSkinInfo.Disabled)
-                return;
-
-            var skins = GetAllUsableSkins();
-
-            int i = skins.IndexOf(CurrentSkinInfo.Value);
-
-            // If the current skin isn't selectable anymore, start from the top.
-            if (i < 0 && direction < 0)
-                i = 0;
-
-            do
-            {
-                i = (i + direction + skins.Count) % skins.Count;
-            } while (skins[i].ID == SkinInfo.RANDOM_SKIN);
-
-            CurrentSkinInfo.Value = skins[i];
-        }
-
-        /// <summary>
-        /// Cycle one skin backward.
-        /// </summary>
-        public void SelectPreviousSkin() => cycleSkins(-1);
-
-        /// <summary>
-        /// Cycle one skin forward.
-        /// </summary>
-        public void SelectNextSkin() => cycleSkins(1);
-
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
         /// </summary>

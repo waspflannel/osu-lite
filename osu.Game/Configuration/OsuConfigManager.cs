@@ -267,22 +267,6 @@ namespace osu.Game.Configuration
                         value: scalingMode.GetLocalisableDescription()
                     )
                 ),
-                new TrackedSetting<string>(OsuSetting.Skin, skin =>
-                {
-                    string skinName = string.Empty;
-
-                    if (Guid.TryParse(skin, out var id))
-                        skinName = LookupSkinName(id);
-
-                    return new SettingDescription(
-                        rawValue: skinName,
-                        name: SkinSettingsStrings.SkinSectionHeader,
-                        value: skinName,
-                        shortcut: new TranslatableString(@"_", @"{0}: {1}",
-                            GlobalActionKeyBindingStrings.RandomSkin,
-                            LookupKeyBindings(GlobalAction.RandomSkin))
-                    );
-                }),
                 new TrackedSetting<float>(OsuSetting.UIScale, scale => new SettingDescription(
                         rawValue: scale,
                         name: GraphicsSettingsStrings.UIScaling,
