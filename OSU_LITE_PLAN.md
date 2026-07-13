@@ -2,6 +2,16 @@
 
 > Companion to `OSU_LITE_MAP.md`. Work top to bottom. **Do not skip the checkpoint at the end of each phase** — the whole point of this ordering is that you always have a running build to fall back to.
 
+## Execution status (as built)
+
+Phases 0–8 are **complete**. The game builds, launches to the main menu, and runs **fully offline** (verified: zero outbound requests to ppy servers). Result: single-ruleset (osu! standard), no editor, no skin editor, one fixed skin, no mod-select UI, trimmed menu/toolbar/settings, dummy offline API.
+
+Notable deviations from the original plan, and why:
+- **Skin-editor removal was merged into Phase 3** (the beatmap editor, skin editor, and Osu ruleset editor components share one blueprint/composer framework and could not be separated). Three genuinely reusable helpers were relocated out of the editor namespace rather than lost: `LabelledTextBoxWithPopover`, `RepeatingButtonBehaviour`, and a new `Beatmaps/BeatDivisor` helper.
+- **All test projects were removed up front (Phase 2)** rather than at the end, because they reference rulesets/online/mods that later phases gut — keeping them compiling through every cut would have been a large ongoing tax.
+- **Online layer: entry points removed + API neutered, classes retained.** Online overlays, online-play screens (multiplayer/playlists/daily/spectate), and chat backend are no longer reachable or instantiated, and `DummyAPIAccess` guarantees no network activity. The *classes* remain as dead code: the online subsystem (~30% of the codebase) is a tightly interconnected web where shared enums/components (e.g. `SearchBeatmapSetsRequest` filters, `KudosuTable`, `UpdateableFlag`) live inside online-overlay namespaces, so wholesale deletion cascades into core infrastructure. Deleting it safely is a dedicated follow-up effort, deliberately not attempted here to protect the working build.
+- **Phase 9** did the safe, isolated cleanups (orphaned toolbar buttons, dead login prompt). The deeper dead-online-code deletion is left as future work.
+
 ## Guiding principles
 
 1. **One phase per commit (or per branch).** Never mix a "safe" cut with a "deep" cut in the same commit. If a phase breaks something, you can revert exactly that phase.
