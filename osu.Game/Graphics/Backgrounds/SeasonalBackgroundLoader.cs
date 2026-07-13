@@ -51,17 +51,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private void fetchSeasonalBackgrounds()
         {
-            if (seasonalBackgrounds.Value != null)
-                return;
-
-            var request = new GetSeasonalBackgroundsRequest();
-            request.Success += response =>
-            {
-                seasonalBackgrounds.Value = response;
-                current = RNG.Next(0, response.Backgrounds?.Count ?? 0);
-            };
-
-            api.PerformAsync(request);
+            // osu! lite is offline; seasonal backgrounds are served online only, so none are fetched.
         }
 
         public SeasonalBackground LoadNextBackground()

@@ -54,15 +54,6 @@ namespace osu.Game.Scoring
                 catch (LegacyScoreDecoder.BeatmapNotFoundException notFound)
                 {
                     Logger.Log($@"Score '{archive.Name}' failed to import: no corresponding beatmap with the hash '{notFound.Hash}' could be found.", LoggingTarget.Database);
-
-                    if (!parameters.Batch)
-                    {
-                        // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
-                        var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
-                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, notFound.Hash, archive));
-                        api.Queue(req);
-                    }
-
                     return null;
                 }
                 catch (Exception e)
@@ -146,66 +137,9 @@ namespace osu.Game.Scoring
             model.User = lookupUserByName(model.RealmUser.Username) ?? model.User;
         }
 
-        private APIUser? lookupUserById(int id)
-        {
-            if (idLookupCache.TryGetValue(id, out var existing))
-            {
-                return existing;
-            }
+        // osu! lite is offline, so users referenced by imported scores cannot be resolved online.
+        private APIUser? lookupUserById(int id) => idLookupCache.GetValueOrDefault(id);
 
-            var userRequest = new GetUserRequest(id);
-
-            api.Perform(userRequest);
-
-            if (userRequest.Response is APIUser user)
-            {
-                APIUser cachedUser;
-
-                idLookupCache.TryAdd(id, cachedUser = new APIUser
-                {
-                    // Because this is a permanent cache, let's only store the pieces we're interested in,
-                    // rather than the full API response. If we start to store more than these three fields
-                    // in realm, this should be undone.
-                    Id = user.Id,
-                    Username = user.Username,
-                    CountryCode = user.CountryCode,
-                });
-
-                return cachedUser;
-            }
-
-            return null;
-        }
-
-        private APIUser? lookupUserByName(string username)
-        {
-            if (usernameLookupCache.TryGetValue(username, out var existing))
-            {
-                return existing;
-            }
-
-            var userRequest = new GetUserRequest(username);
-
-            api.Perform(userRequest);
-
-            if (userRequest.Response is APIUser user)
-            {
-                APIUser cachedUser;
-
-                usernameLookupCache.TryAdd(username, cachedUser = new APIUser
-                {
-                    // Because this is a permanent cache, let's only store the pieces we're interested in,
-                    // rather than the full API response. If we start to store more than these three fields
-                    // in realm, this should be undone.
-                    Id = user.Id,
-                    Username = user.Username,
-                    CountryCode = user.CountryCode,
-                });
-
-                return cachedUser;
-            }
-
-            return null;
-        }
+        private APIUser? lookupUserByName(string username) => usernameLookupCache.GetValueOrDefault(username);
     }
 }

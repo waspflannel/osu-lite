@@ -120,7 +120,7 @@ namespace osu.Game.Online.API
         {
             if (API == null)
             {
-                Fail(new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests."));
+                Fail(new NotSupportedException($"An {nameof(IAPIProvider)} is required to perform requests."));
                 return;
             }
 
