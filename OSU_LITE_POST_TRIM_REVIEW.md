@@ -696,13 +696,15 @@ Deferred to database-aware / Phase F: the `ModPreset` Realm model and the mod-se
 
 Verified at runtime: builds green, reaches MainMenu with no exceptions and no outbound network requests.
 
-### Phase C — Collapse online compatibility paths
+### Phase C — Collapse online compatibility paths — ✅ COMPLETED
 
-- Remove song-select online lookup tasks/result state and render local metadata directly.
-- Inline deterministic beatmap selection and delete `DifficultyRecommender`.
-- Remove unused user/beatmap caches.
-- Narrow `IAPIProvider` or replace it with smaller local interfaces.
-- Simplify bundled metadata processing and rename it away from “online” if retained.
+- ✅ Removed the song-select online lookup entirely: deleted `RealmPopulatingOnlineLookupSource`, `fetchOnlineInfo`, the cached `BeatmapSetLookupResult`/`BeatmapSetLookupStatus` result state, and the online-only wedge rows. `BeatmapMetadataWedge` now renders only local metadata (creator as plain text, source, mapper tags, submitted/ranked, and local user tags) — the genre/language/ratings/fail-retry/success-rate rows and their four sub-display classes are gone. `BeatmapTitleWedge` drops the online play-count (length becomes the leading statistic) and its now-redundant post-lookup status refresh (local status is already applied in `updateDisplay`).
+- ✅ Deleted `DifficultyRecommender` and inlined the deterministic first-suitable-beatmap fallback at all three call sites.
+- ✅ Removed the unused `BeatmapLookupCache` and `UserLookupCache`, plus the offline-meaningless `PlayerTeamFlag` HUD component (its sole consumer).
+- ✅ Narrowed `IAPIProvider` to the offline-consumed members and rewrote `DummyAPIAccess` as a minimal offline provider (removed simulated login/2FA/logout/account-creation/friends/blocks/outage state); deleted `RegistrationRequest`.
+- ✅ Simplified the metadata pipeline to the bundled local cache only: deleted `APIBeatmapMetadataSource`, dropped the `IAPIProvider` dependency from `BeatmapUpdater`/`BeatmapUpdaterMetadataLookup`.
+
+Verified: builds green; three startup smoke tests reach the game with zero exceptions and zero outbound network requests. Note: an interactive song-select/play-through check via computer-use was not possible (the dev build isn't a Start-menu app, so it can't be granted). The removed lookup-result consumers and the cached provider were removed together (grep-verified no other consumers), so the DI graph is self-consistent; a manual playtest of song select → play → results is still recommended before release.
 
 ### Phase D — Simplify settings and notifications
 
