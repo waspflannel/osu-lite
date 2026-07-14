@@ -135,8 +135,6 @@ namespace osu.Game
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
-        private DifficultyRecommender difficultyRecommender;
-
         [Cached]
         private readonly LegacyImportManager legacyImportManager = new LegacyImportManager();
 
@@ -554,7 +552,6 @@ namespace osu.Game
         /// <remarks>
         /// Among items satisfying the predicate, the order of preference is:
         /// <list type="bullet">
-        /// <item>beatmap with recommended difficulty, as provided by <see cref="DifficultyRecommender"/>,</item>
         /// <item>first beatmap from the current ruleset,</item>
         /// <item>first beatmap from any ruleset.</item>
         /// </list>
@@ -593,9 +590,8 @@ namespace osu.Game
                 if (beatmaps.Count == 0)
                     beatmaps = detachedSet.Beatmaps.ToList();
 
-                // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
-                var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
-                                ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
+                // Prefer a beatmap matching the current ruleset, else fall back to a sane selection.
+                var selection = beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
                                 ?? beatmaps.First();
 
                 if (screen is IHandlePresentBeatmap presentableScreen)
@@ -948,7 +944,6 @@ namespace osu.Game
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
-            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
