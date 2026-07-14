@@ -149,11 +149,6 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
 
         /// <summary>
-        /// "This error has been automatically reported to the dev team."
-        /// </summary>
-        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
-
-        /// <summary>
         /// "An action was interrupted due to a dialog being displayed."
         /// </summary>
         public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
