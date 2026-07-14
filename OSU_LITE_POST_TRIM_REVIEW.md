@@ -686,11 +686,15 @@ Each phase should be a separate commit with a desktop build and the import → s
 
 Verified at runtime: builds green, reaches MainMenu with no exceptions, no outbound network requests, and no "DummyAPIAccess cannot process this request" log messages.
 
-### Phase B — Finish already-started deletions
+### Phase B — Finish already-started deletions — ✅ COMPLETED
 
-- Delete mod-select UI, footer, presets, settings, and actions after relocating the two shared helpers.
-- Delete orphaned notification subclasses, DTOs, auth types, overlay helpers, mobile updater, discussion settings, white-box screen, and downloader abstractions.
-- Remove confirmed dead package references.
+- ✅ Deleted the mod-select UI cluster (30 files in `Overlays/Mods/` + `FooterButtonMods`, ~5.5k lines), the `Mods/Input/` hotkey handlers, `ModSpeedHotkeyHandler` and its song-select actions, the `ModSelectHotkeyStyle`/`ModSelectTextSearchStartsActive` settings + config keys + localisation, and the `ModPreset` maintenance panel. Relocated the two shared helpers first: `BeatmapAttributeTooltip` → `Screens/Select`, `ShearedOverlayContainer` → `Overlays`.
+- ✅ Deleted orphaned notification subclasses (`OutageNotification`, `ScoreSubmissionFailureNotification`, `UserAvatarNotification`), overlay/screen helpers (`OverlayView`, `OverlayHeaderBackground`, `OverlayPanelDisplayStyleControl`, `OverlaySidebar`, `OverlayStreamControl`, `BreadcrumbControlOverlayHeader`, `SortDirection`, legacy `DangerousSettingsButton`, `SizeSlider`, `ConfirmDiscardChangesDialog`, `ScreenWhiteBox`, `DiscussionSettings`, `UpdateableOnlineBeatmapSetCover`), `MobileUpdateNotifier`, dead user DTOs (`CountryStatistics`, `Medal`, `StatusIcon`), the 17 orphaned online response DTOs + `OAuthToken`, and the `IModelDownloader`/`ModelDownloader` abstractions.
+- ✅ Removed dead package references: `DiffPlex`, `HtmlAgilityPack`, three `Microsoft.AspNetCore.SignalR.*`, `Microsoft.Extensions.Configuration.Abstractions`, `NUnit` (its only "uses" are `DebugUtils.IsNUnitRunning`, an osu.Framework helper needing no package).
+
+Deferred to database-aware / Phase F: the `ModPreset` Realm model and the mod-select `GlobalAction` enum values (`ToggleModSelection`, `DeselectAllMods`, `IncreaseModSpeed`, `DecreaseModSpeed`) are left as inert tombstones — handlers gone — to avoid a risky Realm keybinding/schema migration mid-phase.
+
+Verified at runtime: builds green, reaches MainMenu with no exceptions and no outbound network requests.
 
 ### Phase C — Collapse online compatibility paths
 
