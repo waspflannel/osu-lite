@@ -389,7 +389,7 @@ namespace osu.Game.Screens.Select
             double debounceInterval = inputManager.CurrentState.Keyboard.Keys.HasAnyButtonPressed ? SELECTION_DEBOUNCE * 2 : SELECTION_DEBOUNCE;
 
             // avoid debounce running early if there's a single long frame.
-            if (!DebugUtils.IsNUnitRunning && Clock.FramesPerSecond > 0)
+            if (Clock.FramesPerSecond > 0)
                 elapsed = Math.Min(1000 / Clock.FramesPerSecond, elapsed);
 
             debounceElapsedTime += elapsed;

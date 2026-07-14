@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.UI
             }
 
             // TODO: replace IsDebugBuild with a framework flag which asserts we are in a test scene, interactively or otherwise.
-            bool allowReferenceClockSeeks = hasReplayAttached || DebugUtils.IsNUnitRunning || DebugUtils.IsDebugBuild || !FrameStablePlayback;
+            bool allowReferenceClockSeeks = hasReplayAttached || DebugUtils.IsDebugBuild || !FrameStablePlayback;
 
             // This is a hotfix for ongoing bass issues we are trying to resolve (see https://www.un4seen.com/forum/?topic=20482.msg145474#msg145474)
             //
