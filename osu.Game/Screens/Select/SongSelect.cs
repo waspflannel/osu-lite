@@ -41,7 +41,6 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -104,8 +103,6 @@ namespace osu.Game.Screens.Select
         /// Generally set to show external content in this space.
         /// </summary>
         public float TopPadding { get; init; }
-
-        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         // Blue is the most neutral choice, so I'm using that for now.
         // Purple makes the most sense to match the "gameplay" flow, but it's a bit too strong for the current design.
@@ -303,7 +300,6 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                 },
-                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler()
             });
 
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
@@ -982,8 +978,6 @@ namespace osu.Game.Screens.Select
             if (game == null)
                 return false;
 
-            var flattenedMods = ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value));
-
             switch (e.Action)
             {
                 case GlobalAction.Select:
@@ -994,12 +988,6 @@ namespace osu.Game.Screens.Select
                     ensureGlobalBeatmapValid();
                     SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
                     return true;
-
-                case GlobalAction.IncreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, flattenedMods);
-
-                case GlobalAction.DecreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, flattenedMods);
             }
 
             return false;

@@ -18,7 +18,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Footer;
 
 namespace osu.Game.Overlays

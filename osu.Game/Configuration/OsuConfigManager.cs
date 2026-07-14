@@ -14,7 +14,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -47,8 +46,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
 
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
-            SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
-            SetDefault(OsuSetting.ModSelectTextSearchStartsActive, true);
 
 
             SetDefault(OsuSetting.BeatmapListingFeaturedArtistFilter, true);
@@ -329,7 +326,6 @@ namespace osu.Game.Configuration
         SongSelectGroupMode,
         SongSelectSortingMode,
         RandomSelectAlgorithm,
-        ModSelectHotkeyStyle,
         ShowFpsDisplay,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
@@ -374,7 +370,6 @@ namespace osu.Game.Configuration
         ReplayPlaybackControlsExpanded,
         AutomaticallyDownloadMissingBeatmaps,
         TouchDisableGameplayTaps,
-        ModSelectTextSearchStartsActive,
 
         /// <summary>
         /// The status for the current user to broadcast to other players.

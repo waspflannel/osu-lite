@@ -6,7 +6,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
@@ -26,7 +25,6 @@ namespace osu.Game.Configuration
             SetDefault(Static.LowBatteryNotificationShownOnce, false);
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
-            SetDefault(Static.LastModSelectPanelSamplePlaybackTime, (double?)null);
             SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds?>(Static.SeasonalBackgrounds, null);
             SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
@@ -68,12 +66,6 @@ namespace osu.Game.Configuration
         /// Used to debounce hover sounds game-wide to avoid volume saturation, especially in scrolling views with many UI controls like <see cref="SettingsOverlay"/>.
         /// </summary>
         LastHoverSoundPlaybackTime,
-
-        /// <summary>
-        /// The last playback time in milliseconds of an on/off sample (from <see cref="ModSelectPanel"/>).
-        /// Used to debounce <see cref="ModSelectPanel"/> on/off sounds game-wide to avoid volume saturation, especially in activating mod presets with many mods.
-        /// </summary>
-        LastModSelectPanelSamplePlaybackTime,
 
         /// <summary>
         /// The last playback time in milliseconds of a rank up/down sample (in <see cref="DefaultRankDisplay"/> and <see cref="LegacyRankDisplay"/>).

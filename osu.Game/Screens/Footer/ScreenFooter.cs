@@ -16,7 +16,6 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Menu;
 using osuTK;
 
