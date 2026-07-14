@@ -383,7 +383,6 @@ namespace osu.Game
                 })
             });
 
-            base.Content.Add(new TouchInputInterceptor());
             base.Content.Add(hitErrorTracker);
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
@@ -629,9 +628,6 @@ namespace osu.Game
 
                 case JoystickHandler jh:
                     return new JoystickSettings(jh);
-
-                case TouchHandler th:
-                    return new TouchSettings(th);
 
                 case PenHandler ph:
                     return new PenSettings(ph);

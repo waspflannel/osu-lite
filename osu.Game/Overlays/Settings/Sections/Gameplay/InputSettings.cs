@@ -32,14 +32,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Caption = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = SkinSettingsStrings.GameplayCursorDuringTouch,
-                    Current = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch)
-                })
-                {
-                    Keywords = new[] { @"touchscreen" },
-                },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API.Requests.Responses;
@@ -26,7 +25,6 @@ namespace osu.Game.Configuration
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
-            SetDefault(Static.TouchInputActive, RuntimeInfo.IsMobile);
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
             SetDefault<ScoreInfo?>(Static.LastAppliedOffsetScore, null);
             SetDefault<UserActivity?>(Static.UserOnlineActivity, null);
@@ -65,12 +63,6 @@ namespace osu.Game.Configuration
         /// Used to debounce rank change sounds game-wide to avoid potential volume saturation from multiple simultaneous playback.
         /// </summary>
         LastRankChangeSamplePlaybackTime,
-
-        /// <summary>
-        /// Whether the last positional input received was a touch input.
-        /// Used in touchscreen detection scenarios (<see cref="TouchInputInterceptor"/>).
-        /// </summary>
-        TouchInputActive,
 
         /// <summary>
         /// Stores the local user's last score (can be completed or aborted).

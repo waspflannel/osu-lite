@@ -52,8 +52,6 @@ namespace osu.Game.Screens.Select
         private void load(AudioManager audio)
         {
             sampleConfirmSelection = audio.Samples.Get(@"SongSelect/confirm-selection");
-
-            AddInternal(new SongSelectTouchInputDetector());
         }
 
         public override IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)

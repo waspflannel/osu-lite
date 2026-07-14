@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        public override bool PropagatePositionalInputSubTree => alwaysShow.Value || touchActive.Value;
+        public override bool PropagatePositionalInputSubTree => alwaysShow.Value;
 
         public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
@@ -84,11 +84,6 @@ namespace osu.Game.Screens.Play.HUD
             alwaysShow = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton);
         }
 
-        [Resolved]
-        private SessionStatics sessionStatics { get; set; }
-
-        private Bindable<bool> touchActive;
-
         protected override void LoadComplete()
         {
             button.HoldActivationDelay.BindValueChanged(v =>
@@ -98,20 +93,8 @@ namespace osu.Game.Screens.Play.HUD
                     : UserInterfaceStrings.PressForMenu;
             }, true);
 
-            touchActive = sessionStatics.GetBindable<bool>(Static.TouchInputActive);
-
-            if (touchActive.Value)
-            {
-                Alpha = 1f;
-                text.FadeInFromZero(500, Easing.OutQuint)
-                    .Delay(1500)
-                    .FadeOut(500, Easing.OutQuint);
-            }
-            else
-            {
-                Alpha = 0;
-                text.Alpha = 0f;
-            }
+            Alpha = 0;
+            text.Alpha = 0f;
 
             base.LoadComplete();
         }
@@ -131,17 +114,12 @@ namespace osu.Game.Screens.Play.HUD
             // While the button is hovered or still animating, keep fully visible.
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
-            // When touch input is detected, keep visible at a constant opacity.
-            else if (touchActive.Value)
-                Alpha = 0.5f;
             // Otherwise, if the user chooses, show it when the mouse is nearby.
             else if (alwaysShow.Value)
             {
-                float minAlpha = touchActive.Value ? .08f : 0;
-
                 Alpha = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, Math.Clamp(1 - positionalAdjust, minAlpha, 1), 0, 200, Easing.OutQuint);
+                    Alpha, Math.Clamp(1 - positionalAdjust, 0, 1), 0, 200, Easing.OutQuint);
             }
             else
                 Alpha = 0;
