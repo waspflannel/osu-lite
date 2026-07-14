@@ -199,9 +199,6 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
         private IBeatmapUpdater beatmapUpdater;
 
-        private UserLookupCache userCache;
-        private BeatmapLookupCache beatmapCache;
-
         private RulesetConfigCache rulesetConfigCache;
 
         private SessionAverageHitErrorTracker hitErrorTracker;
@@ -320,12 +317,6 @@ namespace osu.Game
             dependencies.CacheAs(beatmapUpdater = CreateBeatmapUpdater());
 
             BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
-
-            dependencies.Cache(userCache = new UserLookupCache());
-            base.Content.Add(userCache);
-
-            dependencies.Cache(beatmapCache = new BeatmapLookupCache());
-            base.Content.Add(beatmapCache);
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
