@@ -44,8 +44,6 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        private readonly BeatmapExporter beatmapExporter;
-
         private readonly LegacyBeatmapExporter legacyBeatmapExporter;
 
         public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
@@ -82,11 +80,6 @@ namespace osu.Game.Beatmaps
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
-
-            beatmapExporter = new BeatmapExporter(storage)
-            {
-                PostNotification = obj => PostNotification?.Invoke(obj)
-            };
 
             legacyBeatmapExporter = new LegacyBeatmapExporter(storage)
             {
@@ -488,8 +481,6 @@ namespace osu.Game.Beatmaps
 
         public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
             beatmapImporter.BeginExternalEditing(model);
-
-        public Task Export(BeatmapSetInfo beatmapSet) => beatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
 
         public Task ExportLegacy(BeatmapSetInfo beatmapSet) => legacyBeatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
 

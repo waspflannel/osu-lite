@@ -46,14 +46,12 @@ namespace osu.Desktop.Windows
         private static readonly FileAssociation[] file_associations =
         {
             new FileAssociation(@".osz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Beatmap),
-            new FileAssociation(@".olz", WindowsAssociationManagerStrings.OsuBeatmap, Icons.Beatmap),
             new FileAssociation(@".osr", WindowsAssociationManagerStrings.OsuReplay, Icons.Beatmap),
         };
 
         private static readonly UriAssociation[] uri_associations =
         {
             new UriAssociation(@"osu", WindowsAssociationManagerStrings.OsuProtocol, Icons.Lazer),
-            new UriAssociation(@"osump", WindowsAssociationManagerStrings.OsuMultiplayer, Icons.Lazer),
         };
 
         /// <summary>

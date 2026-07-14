@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using osu.Desktop.LegacyIpc;
 using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
@@ -21,8 +20,6 @@ namespace osu.Desktop
 #else
         private const string base_game_name = @"osu";
 #endif
-
-        private static LegacyTcpIpcProvider? legacyIpc;
 
         [STAThread]
         public static void Main(string[] args)
@@ -107,24 +104,7 @@ namespace osu.Desktop
                     }
                 }
 
-                if (host.IsPrimaryInstance)
-                {
-                    try
-                    {
-                        Logger.Log("Starting legacy IPC provider...");
-                        legacyIpc = new LegacyTcpIpcProvider();
-                        legacyIpc.Bind();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex, "Failed to start legacy IPC provider");
-                    }
-                }
-
-                host.Run(new OsuGameDesktop(args)
-                {
-                    EnableWebSocketServer = Environment.GetEnvironmentVariable("OSU_WEBSOCKET_SERVER") == "1",
-                });
+                host.Run(new OsuGameDesktop(args));
             }
         }
 

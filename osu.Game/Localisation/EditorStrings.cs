@@ -55,11 +55,6 @@ namespace osu.Game.Localisation
         public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
 
         /// <summary>
-        /// "For editing (.olz)"
-        /// </summary>
-        public static LocalisableString ExportForEditing => new TranslatableString(getKey(@"export_for_editing"), @"For editing (.olz)");
-
-        /// <summary>
         /// "For compatibility (.osz)"
         /// </summary>
         public static LocalisableString ExportForCompatibility => new TranslatableString(getKey(@"export_for_compatibility"), @"For compatibility (.osz)");
