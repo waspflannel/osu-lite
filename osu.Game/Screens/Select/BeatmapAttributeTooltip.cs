@@ -11,10 +11,11 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Difficulty;
 using osuTK;
 
-namespace osu.Game.Overlays.Mods
+namespace osu.Game.Screens.Select
 {
     public partial class BeatmapAttributeTooltip : VisibilityContainer, ITooltip<RulesetBeatmapAttribute?>
     {

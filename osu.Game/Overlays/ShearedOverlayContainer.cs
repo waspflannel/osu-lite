@@ -12,7 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Footer;
 
-namespace osu.Game.Overlays.Mods
+namespace osu.Game.Overlays
 {
     /// <summary>
     /// A sheared overlay which provides a header and basic animations.
