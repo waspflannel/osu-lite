@@ -94,26 +94,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ScrollSpeedTooltip(int scrollTime, double scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1:N1})", scrollTime, scrollSpeed);
 
-        /// <summary>
-        /// "Mobile layout"
-        /// </summary>
-        public static LocalisableString MobileLayout => new TranslatableString(getKey(@"mobile_layout"), @"Mobile layout");
-
-        /// <summary>
-        /// "Portrait"
-        /// </summary>
-        public static LocalisableString Portrait => new TranslatableString(getKey(@"portrait"), @"Portrait");
-
-        /// <summary>
-        /// "Landscape"
-        /// </summary>
-        public static LocalisableString Landscape => new TranslatableString(getKey(@"landscape"), @"Landscape");
-
-        /// <summary>
-        /// "Landscape (expanded columns)"
-        /// </summary>
-        public static LocalisableString LandscapeExpandedColumns => new TranslatableString(getKey(@"landscape_expanded_columns"), @"Landscape (expanded columns)");
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

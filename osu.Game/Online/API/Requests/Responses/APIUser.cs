@@ -195,14 +195,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"beatmap_playcounts_count")]
         public int BeatmapPlayCountsCount;
 
-        [JsonProperty(@"playstyle")]
-        private string[] playStyle
-        {
-            set => PlayStyles = value?.Select(str => Enum.Parse<APIPlayStyle>(str, true)).ToArray();
-        }
-
-        public APIPlayStyle[] PlayStyles;
-
         [JsonProperty(@"playmode")]
         public string PlayMode;
 
@@ -236,14 +228,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public UserStatistics Statistics
         {
             get => statistics ??= new UserStatistics();
-            set
-            {
-                if (statistics != null)
-                    // we may already have rank history populated
-                    value.RankHistory = statistics.RankHistory;
-
-                statistics = value;
-            }
+            set => statistics = value;
         }
 
         // Only provided via /users/ batch lookups. Usually implicitly comes inside `UserStatistics`.
@@ -260,27 +245,6 @@ namespace osu.Game.Online.API.Requests.Responses
             public int RulesetId;
         }
 
-        [JsonProperty(@"rank_history")]
-        private APIRankHistory rankHistory
-        {
-            set => Statistics.RankHistory = value;
-        }
-
-        [JsonProperty(@"active_tournament_banners")]
-        public TournamentBanner[] TournamentBanners;
-
-        [JsonProperty("badges")]
-        public Badge[] Badges;
-
-        [JsonProperty("user_achievements")]
-        public APIUserAchievement[] Achievements;
-
-        [JsonProperty("monthly_playcounts")]
-        public APIUserHistoryCount[] MonthlyPlayCounts;
-
-        [JsonProperty("replays_watched_counts")]
-        public APIUserHistoryCount[] ReplaysWatchedCounts;
-
         /// <summary>
         /// All user statistics per ruleset's short name (in the case of a <c>GetUsersRequest</c> or <c>GetMeRequest</c> response).
         /// Otherwise empty. Can be altered for testing purposes.
@@ -289,15 +253,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("statistics_rulesets")]
         [CanBeNull]
         public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
-
-        [JsonProperty("groups")]
-        public APIUserGroup[] Groups;
-
-        [JsonProperty("daily_challenge_user_stats")]
-        public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
-
-        [JsonProperty("matchmaking_stats")]
-        public APIUserMatchmakingStatistics[] MatchmakingStatistics = [];
 
         public override string ToString() => Username;
 

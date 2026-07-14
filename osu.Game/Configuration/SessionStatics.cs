@@ -19,7 +19,6 @@ namespace osu.Game.Configuration
     {
         protected override void InitialiseDefaults()
         {
-            SetDefault(Static.LoginOverlayDisplayed, false);
             SetDefault(Static.MutedAudioNotificationShownOnce, false);
             SetDefault(Static.LowBatteryNotificationShownOnce, false);
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
@@ -39,7 +38,6 @@ namespace osu.Game.Configuration
         /// </remarks>
         public void ResetAfterInactivity()
         {
-            GetBindable<bool>(Static.LoginOverlayDisplayed).SetDefault();
             GetBindable<bool>(Static.MutedAudioNotificationShownOnce).SetDefault();
             GetBindable<bool>(Static.LowBatteryNotificationShownOnce).SetDefault();
         }
@@ -47,7 +45,6 @@ namespace osu.Game.Configuration
 
     public enum Static
     {
-        LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
         LowBatteryNotificationShownOnce,
         FeaturedArtistDisclaimerShownOnce,

@@ -39,11 +39,6 @@ namespace osu.Game.Online
         public string SpectatorUrl { get; set; } = string.Empty;
 
         /// <summary>
-        /// The endpoint for the SignalR multiplayer server.
-        /// </summary>
-        public string MultiplayerUrl { get; set; } = string.Empty;
-
-        /// <summary>
         /// The endpoint for the SignalR metadata server.
         /// </summary>
         public string MetadataUrl { get; set; } = string.Empty;

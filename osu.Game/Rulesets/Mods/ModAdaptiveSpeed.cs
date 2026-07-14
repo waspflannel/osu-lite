@@ -33,9 +33,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Fun;
 
-        public sealed override bool ValidForMultiplayer => false;
-        public sealed override bool ValidForMultiplayerAsFreeMod => false;
-
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp), typeof(ModAutoplay) };
 
         [SettingSource("Initial rate", "The starting speed of the track", SettingControlType = typeof(MultiplierSettingsSlider))]

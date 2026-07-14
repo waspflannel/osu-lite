@@ -50,24 +50,6 @@ namespace osu.Game.Rulesets.Mods
         bool UserPlayable { get; }
 
         /// <summary>
-        /// Whether this mod is valid for multiplayer matches.
-        /// Should be <c>false</c> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).
-        /// </summary>
-        bool ValidForMultiplayer { get; }
-
-        /// <summary>
-        /// Whether this mod is valid as a required mod when freestyle is enabled.
-        /// Should be <c>true</c> for mods that are guaranteed to be implemented across all rulesets.
-        /// </summary>
-        bool ValidForFreestyleAsRequiredMod { get; }
-
-        /// <summary>
-        /// Whether this mod is valid as a free mod in multiplayer matches.
-        /// Should be <c>false</c> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).
-        /// </summary>
-        bool ValidForMultiplayerAsFreeMod { get; }
-
-        /// <summary>
         /// Indicates that this mod is always permitted in scenarios wherein a user is submitting a score regardless of other circumstances.
         /// Intended for mods that are informational in nature and do not really affect gameplay by themselves,
         /// but are more of a gauge of increased/decreased difficulty due to the user's configuration (e.g. <see cref="ModTouchDevice"/>).

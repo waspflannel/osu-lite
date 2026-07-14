@@ -84,11 +84,6 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
 
         /// <summary>
-        /// "{0} invited you to the multiplayer match &quot;{1}&quot;! Click to join."
-        /// </summary>
-        public static LocalisableString InvitedYouToTheMultiplayer(string username, string roomName) => new TranslatableString(getKey(@"invited_you_to_the_multiplayer"), @"{0} invited you to the multiplayer match ""{1}""! Click to join.", username, roomName);
-
-        /// <summary>
         /// "You do not have the beatmap for this replay."
         /// </summary>
         public static LocalisableString MissingBeatmapForReplay => new TranslatableString(getKey(@"missing_beatmap_for_replay"), @"You do not have the beatmap for this replay.");
@@ -102,11 +97,6 @@ Please try changing your audio device to a working setting.");
         /// "Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it."
         /// </summary>
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
-
-        /// <summary>
-        /// "This multiplayer room has ended. Click to display room results."
-        /// </summary>
-        public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
 
         /// <summary>
         /// "Mention"
@@ -189,16 +179,6 @@ Please try changing your audio device to a working setting.");
         /// </summary>
         public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot saved! Click to view.
 {0}", filename);
-
-        /// <summary>
-        /// "The multiplayer server will be right back..."
-        /// </summary>
-        public static LocalisableString MultiplayerServerShuttingDownImmediately => new TranslatableString(getKey(@"multiplayer_server_shutting_down_immediately"), @"The multiplayer server will be right back...");
-
-        /// <summary>
-        /// "The multiplayer server is restarting in {0}."
-        /// </summary>
-        public static LocalisableString MultiplayerServerShuttingDownRemaining(string remainingTime) => new TranslatableString(getKey(@"multiplayer_server_shutting_down_remaining"), @"The multiplayer server is restarting in {0}.", remainingTime);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

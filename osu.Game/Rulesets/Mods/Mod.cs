@@ -97,14 +97,6 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool UserPlayable => true;
 
         [JsonIgnore]
-        public virtual bool ValidForMultiplayer => true;
-
-        public virtual bool ValidForFreestyleAsRequiredMod => false;
-
-        [JsonIgnore]
-        public virtual bool ValidForMultiplayerAsFreeMod => true;
-
-        [JsonIgnore]
         public virtual bool AlwaysValidForSubmission => false;
 
         /// <summary>

@@ -46,9 +46,6 @@ namespace osu.Game.Users
         [JsonProperty(@"country_rank")]
         public int? CountryRank;
 
-        // populated via User model, as that's where the data currently lives.
-        public APIRankHistory RankHistory;
-
         [JsonProperty(@"pp")]
         public decimal? PP;
 
