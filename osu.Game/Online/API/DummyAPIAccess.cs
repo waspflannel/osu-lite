@@ -52,7 +52,8 @@ namespace osu.Game.Online.API
         /// </summary>
         public Func<APIRequest, bool>? HandleRequest;
 
-        private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Online);
+        // osu! lite is offline: the API never connects, so IsLoggedIn is always false and the local user stays a guest.
+        private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Offline);
 
         private bool shouldFailNextLogin;
         private bool stayConnectingNextLogin;
