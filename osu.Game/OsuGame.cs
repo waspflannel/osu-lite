@@ -64,7 +64,6 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Seasonal;
 using osu.Game.Skinning;
-using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
@@ -715,8 +714,6 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
-        protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
-
         /// <summary>
         /// Adjust the globally applied <see cref="DrawSizePreservingFillContainer.TargetDrawSize"/> in every <see cref="ScalingContainer"/>.
         /// Useful for changing how the game handles different aspect ratios.
@@ -973,9 +970,6 @@ namespace osu.Game
 
             loadComponentSingleFile(screenshotManager, Add);
 
-            // dependency on notification overlay, dependent by settings overlay
-            loadComponentSingleFile(CreateUpdateManager(), Add, true);
-
             // overlay elements
             loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), footerBasedOverlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
@@ -1017,17 +1011,10 @@ namespace osu.Game
 
             applyConfigMigrations();
 
-            string lastVersion = LocalConfig.Get<string>(OsuSetting.Version);
-            string version = Version;
-
-            // only show a notification if we've previously saved a version to the config file (ie. not the first run).
-            if (IsDeployedBuild && !string.IsNullOrEmpty(lastVersion) && version != lastVersion)
-                Notifications.Post(new UpdateCompleteNotification(version));
-
             // finally, update the version stored to the configuration.
             // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
             // debug / local compilations will reset to a non-release string.
-            LocalConfig.SetValue(OsuSetting.Version, version);
+            LocalConfig.SetValue(OsuSetting.Version, Version);
         }
 
         /// <summary>

@@ -11,14 +11,11 @@ using osu.Desktop.Performance;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
 using osu.Game;
-using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
-using osu.Game.Updater;
 using osu.Desktop.MacOS;
 using osu.Desktop.Windows;
 using osu.Framework.Allocation;
-using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Performance;
@@ -33,8 +30,6 @@ namespace osu.Desktop
 
         [Cached(typeof(IHighPerformanceSessionManager))]
         private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
-
-        public bool IsFirstRun { get; init; }
 
         public bool EnableWebSocketServer { get; init; }
 
@@ -107,25 +102,13 @@ namespace osu.Desktop
 
         public static bool IsPackageManaged => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER"));
 
-        protected override UpdateManager CreateUpdateManager()
-        {
-            // If this is the first time we've run the game, ie it is being installed,
-            // reset the user's release stream to "lazer".
-            //
-            // This ensures that if a user is trying to recover from a failed startup on an unstable release stream,
-            // the game doesn't immediately try and update them back to the release stream after starting up.
-            if (IsFirstRun)
-                LocalConfig.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
-
-            if (IsPackageManaged)
-                return new NoActionUpdateManager();
-
-            return new VelopackUpdateManager();
-        }
-
         public override bool RestartAppWhenExited()
         {
-            RestartOnExitAction = () => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId);
+            string? exePath = Environment.ProcessPath;
+            if (string.IsNullOrEmpty(exePath))
+                return false;
+
+            RestartOnExitAction = () => System.Diagnostics.Process.Start(exePath);
             return true;
         }
 
@@ -139,6 +122,7 @@ namespace osu.Desktop
             {
                 case RuntimeInfo.Platform.Windows:
                     LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+                    WindowsAssociationManager.UpdateAssociations();
                     break;
 
                 case RuntimeInfo.Platform.macOS when !IsPackageManaged && IsDeployedBuild:

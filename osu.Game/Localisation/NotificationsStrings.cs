@@ -104,28 +104,6 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
 
         /// <summary>
-        /// "You are now running osu! {0}.
-        /// Click to see what&#39;s new!"
-        /// </summary>
-        public static LocalisableString GameVersionAfterUpdate(string version) => new TranslatableString(getKey(@"game_version_after_update"), @"You are now running osu! {0}.
-Click to see what's new!", version);
-
-        /// <summary>
-        /// "Update ready to install. Click to restart!"
-        /// </summary>
-        public static LocalisableString UpdateReadyToInstall => new TranslatableString(getKey(@"update_ready_to_install"), @"Update ready to install. Click to restart!");
-
-        /// <summary>
-        /// "This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended."
-        /// </summary>
-        public static LocalisableString NotOfficialBuild => new TranslatableString(getKey(@"not_official_build"), @"This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended.");
-
-        /// <summary>
-        /// "Downloading update..."
-        /// </summary>
-        public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
-
-        /// <summary>
         /// "This multiplayer room has ended. Click to display room results."
         /// </summary>
         public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
@@ -174,21 +152,6 @@ Click to see what's new!", version);
         /// "This error has been automatically reported to the dev team."
         /// </summary>
         public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
-
-        /// <summary>
-        /// "A newer release of osu! has been found ({0} → {1})."
-        /// </summary>
-        public static LocalisableString UpdateAvailable(string oldVersion, string newVersion) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", oldVersion, newVersion);
-
-        /// <summary>
-        /// "Click here to download the new version, which can be installed over the top of your existing installation."
-        /// </summary>
-        public static LocalisableString UpdateAvailableManualInstall => new TranslatableString(getKey(@"update_available_manual_install"), @"Click here to download the new version, which can be installed over the top of your existing installation.");
-
-        /// <summary>
-        /// "Check with your package manager / provider to bring osu! up-to-date!"
-        /// </summary>
-        public static LocalisableString UpdateAvailablePackageManaged => new TranslatableString(getKey(@"update_available_package_managed"), @"Check with your package manager / provider to bring osu! up-to-date!");
 
         /// <summary>
         /// "An action was interrupted due to a dialog being displayed."
