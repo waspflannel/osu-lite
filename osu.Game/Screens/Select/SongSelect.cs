@@ -155,7 +155,6 @@ namespace osu.Game.Screens.Select
 
         private InputManager inputManager = null!;
 
-        private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
         private Bindable<bool> configBackgroundBlur = null!;
         private Bindable<bool> showConvertedBeatmaps = null!;
@@ -168,7 +167,6 @@ namespace osu.Game.Screens.Select
             AddRangeInternal(new Drawable[]
             {
                 new GlobalScrollAdjustsVolume(),
-                onlineLookupSource,
                 mainContent = new Container
                 {
                     Anchor = Anchor.Centre,
@@ -696,7 +694,6 @@ namespace osu.Game.Screens.Select
             ensurePlayingSelected();
             updateBackgroundDim();
             updateWedgeVisibility();
-            fetchOnlineInfo(force: ReferenceEquals(e.OldValue, e.NewValue));
         }
 
         private void onLeavingScreen()
@@ -1013,75 +1010,6 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
-        }
-
-        #endregion
-
-        #region Online lookups
-
-        public enum BeatmapSetLookupStatus
-        {
-            InProgress,
-            Completed,
-        }
-
-        public class BeatmapSetLookupResult
-        {
-            public BeatmapSetLookupStatus Status { get; }
-            public APIBeatmapSet? Result { get; }
-
-            private BeatmapSetLookupResult(BeatmapSetLookupStatus status, APIBeatmapSet? result)
-            {
-                Status = status;
-                Result = result;
-            }
-
-            public static BeatmapSetLookupResult InProgress() => new BeatmapSetLookupResult(BeatmapSetLookupStatus.InProgress, null);
-            public static BeatmapSetLookupResult Completed(APIBeatmapSet? beatmapSet) => new BeatmapSetLookupResult(BeatmapSetLookupStatus.Completed, beatmapSet);
-        }
-
-        /// <summary>
-        /// Result of the latest online beatmap set lookup.
-        /// Note that this being <see langword="null"/> or <see cref="BeatmapSetLookupResult.InProgress"/> is different from
-        /// being a <see cref="BeatmapSetLookupResult.Completed"/> with a <see cref="BeatmapSetLookupResult.Result"/> of null.
-        /// The former indicates a lookup never occurring or being in progress, while the latter indicates a completed lookup with no result.
-        /// </summary>
-        [Cached(typeof(IBindable<BeatmapSetLookupResult?>))]
-        private readonly Bindable<BeatmapSetLookupResult?> lastLookupResult = new Bindable<BeatmapSetLookupResult?>();
-
-        private CancellationTokenSource? onlineLookupCancellation;
-        private Task<APIBeatmapSet?>? currentOnlineLookup;
-
-        private void fetchOnlineInfo(bool force = false)
-        {
-            var beatmapSetInfo = Beatmap.Value.BeatmapSetInfo;
-
-            if (lastLookupResult.Value?.Result?.OnlineID == beatmapSetInfo.OnlineID && !force)
-                return;
-
-            onlineLookupCancellation?.Cancel();
-            onlineLookupCancellation = null;
-
-            if (beatmapSetInfo.OnlineID < 0)
-            {
-                lastLookupResult.Value = BeatmapSetLookupResult.Completed(null);
-                return;
-            }
-
-            lastLookupResult.Value = BeatmapSetLookupResult.InProgress();
-            onlineLookupCancellation = new CancellationTokenSource();
-            currentOnlineLookup = onlineLookupSource.GetBeatmapSetAsync(beatmapSetInfo.OnlineID, onlineLookupCancellation.Token);
-            currentOnlineLookup.ContinueWith(t =>
-            {
-                if (t.IsCompletedSuccessfully)
-                    Schedule(() => lastLookupResult.Value = BeatmapSetLookupResult.Completed(t.GetResultSafely()));
-
-                if (t.Exception != null)
-                {
-                    Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
-                    Schedule(() => lastLookupResult.Value = BeatmapSetLookupResult.Completed(null));
-                }
-            });
         }
 
         #endregion
