@@ -706,12 +706,15 @@ Verified at runtime: builds green, reaches MainMenu with no exceptions and no ou
 
 Verified: builds green; three startup smoke tests reach the game with zero exceptions and zero outbound network requests. Note: an interactive song-select/play-through check via computer-use was not possible (the dev build isn't a Start-menu app, so it can't be granted). The removed lookup-result consumers and the cached provider were removed together (grep-verified no other consumers), so the DI graph is self-consistent; a manual playtest of song select → play → results is still recommended before release.
 
-### Phase D — Simplify settings and notifications
+### Phase D — Simplify settings and notifications — 🚧 IN PROGRESS
 
-- Remove invalid/dead settings and config keys.
-- Remove April Fools and seasonal-background settings.
-- Consolidate to the six-section layout.
-- Keep toast/progress delivery while removing notification history, toolbar button, unread state, and hotkey.
+- ✅ Removed dead online config keys and defaults: `NotifyOnUsernameMentioned`/`NotifyOnPrivateMessage`/`NotifyOnFriendPresenceChange`, `ShowOnlineExplicitContent`, `AutomaticallyDownloadMissingBeatmaps`, `BeatmapListingFeaturedArtistFilter`, `DashboardSortMode`, `ProfileCoverExpanded`, `WasSupporter` (plus the unused `LocalUserState` that read it).
+- ✅ Removed the April Fools `AfToggleSection` and its date-based settings insertion.
+- ✅ Removed the dead seasonal-background feature end to end (setting, `SeasonalBackgroundLoader`, `SeasonalBackgroundMode`, `APISeasonalBackgrounds`, session static, settings dropdown, localisation). Its loader was an empty offline stub, so `BackgroundScreenDefault` already fell back to normal backgrounds — behavior-preserving.
+- ✅ Removed the toolbar notification button and its unread badge.
+- ⏳ **Deferred (larger/riskier, not yet done):**
+  - The internal `NotificationOverlay` drawer/history split — keep the transient toast/progress tray while removing the permanent history sections, unread/read state, and the `ToggleNotifications` hotkey. This is delicate because every import/maintenance/error path depends on the notification model for feedback, so it needs careful refactoring plus a runtime check that progress/cancel/error toasts still work.
+  - The six-section settings consolidation (a cosmetic reorg; lower value, deferred to keep focus on removals).
 
 ### Phase E — Confirmed peripheral cuts
 
