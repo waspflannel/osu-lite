@@ -1,5 +1,32 @@
 # osu! lite post-trim review
 
+## ▶ Second-pass execution status (resume here)
+
+The second trimming pass is **in progress** on branch **`osu-lite-trim2`** (branched from `osu-lite` at `13116b584e`). Work is in small, individually-building commits; every commit compiles `osu.Desktop` clean, and startup was runtime-verified after Phases A–B (reaches MainMenu, no exceptions, zero outbound network).
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| A — Correct documented behavior | ✅ Done | Runtime-verified |
+| B — Finish already-started deletions | ✅ Done | Runtime-verified (~5.5k+ lines) |
+| C — Collapse online compatibility paths | ✅ Done | Build-verified; interactive song-select playtest still recommended |
+| D — Simplify settings and notifications | 🚧 Partial | Dead settings + April Fools + seasonal + toolbar button done; see deferred items below |
+| E — Confirmed peripheral cuts | ⬜ Not started | 8 sub-items; includes database-aware collection removal |
+| F — Final dead-code & dependency sweep | ⬜ Not started | Run after E |
+
+**To resume:** read the per-phase detail in the "Suggested implementation sequence" section (bottom of this doc) — completed phases carry a ✅ and a summary of exactly what changed; the in-progress and not-started phases list the remaining work.
+
+**Remaining work, concretely:**
+
+1. **Finish Phase D:**
+   - Notification drawer/history split: keep the transient toast/progress tray (`NotificationOverlayToastTray`) but remove the permanent drawer history (`NotificationSection`), unread/read state, and the `ToggleNotifications` hotkey/binding. Delicate — every import/maintenance/error path posts to `INotificationOverlay`, so verify progress/cancel/error toasts still appear afterward.
+   - Six-section settings consolidation (cosmetic; low priority).
+2. **Phase E** (each a separate commit): collections (database-aware — prefer schema tombstone over deleting the Realm model without a migration), updater/release streams, Sentry, Discord Rich Presence, first-run→minimal migration prompt, legacy IPC/WebSocket/`.olz`/`osump://`, remaining seasonal UI (`SeasonalUIConfig`/Christmas) + latency certifier, touch (product decision).
+3. **Phase F:** re-run cross-file reference analysis; sweep newly-orphaned localisation, config enums, assets; resolve the persisted-enum tombstones left behind (mod-select `GlobalAction`s: `ToggleModSelection`/`DeselectAllMods`/`IncreaseModSpeed`/`DecreaseModSpeed`; `ToggleNotifications`; and the `ModPreset` Realm model) via a deliberate Realm migration or explicit tombstone.
+
+**Known deferred tombstones (intentionally left inert, handlers removed):** mod-select `GlobalAction` enum values, `ModPreset` Realm model + its `RealmAccess` delete-pending hook, and stable *skin* migration (folded into the Phase E first-run rework since it shares the `StableContent` flags).
+
+**Verification gap:** an interactive song-select → play → results playtest was not performed — the dev build isn't a Start-menu app, so computer-use can't drive its window. Recommend a manual playtest of the Phase A–C changes (especially the song-select metadata wedges) before Phase E.
+
 ## Purpose and scope
 
 This document reviews the `osu-lite` branch after the major reduction recorded in `OSU_LITE_PLAN.md`. It compares the stated product contract with the current code, identifies additional features that could be removed, and marks dead or unnecessary code that is either self-contained or intertwined with retained gameplay.
