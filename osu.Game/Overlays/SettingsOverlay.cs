@@ -44,10 +44,6 @@ namespace osu.Game.Overlays
                 new DebugSection()
             };
 
-            var today = DateTimeOffset.Now;
-            if (today.Month == 4 && today.Day == 1)
-                sections.Insert(7, new AfToggleSection());
-
             return sections;
         }
 

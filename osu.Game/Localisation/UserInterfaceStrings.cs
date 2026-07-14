@@ -69,10 +69,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString BackgroundSource => new TranslatableString(getKey(@"background_source"), @"Background source");
 
-        /// <summary>
-        /// "Seasonal backgrounds"
-        /// </summary>
-        public static LocalisableString SeasonalBackgrounds => new TranslatableString(getKey(@"seasonal_backgrounds"), @"Seasonal backgrounds");
 
         /// <summary>
         /// "Changes to this setting will only apply with an active osu!supporter tag."
@@ -123,21 +119,6 @@ namespace osu.Game.Localisation
         /// "Beatmap (with storyboard / video)"
         /// </summary>
         public static LocalisableString BeatmapWithStoryboard => new TranslatableString(getKey(@"beatmap_with_storyboard"), @"Beatmap (with storyboard / video)");
-
-        /// <summary>
-        /// "Always"
-        /// </summary>
-        public static LocalisableString AlwaysSeasonalBackground => new TranslatableString(getKey(@"always_seasonal_backgrounds"), @"Always");
-
-        /// <summary>
-        /// "Never"
-        /// </summary>
-        public static LocalisableString NeverSeasonalBackground => new TranslatableString(getKey(@"never_seasonal_backgrounds"), @"Never");
-
-        /// <summary>
-        /// "Sometimes"
-        /// </summary>
-        public static LocalisableString SometimesSeasonalBackground => new TranslatableString(getKey(@"sometimes_seasonal_backgrounds"), @"Sometimes");
 
         /// <summary>
         /// "Never repeat"
