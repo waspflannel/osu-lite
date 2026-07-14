@@ -9,7 +9,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
-using osu.Game.Online.API;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
@@ -26,12 +25,12 @@ namespace osu.Game.Beatmaps
 
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdaterMetadataLookup));
 
-        public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapDifficultyCache difficultyCache, IAPIProvider api, Storage storage)
+        public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapDifficultyCache difficultyCache, Storage storage)
         {
             this.workingBeatmapCache = workingBeatmapCache;
             this.difficultyCache = difficultyCache;
 
-            metadataLookup = new BeatmapUpdaterMetadataLookup(api, storage);
+            metadataLookup = new BeatmapUpdaterMetadataLookup(storage);
         }
 
         public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)

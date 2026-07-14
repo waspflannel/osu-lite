@@ -7,26 +7,24 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
-using osu.Game.Online.API;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A component which handles population of online IDs for beatmaps using a two part lookup procedure.
+    /// A component which populates beatmap metadata/online IDs from the bundled local metadata cache.
+    /// osu! lite is offline, so there is no remote metadata source.
     /// </summary>
     public class BeatmapUpdaterMetadataLookup : IDisposable
     {
-        private readonly IOnlineBeatmapMetadataSource apiMetadataSource;
         private readonly IOnlineBeatmapMetadataSource localCachedMetadataSource;
 
-        public BeatmapUpdaterMetadataLookup(IAPIProvider api, Storage storage)
-            : this(new APIBeatmapMetadataSource(api), new LocalCachedBeatmapMetadataSource(storage))
+        public BeatmapUpdaterMetadataLookup(Storage storage)
+            : this(new LocalCachedBeatmapMetadataSource(storage))
         {
         }
 
-        internal BeatmapUpdaterMetadataLookup(IOnlineBeatmapMetadataSource apiMetadataSource, IOnlineBeatmapMetadataSource localCachedMetadataSource)
+        internal BeatmapUpdaterMetadataLookup(IOnlineBeatmapMetadataSource localCachedMetadataSource)
         {
-            this.apiMetadataSource = apiMetadataSource;
             this.localCachedMetadataSource = localCachedMetadataSource;
         }
 
@@ -101,25 +99,15 @@ namespace osu.Game.Beatmaps
         /// <param name="preferOnlineFetch">Whether online sources should be preferred for the lookup.</param>
         /// <param name="result">The result of the lookup. Can be <see langword="null"/> if no matching beatmap was found (or the lookup failed).</param>
         /// <returns>
-        /// <see langword="true"/> if any of the metadata sources were available and returned a valid <paramref name="result"/>.
-        /// <see langword="false"/> if none of the metadata sources were available, or if there was insufficient data to return a valid <paramref name="result"/>.
+        /// <see langword="true"/> if the local metadata cache was available and returned a valid <paramref name="result"/>.
+        /// <see langword="false"/> if the cache was unavailable, or if there was insufficient data to return a valid <paramref name="result"/>.
         /// </returns>
         /// <remarks>
-        /// There are two cases wherein this method will return <see langword="false"/>:
-        /// <list type="bullet">
-        /// <item>If neither the local cache or the API are available to query.</item>
-        /// <item>If the API is not available to query, and a positive match was not made in the local cache.</item>
-        /// </list>
-        /// In either case, the online ID read from the .osu file will be preserved, which may not necessarily be what we want.
-        /// TODO: reconsider this if/when a better flow for queueing online retrieval is implemented.
+        /// When this returns <see langword="false"/>, the online ID read from the .osu file will be preserved, which may not necessarily be what we want.
         /// </remarks>
         private bool tryLookup(BeatmapInfo beatmapInfo, bool preferOnlineFetch, out OnlineBeatmapMetadata? result)
         {
-            bool useLocalCache = !apiMetadataSource.Available || !preferOnlineFetch;
-            if (useLocalCache && localCachedMetadataSource.TryLookup(beatmapInfo, out result))
-                return true;
-
-            if (apiMetadataSource.TryLookup(beatmapInfo, out result))
+            if (localCachedMetadataSource.TryLookup(beatmapInfo, out result))
                 return true;
 
             result = null;
@@ -128,7 +116,6 @@ namespace osu.Game.Beatmaps
 
         public void Dispose()
         {
-            apiMetadataSource.Dispose();
             localCachedMetadataSource.Dispose();
         }
     }

@@ -592,7 +592,7 @@ namespace osu.Game
             }
         }
 
-        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage);
+        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache, Storage);
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
