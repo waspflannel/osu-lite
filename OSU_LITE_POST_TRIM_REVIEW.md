@@ -677,12 +677,14 @@ Config keys are name-based, so unused values are easier to stop registering than
 
 Each phase should be a separate commit with a desktop build and the import → song select → play → results smoke path.
 
-### Phase A — Correct documented behavior
+### Phase A — Correct documented behavior — ✅ COMPLETED
 
-- Enforce Argon and remove all user-skin import/select/export/delete/migration entrypoints.
-- Remove `.osk` association.
-- Set the offline identity/API state consistently to guest/offline.
-- Remove no-op online UI links and visible supporter/online affordances.
+- ✅ Enforce Argon and remove user-skin import routing/`PresentSkin`/configured-skin restoration + persistence + the "Delete ALL skins" maintenance panel. (Stable skin *migration* removal is folded into the Phase E first-run rework since it shares the `StableContent` flags; the unused `SkinManager` export/delete/rename members are now dead-but-inert and swept in Phase F.)
+- ✅ Remove `.osk` association (Windows file association + `SkinImporter` handled extensions).
+- ✅ Set the offline identity/API state consistently to offline: `DummyAPIAccess` now starts `APIState.Offline` so `IsLoggedIn` is always false; `ScoreImporter` LastPlayed no longer gates on login. (Local user kept as "Local user" — a valid local-player representation — to avoid `SYSTEM_USER_ID` sentinel edge cases in local score attribution.)
+- ✅ Remove visible no-op online affordances: main-menu `SupporterDisplay`, song-select "searching online" link, settings wiki quick action. (Mapper/creator name de-linking is folded into the Phase C wedge rework since those files are rewritten there.)
+
+Verified at runtime: builds green, reaches MainMenu with no exceptions, no outbound network requests, and no "DummyAPIAccess cannot process this request" log messages.
 
 ### Phase B — Finish already-started deletions
 
