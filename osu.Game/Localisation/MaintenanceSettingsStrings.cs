@@ -80,36 +80,6 @@ namespace osu.Game.Localisation
         public static LocalisableString RestoreAllRecentlyDeletedBeatmaps => new TranslatableString(getKey(@"restore_all_recently_deleted_beatmaps"), @"Restore all recently deleted beatmaps");
 
         /// <summary>
-        /// "Delete ALL mod presets"
-        /// </summary>
-        public static LocalisableString DeleteAllModPresets => new TranslatableString(getKey(@"delete_all_mod_presets"), @"Delete ALL mod presets");
-
-        /// <summary>
-        /// "Restore all recently deleted mod presets"
-        /// </summary>
-        public static LocalisableString RestoreAllRecentlyDeletedModPresets => new TranslatableString(getKey(@"restore_all_recently_deleted_mod_presets"), @"Restore all recently deleted mod presets");
-
-        /// <summary>
-        /// "Deleted all mod presets!"
-        /// </summary>
-        public static LocalisableString DeletedAllModPresets => new TranslatableString(getKey(@"deleted_all_mod_presets"), @"Deleted all mod presets!");
-
-        /// <summary>
-        /// "No mod presets found to delete!"
-        /// </summary>
-        public static LocalisableString NoModPresetsFoundToDelete => new TranslatableString(getKey(@"no_mod_presets_found_to_delete"), @"No mod presets found to delete!");
-
-        /// <summary>
-        /// "Restored all deleted mod presets!"
-        /// </summary>
-        public static LocalisableString RestoredAllDeletedModPresets => new TranslatableString(getKey(@"restored_all_deleted_mod_presets"), @"Restored all deleted mod presets!");
-
-        /// <summary>
-        /// "No mod presets found to restore!"
-        /// </summary>
-        public static LocalisableString NoModPresetsFoundToRestore => new TranslatableString(getKey(@"no_mod_presets_found_to_restore"), @"No mod presets found to restore!");
-
-        /// <summary>
         /// "Please select your osu!stable install location"
         /// </summary>
         public static LocalisableString StableDirectorySelectHeader => new TranslatableString(getKey(@"stable_directory_select_header"), @"Please select your osu!stable install location");

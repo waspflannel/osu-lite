@@ -11,7 +11,7 @@ The second trimming pass is **in progress** on branch **`osu-lite-trim2`** (bran
 | C — Collapse online compatibility paths | ✅ Done | Build-verified; interactive song-select playtest still recommended |
 | D — Simplify settings and notifications | 🚧 Partial | Dead settings + April Fools + seasonal + toolbar button done; see deferred items below |
 | E — Confirmed peripheral cuts | ✅ Done | All 8 sub-items complete; see below |
-| F — Final dead-code & dependency sweep | ⬜ Not started | Run after E |
+| F — Final dead-code & dependency sweep | 🚧 Partial | ModPreset + GlobalAction tombstones done; broader orphan sweep in progress |
 
 **To resume:** read the per-phase detail in the "Suggested implementation sequence" section (bottom of this doc) — completed phases carry a ✅ and a summary of exactly what changed; the in-progress and not-started phases list the remaining work.
 
@@ -22,7 +22,7 @@ The second trimming pass is **in progress** on branch **`osu-lite-trim2`** (bran
    - Six-section settings consolidation (cosmetic; low priority).
 2. **Phase F:** re-run cross-file reference analysis; sweep newly-orphaned localisation, config enums, assets; resolve the persisted-enum tombstones left behind (mod-select `GlobalAction`s: `ToggleModSelection`/`DeselectAllMods`/`IncreaseModSpeed`/`DecreaseModSpeed`; `ToggleNotifications`; and the `ModPreset` Realm model) via a deliberate Realm migration or explicit tombstone.
 
-**Known deferred tombstones (intentionally left inert, handlers removed):** mod-select `GlobalAction` enum values, `ModPreset` Realm model + its `RealmAccess` delete-pending hook, and `ModTouchDevice`/`OsuModTouchDevice` (kept for replay/difficulty fidelity after touch input removal — see Phase E item 8).
+**Known deferred tombstones:** `ModTouchDevice`/`OsuModTouchDevice` (kept for replay/difficulty fidelity after touch input removal — see Phase E item 8). The `GlobalAction` and `ModPreset` tombstones listed above are now resolved (see Phase F below).
 
 **Verification gap:** an interactive song-select → play → results playtest was not performed — the dev build isn't a Start-menu app, so computer-use can't drive its window. Recommend a manual playtest before shipping, covering song select, gameplay, results, and the first-run migration prompt.
 
@@ -755,11 +755,11 @@ Execute as separate reviewable commits:
 - ✅ Seasonal UI and latency certifier — deleted `osu.Game/Seasonal/` (6 files: `SeasonalUIConfig`, `IntroChristmas`, `OsuLogoChristmas`, `SeasonalMenuLogoVisualisation`, `SeasonalMenuSideFlashes`, `MainMenuSeasonalLighting`) and `osu.Game/Screens/Utility/` (the 10-file latency certifier, including its Maintenance-settings entry point and `DebugSettingsStrings.RunLatencyCertifier`). Every `SeasonalUIConfig.ENABLED` branch collapsed to its always-taken non-seasonal path (`OsuGame`'s logo, `MainMenu`'s lighting/side-flashes/fountains/dim, `Loader`'s intro selection, `MusicController`'s track-list filter). There is now one deterministic main-menu presentation path. Build-verified (`osu.Desktop` clean).
 - ✅ Touch support — removed per explicit user decision (product choice, confirmed 2026-07-14). Deleted `TouchInputInterceptor`, `SongSelectTouchInputDetector`, `PlayerTouchInputDetector` (already dead), `OsuTouchInputMapper`, the `TouchSettings` input-device panel, `TouchSettingsStrings.cs`, and the orphaned `MobileUtils.cs`. Removed `Static.TouchInputActive`, `OsuSetting.GameplayCursorDuringTouch`/`TouchDisableGameplayTaps` and their settings UI, the touch-taps-blocking branch in `RulesetInputManager`, the touch-cursor-visibility branch in `GlobalCursorDisplay` (now always hides the cursor for touch-sourced input), and the `OsuTouchInputMapper` construction + `TouchMoveEvent` handling in `OsuInputManager`. `PlayerSettings/InputSettings` and `GeneralSettingsStrings`/`RulesetSettingsStrings` touch-only strings were simplified/removed to match desktop-only mouse input. `ModTouchDevice`/`OsuModTouchDevice` mod classes and their difficulty-calculator adjustments (`Aim`/`Flashlight`/`Reading`/`OsuDifficultyCalculator`) were deliberately **kept** as inert — they can no longer be selected or auto-applied, but keeping them preserves correct star rating and replay fidelity for any local `.osr` that used Touch Device historically, consistent with the "replay mods are retained" contract. Build-verified (`osu.Desktop` clean).
 
-### Phase F — Final dead-code and dependency sweep
+### Phase F — Final dead-code and dependency sweep — 🚧 IN PROGRESS
 
-- Re-run cross-file type/reference analysis after the larger owners are gone.
-- Remove newly orphaned localisation, config enums, user DTO fields, graphics controls, packages, assets, and comments.
-- Search for “online”, “login”, “multiplayer”, “supporter”, “skin import”, “mod select”, “collection”, and “mobile” in active source and justify every remaining occurrence.
+- ✅ Resolved the `ModPreset` Realm model tombstone via a deliberate migration: `osu.Game/Rulesets/Mods/ModPreset.cs` deleted, `schema_version` bumped 52→53, the `RealmAccess` delete-pending cleanup hook for `ModPreset` removed, and all orphaned `ModPreset`-only localisation (`CommonStrings.ModPresets`, `MaintenanceSettingsStrings.*ModPresets*`, `DeleteConfirmationContentStrings.ModPresets`, `MenuTipStrings.ModPresets`/`ModCustomisationSettings`) deleted.
+- ✅ Resolved the mod-select `GlobalAction` tombstones (`ToggleModSelection`, `DeselectAllMods`, `IncreaseModSpeed`, `DecreaseModSpeed`) and `ToggleNotifications`: removed their default `KeyBinding` entries (which also removes them from the keybinding settings UI, since that UI is driven off the default-binding lists) and their `[LocalisableDescription]` attributes, replacing each with a `// Tombstoned: ...` comment. The enum *values* themselves are kept, unrenumbered, since they're persisted as integers in existing users' Realm keybinding rows. Also tombstoned three further dead online-overlay actions found in the same enum during this pass (`ToggleChat`, `ToggleSocial`, `ToggleBeatmapListing`, `ToggleProfile`) using the same pattern, and deleted the now-fully-dead `SpeedChangeToast` (only ever displayed the now-tombstoned mod-speed bindings, had zero constructors anywhere). Orphaned `GlobalActionKeyBindingStrings` entries for all of the above were removed. Build-verified (`osu.Desktop` clean).
+- 🚧 Broader cross-file orphan sweep (unused classes/DTOs, unused package references, leftover empty directories) — in progress, see below once complete.
 
 ## Validation gates for future phases
 

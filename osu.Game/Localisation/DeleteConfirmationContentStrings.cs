@@ -34,11 +34,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Scores => new TranslatableString(getKey(@"scores"), @"Are you sure you want to delete all scores? This cannot be undone!");
 
-        /// <summary>
-        /// "Are you sure you want to delete all mod presets?"
-        /// </summary>
-        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"Are you sure you want to delete all mod presets?");
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -102,8 +102,9 @@ namespace osu.Game.Database
         /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
         /// 51   2025-07-22    Add ScoreInfo.Pauses.
         /// 52   2026-07-14    Remove BeatmapCollection (collections feature removed from osu! lite).
+        /// 53   2026-07-14    Remove ModPreset (mod-select feature removed from osu! lite).
         /// </summary>
-        private const int schema_version = 52;
+        private const int schema_version = 53;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -407,11 +408,6 @@ namespace osu.Game.Database
                     var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
 
                     foreach (var s in pendingDeleteSkins)
-                        realm.Remove(s);
-
-                    var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
-
-                    foreach (var s in pendingDeletePresets)
                         realm.Remove(s);
 
                     transaction.Commit();
