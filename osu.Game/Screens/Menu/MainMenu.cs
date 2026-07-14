@@ -35,7 +35,6 @@ using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select;
-using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
 
@@ -121,7 +120,6 @@ namespace osu.Game.Screens.Menu
 
             AddRangeInternal(new[]
             {
-                SeasonalUIConfig.ENABLED ? new MainMenuSeasonalLighting() : Empty(),
                 new GlobalScrollAdjustsVolume(),
                 buttonsContainer = new ParallaxContainer
                 {
@@ -140,15 +138,14 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 logoTarget = new Container { RelativeSizeAxes = Axes.Both, },
-                sideFlashes = SeasonalUIConfig.ENABLED ? new SeasonalMenuSideFlashes() : new MenuSideFlashes(),
+                sideFlashes = new MenuSideFlashes(),
                 songTicker = new SongTicker
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
-                // For now, this is too much alongside the seasonal lighting.
-                SeasonalUIConfig.ENABLED ? Empty() : new KiaiMenuFountains(),
+                new KiaiMenuFountains(),
                 bottomElementsFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -168,7 +165,7 @@ namespace osu.Game.Screens.Menu
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
-            float baseDim = SeasonalUIConfig.ENABLED ? 0.84f : 1;
+            const float baseDim = 1;
 
             Buttons.StateChanged += state =>
             {

@@ -34,11 +34,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SelectFile => new TranslatableString(getKey(@"select_file"), @"Select a file");
 
-        /// <summary>
-        /// "Run latency certifier"
-        /// </summary>
-        public static LocalisableString RunLatencyCertifier => new TranslatableString(getKey(@"run_latency_certifier"), @"Run latency certifier");
-
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

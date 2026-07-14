@@ -11,7 +11,6 @@ using osu.Framework.Screens;
 using osu.Game.Localisation;
 using osu.Game.Screens;
 using osu.Game.Screens.Import;
-using osu.Game.Screens.Utility;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -40,11 +39,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()));
                     },
                 },
-                new SettingsButtonV2
-                {
-                    Text = DebugSettingsStrings.RunLatencyCertifier,
-                    Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
-                }
             });
         }
 
