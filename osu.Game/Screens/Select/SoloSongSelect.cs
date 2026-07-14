@@ -62,9 +62,6 @@ namespace osu.Game.Screens.Select
 
             yield return new OsuMenuItemSpacer();
 
-            foreach (var i in CreateCollectionMenuActions(beatmap))
-                yield return i;
-
             if (beatmap.LastPlayed == null)
                 yield return new OsuMenuItem(SongSelectStrings.MarkAsPlayed, MenuItemType.Standard, () => beatmaps.MarkPlayed(beatmap)) { Icon = FontAwesome.Solid.TimesCircle };
             else

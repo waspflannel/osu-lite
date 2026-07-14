@@ -67,7 +67,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new ImportCheckbox(CommonStrings.Beatmaps, StableContent.Beatmaps),
                 new ImportCheckbox(CommonStrings.Scores, StableContent.Scores),
                 new ImportCheckbox(CommonStrings.Skins, StableContent.Skins),
-                new ImportCheckbox(CommonStrings.Collections, StableContent.Collections),
                 copyInformation = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,

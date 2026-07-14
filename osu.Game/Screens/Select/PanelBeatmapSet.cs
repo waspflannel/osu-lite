@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -18,8 +17,6 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Collections;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
@@ -207,12 +204,6 @@ namespace osu.Game.Screens.Select
             spreadDisplay.BeatmapSet.Value = null;
         }
 
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
-        [Resolved]
-        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
-
         public override MenuItem[] ContextMenuItems
         {
             get
@@ -231,17 +222,6 @@ namespace osu.Game.Screens.Select
                 }
 
 
-                var collectionItems = realm.Realm.All<BeatmapCollection>()
-                                           .OrderBy(c => c.Name)
-                                           .AsEnumerable()
-                                           .Select(createCollectionMenuItem)
-                                           .ToList();
-
-                if (manageCollectionsDialog != null)
-                    collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, manageCollectionsDialog.Show));
-
-                items.Add(new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems });
-
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem(SongSelectStrings.RestoreAllHidden, MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
 
@@ -250,48 +230,5 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
-        {
-            var beatmapSet = groupedBeatmapSet.BeatmapSet;
-
-            TernaryState state;
-
-            int countExisting = beatmapSet.Beatmaps.Count(b => collection.BeatmapMD5Hashes.Contains(b.MD5Hash));
-
-            if (countExisting == beatmapSet.Beatmaps.Count)
-                state = TernaryState.True;
-            else if (countExisting > 0)
-                state = TernaryState.Indeterminate;
-            else
-                state = TernaryState.False;
-
-            var liveCollection = collection.ToLive(realm);
-
-            return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
-            {
-                Task.Run(() => liveCollection.PerformWrite(c =>
-                {
-                    foreach (var b in beatmapSet.Beatmaps)
-                    {
-                        switch (s)
-                        {
-                            case TernaryState.True:
-                                if (c.BeatmapMD5Hashes.Contains(b.MD5Hash))
-                                    continue;
-
-                                c.BeatmapMD5Hashes.Add(b.MD5Hash);
-                                break;
-
-                            case TernaryState.False:
-                                c.BeatmapMD5Hashes.Remove(b.MD5Hash);
-                                break;
-                        }
-                    }
-                }));
-            })
-            {
-                State = { Value = state }
-            };
-        }
     }
 }

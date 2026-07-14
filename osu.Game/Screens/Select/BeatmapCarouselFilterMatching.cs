@@ -144,7 +144,6 @@ namespace osu.Game.Screens.Select
 
             if (!match) return false;
 
-            match &= criteria.CollectionBeatmapMD5Hashes?.Contains(beatmap.MD5Hash) ?? true;
             if (match && criteria.RulesetCriteria != null)
                 match &= criteria.RulesetCriteria.Matches(beatmap, criteria);
 

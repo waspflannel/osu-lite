@@ -101,11 +101,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Unsourced => new TranslatableString(getKey(@"unsourced"), @"Unsourced");
 
         /// <summary>
-        /// "Not in collection"
-        /// </summary>
-        public static LocalisableString NotInCollection => new TranslatableString(getKey(@"not_in_collection"), @"Not in collection");
-
-        /// <summary>
         /// "My maps"
         /// </summary>
         public static LocalisableString MyMaps => new TranslatableString(getKey(@"my_maps"), @"My maps");

@@ -217,7 +217,7 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, new Storyboard(), transferCollections: false);
+            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, new Storyboard());
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
@@ -354,15 +354,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Saves an existing <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
         /// </summary>
-        /// <remarks>
-        /// This method will also update any user beatmap collection hash references to the new post-saved hash.
-        /// </remarks>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
         /// <param name="storyboard">The storyboard content to write, null if to be omitted.</param>
         public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null, Storyboard? storyboard = null) =>
-            save(beatmapInfo, beatmapContent, beatmapSkin, storyboard, transferCollections: true);
+            save(beatmapInfo, beatmapContent, beatmapSkin, storyboard);
 
         public void DeleteAllVideos()
         {
@@ -504,7 +501,7 @@ namespace osu.Game.Beatmaps
             setInfo.Status = BeatmapOnlineStatus.LocallyModified;
         }
 
-        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, Storyboard? storyboard, bool transferCollections)
+        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, Storyboard? storyboard)
         {
             var setInfo = beatmapInfo.BeatmapSet;
             Debug.Assert(setInfo != null);
@@ -543,8 +540,6 @@ namespace osu.Game.Beatmaps
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
-                string oldMd5Hash = beatmapInfo.MD5Hash;
-
                 beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
                 beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
@@ -555,9 +550,6 @@ namespace osu.Game.Beatmaps
                 var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
 
                 setInfo.CopyChangesToRealm(liveBeatmapSet);
-
-                if (transferCollections)
-                    beatmapInfo.TransferCollectionReferences(r, oldMd5Hash);
 
                 liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
                               .UpdateLocalScores(r);

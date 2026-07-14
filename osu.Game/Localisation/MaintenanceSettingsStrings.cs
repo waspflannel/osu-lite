@@ -70,11 +70,6 @@ namespace osu.Game.Localisation
         public static LocalisableString DeleteAllSkins => new TranslatableString(getKey(@"delete_all_skins"), @"Delete ALL skins");
 
         /// <summary>
-        /// "Delete ALL collections"
-        /// </summary>
-        public static LocalisableString DeleteAllCollections => new TranslatableString(getKey(@"delete_all_collections"), @"Delete ALL collections");
-
-        /// <summary>
         /// "Restore all hidden difficulties"
         /// </summary>
         public static LocalisableString RestoreAllHiddenDifficulties => new TranslatableString(getKey(@"restore_all_hidden_difficulties"), @"Restore all hidden difficulties");
@@ -93,16 +88,6 @@ namespace osu.Game.Localisation
         /// "Restore all recently deleted mod presets"
         /// </summary>
         public static LocalisableString RestoreAllRecentlyDeletedModPresets => new TranslatableString(getKey(@"restore_all_recently_deleted_mod_presets"), @"Restore all recently deleted mod presets");
-
-        /// <summary>
-        /// "Deleted all collections!"
-        /// </summary>
-        public static LocalisableString DeletedAllCollections => new TranslatableString(getKey(@"deleted_all_collections"), @"Deleted all collections!");
-
-        /// <summary>
-        /// "No collections found to delete!"
-        /// </summary>
-        public static LocalisableString NoCollectionsFoundToDelete => new TranslatableString(getKey(@"no_collections_found_to_delete"), @"No collections found to delete!");
 
         /// <summary>
         /// "Deleted all mod presets!"

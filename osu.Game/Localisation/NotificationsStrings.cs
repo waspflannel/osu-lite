@@ -171,26 +171,6 @@ Click to see what's new!", version);
         public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
 
         /// <summary>
-        /// "Collections import is initialising..."
-        /// </summary>
-        public static LocalisableString CollectionsImportInitialising => new TranslatableString(getKey(@"collections_import_initialising"), @"Collections import is initialising...");
-
-        /// <summary>
-        /// "Reading collections..."
-        /// </summary>
-        public static LocalisableString ReadingCollections => new TranslatableString(getKey(@"reading_collections"), @"Reading collections...");
-
-        /// <summary>
-        /// "Imported {0} collections"
-        /// </summary>
-        public static LocalisableString CollectionsImportProgress(int count) => new TranslatableString(getKey(@"collections_import_progress"), @"Imported {0} collections", count);
-
-        /// <summary>
-        /// "Imported {0} of {1} collections"
-        /// </summary>
-        public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
-
-        /// <summary>
         /// "This error has been automatically reported to the dev team."
         /// </summary>
         public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
@@ -261,16 +241,6 @@ Click to see what's new!", version);
         /// "The multiplayer server is restarting in {0}."
         /// </summary>
         public static LocalisableString MultiplayerServerShuttingDownRemaining(string remainingTime) => new TranslatableString(getKey(@"multiplayer_server_shutting_down_remaining"), @"The multiplayer server is restarting in {0}.", remainingTime);
-
-        /// <summary>
-        /// "Created new collection &quot;{0}&quot; with {1} beatmaps."
-        /// </summary>
-        public static LocalisableString CollectionCreated(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_created"), @"Created new collection ""{0}"" with {1} beatmaps.", name, beatmapsCount);
-
-        /// <summary>
-        /// "Added {0} beatmaps to collection &quot;{1}&quot;."
-        /// </summary>
-        public static LocalisableString CollectionBeatmapsAdded(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_beatmaps_added"), @"Added {0} beatmaps to collection ""{1}"".", beatmapsCount, name);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -10,7 +10,7 @@ The second trimming pass is **in progress** on branch **`osu-lite-trim2`** (bran
 | B — Finish already-started deletions | ✅ Done | Runtime-verified (~5.5k+ lines) |
 | C — Collapse online compatibility paths | ✅ Done | Build-verified; interactive song-select playtest still recommended |
 | D — Simplify settings and notifications | 🚧 Partial | Dead settings + April Fools + seasonal + toolbar button done; see deferred items below |
-| E — Confirmed peripheral cuts | ⬜ Not started | 8 sub-items; includes database-aware collection removal |
+| E — Confirmed peripheral cuts | 🚧 Partial | 1/8 sub-items done (collections); see below |
 | F — Final dead-code & dependency sweep | ⬜ Not started | Run after E |
 
 **To resume:** read the per-phase detail in the "Suggested implementation sequence" section (bottom of this doc) — completed phases carry a ✅ and a summary of exactly what changed; the in-progress and not-started phases list the remaining work.
@@ -747,7 +747,7 @@ Verified: builds green; three startup smoke tests reach the game with zero excep
 
 Execute as separate reviewable commits:
 
-- Collections.
+- ✅ Collections — removed end to end: `osu.Game/Collections/` (7 files), `LegacyCollectionImporter`, song-select grouping/filter/dropdown/context-menu integration (`FilterCriteria`, `FilterControl`, `CollectionDropdown`, `BeatmapCarousel`/`BeatmapCarouselFilterGrouping`/`BeatmapCarouselFilterMatching`, `PanelBeatmapSet`, `SongSelect`/`SoloSongSelect`, `FooterButtonOptions.Popover`), results-screen `CollectionButton`/`CollectionPopover`, Maintenance `CollectionsSettings`, first-run checkbox, debug batch-import button, beatmap-hash MD5 transfer hooks (`BeatmapImporter`/`BeatmapInfo`/`BeatmapManager`), AutoMapper registration, and localisation. Existing Realm databases are handled via a deliberate schema migration (`schema_version` 51→52, historical `case 21` stable-import block turned into a documented no-op) rather than an silent model deletion. Touch support removal (item 8) was confirmed via user decision to proceed with removal. Build-verified (`osu.Desktop` clean).
 - Updater/release streams.
 - Sentry.
 - Discord Rich Presence.

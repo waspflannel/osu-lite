@@ -30,11 +30,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"Are you sure you want to delete all skins? This cannot be undone!");
 
         /// <summary>
-        /// "Are you sure you want to delete all collections? This cannot be undone!"
-        /// </summary>
-        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Are you sure you want to delete all collections? This cannot be undone!");
-
-        /// <summary>
         /// "Are you sure you want to delete all scores? This cannot be undone!"
         /// </summary>
         public static LocalisableString Scores => new TranslatableString(getKey(@"scores"), @"Are you sure you want to delete all scores? This cannot be undone!");

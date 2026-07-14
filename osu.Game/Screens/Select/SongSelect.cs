@@ -29,7 +29,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
@@ -142,10 +141,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private ManageCollectionsDialog? collectionsDialog { get; set; }
-
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -1072,9 +1067,6 @@ namespace osu.Game.Screens.Select
         #region Beatmap management
 
         [Resolved]
-        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
-
-        [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
@@ -1083,26 +1075,7 @@ namespace osu.Game.Screens.Select
             {
                 Icon = FontAwesome.Solid.Check
             };
-
-            yield return new OsuMenuItemSpacer();
-
-            foreach (var i in CreateCollectionMenuActions(beatmap))
-                yield return i;
         }
-
-        protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
-        {
-            var collectionItems = realm.Realm.All<BeatmapCollection>()
-                                       .OrderBy(c => c.Name)
-                                       .AsEnumerable()
-                                       .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
-
-            collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
-
-            yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
-        }
-
-        public void ManageCollections() => collectionsDialog?.Show();
 
         public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
 

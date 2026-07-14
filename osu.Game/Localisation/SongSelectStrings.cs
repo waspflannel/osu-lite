@@ -230,11 +230,6 @@ namespace osu.Game.Localisation
         public static LocalisableString MyMaps => new TranslatableString(getKey(@"my_maps"), @"My Maps");
 
         /// <summary>
-        /// "Collections"
-        /// </summary>
-        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
-
-        /// <summary>
         /// "Rank Achieved"
         /// </summary>
         public static LocalisableString RankAchieved => new TranslatableString(getKey(@"rank_achieved"), @"Rank Achieved");
