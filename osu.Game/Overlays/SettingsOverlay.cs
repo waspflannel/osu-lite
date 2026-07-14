@@ -33,7 +33,6 @@ namespace osu.Game.Overlays
         {
             var sections = new List<SettingsSection>
             {
-                // This list should be kept in sync with ScreenBehaviour.
                 new GeneralSection(),
                 new InputSection(createSubPanel(new KeyBindingPanel())),
                 new UserInterfaceSection(),
@@ -43,10 +42,6 @@ namespace osu.Game.Overlays
                 new MaintenanceSection(),
                 new DebugSection()
             };
-
-            var today = DateTimeOffset.Now;
-            if (today.Month == 4 && today.Day == 1)
-                sections.Insert(7, new AfToggleSection());
 
             return sections;
         }

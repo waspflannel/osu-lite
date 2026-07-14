@@ -101,8 +101,10 @@ namespace osu.Game.Database
         /// 49   2025-06-10    Reset the LegacyOnlineID to -1 for all scores that have it set to 0 (which is semantically the same) for consistency of handling with OnlineID.
         /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
         /// 51   2025-07-22    Add ScoreInfo.Pauses.
+        /// 52   2026-07-14    Remove BeatmapCollection (collections feature removed from osu! lite).
+        /// 53   2026-07-14    Remove ModPreset (mod-select feature removed from osu! lite).
         /// </summary>
-        private const int schema_version = 51;
+        private const int schema_version = 53;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -406,11 +408,6 @@ namespace osu.Game.Database
                     var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
 
                     foreach (var s in pendingDeleteSkins)
-                        realm.Remove(s);
-
-                    var pendingDeletePresets = realm.All<ModPreset>().Where(s => s.DeletePending);
-
-                    foreach (var s in pendingDeletePresets)
                         realm.Remove(s);
 
                     transaction.Commit();
@@ -974,15 +971,8 @@ namespace osu.Game.Database
                     break;
 
                 case 21:
-                    // Migrate collections from external file to inside realm.
-                    // We use the "legacy" importer because that is how things were actually being saved out until now.
-                    var legacyCollectionImporter = new LegacyCollectionImporter(this);
-
-                    if (legacyCollectionImporter.GetAvailableCount(storage).GetResultSafely() > 0)
-                    {
-                        legacyCollectionImporter.ImportFromStorage(storage).ContinueWith(_ => storage.Move("collection.db", "collection.db.migrated"));
-                    }
-
+                    // Historically this migrated collections from external file to inside realm.
+                    // The collections feature has since been removed from osu! lite (schema version 52), so this is a no-op.
                     break;
 
                 case 25:

@@ -22,7 +22,6 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -107,7 +106,6 @@ namespace osu.Game.Screens.Select
                 grouping = new BeatmapCarouselFilterGrouping
                 {
                     GetCriteria = () => Criteria!,
-                    GetCollections = GetAllCollections,
                     GetLocalUserTopRanks = GetBeatmapInfoGuidToTopRankMapping,
                     GetFavouriteBeatmapSets = GetFavouriteBeatmapSets,
                 }
@@ -819,16 +817,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
-
-        /// <remarks>
-        /// FOOTGUN WARNING: this being sorted on the realm side before detaching is IMPORTANT.
-        /// realm supports sorting as an internal operation, and realm's implementation of string sorting does NOT match dotnet's
-        /// with respect to treatment of punctuation characters like <c>-</c> or <c>_</c>, among others.
-        /// All other places that show lists of collections also use the realm-side sorting implementation,
-        /// because they use the sorting operation inside subscription queries for efficient drawable management,
-        /// so this usage kind of has to follow suit.
-        /// </remarks>
-        protected virtual List<BeatmapCollection> GetAllCollections() => realm.Run(r => r.All<BeatmapCollection>().OrderBy(c => c.Name).AsEnumerable().Detach());
 
         protected virtual Dictionary<Guid, ScoreRank> GetBeatmapInfoGuidToTopRankMapping(FilterCriteria criteria) => realm.Run(r =>
         {

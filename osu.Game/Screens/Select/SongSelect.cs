@@ -29,7 +29,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
@@ -41,7 +40,6 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -105,8 +103,6 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public float TopPadding { get; init; }
 
-        private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
-
         // Blue is the most neutral choice, so I'm using that for now.
         // Purple makes the most sense to match the "gameplay" flow, but it's a bit too strong for the current design.
         // TODO: Colour scheme choice should probably be customisable by the user.
@@ -147,12 +143,6 @@ namespace osu.Game.Screens.Select
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private ManageCollectionsDialog? collectionsDialog { get; set; }
-
-        [Resolved]
-        private DifficultyRecommender? difficultyRecommender { get; set; }
-
-        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
@@ -160,7 +150,6 @@ namespace osu.Game.Screens.Select
 
         private InputManager inputManager = null!;
 
-        private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
         private Bindable<bool> configBackgroundBlur = null!;
         private Bindable<bool> showConvertedBeatmaps = null!;
@@ -173,7 +162,6 @@ namespace osu.Game.Screens.Select
             AddRangeInternal(new Drawable[]
             {
                 new GlobalScrollAdjustsVolume(),
-                onlineLookupSource,
                 mainContent = new Container
                 {
                     Anchor = Anchor.Centre,
@@ -303,7 +291,6 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                 },
-                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler()
             });
 
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
@@ -320,7 +307,7 @@ namespace osu.Game.Screens.Select
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
-            var recommendedBeatmap = difficultyRecommender?.GetRecommendedBeatmap(groupedBeatmaps.Select(gb => gb.Beatmap)) ?? groupedBeatmaps.First().Beatmap;
+            var recommendedBeatmap = groupedBeatmaps.First().Beatmap;
             queueBeatmapSelection(groupedBeatmaps.First(bug => bug.Beatmap.Equals(recommendedBeatmap)));
         }
 
@@ -586,7 +573,7 @@ namespace osu.Game.Screens.Select
 
                 if (validBeatmaps.Any())
                 {
-                    var beatmap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+                    var beatmap = validBeatmaps.First();
                     carousel.CurrentBeatmap = beatmap;
                     debounceQueueSelection(beatmap);
                     return true;
@@ -702,7 +689,6 @@ namespace osu.Game.Screens.Select
             ensurePlayingSelected();
             updateBackgroundDim();
             updateWedgeVisibility();
-            fetchOnlineInfo(force: ReferenceEquals(e.OldValue, e.NewValue));
         }
 
         private void onLeavingScreen()
@@ -982,8 +968,6 @@ namespace osu.Game.Screens.Select
             if (game == null)
                 return false;
 
-            var flattenedMods = ModUtils.FlattenMods(game.AvailableMods.Value.SelectMany(kv => kv.Value));
-
             switch (e.Action)
             {
                 case GlobalAction.Select:
@@ -994,12 +978,6 @@ namespace osu.Game.Screens.Select
                     ensureGlobalBeatmapValid();
                     SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
                     return true;
-
-                case GlobalAction.IncreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(0.05, flattenedMods);
-
-                case GlobalAction.DecreaseModSpeed:
-                    return modSpeedHotkeyHandler.ChangeSpeed(-0.05, flattenedMods);
             }
 
             return false;
@@ -1027,75 +1005,6 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
-        }
-
-        #endregion
-
-        #region Online lookups
-
-        public enum BeatmapSetLookupStatus
-        {
-            InProgress,
-            Completed,
-        }
-
-        public class BeatmapSetLookupResult
-        {
-            public BeatmapSetLookupStatus Status { get; }
-            public APIBeatmapSet? Result { get; }
-
-            private BeatmapSetLookupResult(BeatmapSetLookupStatus status, APIBeatmapSet? result)
-            {
-                Status = status;
-                Result = result;
-            }
-
-            public static BeatmapSetLookupResult InProgress() => new BeatmapSetLookupResult(BeatmapSetLookupStatus.InProgress, null);
-            public static BeatmapSetLookupResult Completed(APIBeatmapSet? beatmapSet) => new BeatmapSetLookupResult(BeatmapSetLookupStatus.Completed, beatmapSet);
-        }
-
-        /// <summary>
-        /// Result of the latest online beatmap set lookup.
-        /// Note that this being <see langword="null"/> or <see cref="BeatmapSetLookupResult.InProgress"/> is different from
-        /// being a <see cref="BeatmapSetLookupResult.Completed"/> with a <see cref="BeatmapSetLookupResult.Result"/> of null.
-        /// The former indicates a lookup never occurring or being in progress, while the latter indicates a completed lookup with no result.
-        /// </summary>
-        [Cached(typeof(IBindable<BeatmapSetLookupResult?>))]
-        private readonly Bindable<BeatmapSetLookupResult?> lastLookupResult = new Bindable<BeatmapSetLookupResult?>();
-
-        private CancellationTokenSource? onlineLookupCancellation;
-        private Task<APIBeatmapSet?>? currentOnlineLookup;
-
-        private void fetchOnlineInfo(bool force = false)
-        {
-            var beatmapSetInfo = Beatmap.Value.BeatmapSetInfo;
-
-            if (lastLookupResult.Value?.Result?.OnlineID == beatmapSetInfo.OnlineID && !force)
-                return;
-
-            onlineLookupCancellation?.Cancel();
-            onlineLookupCancellation = null;
-
-            if (beatmapSetInfo.OnlineID < 0)
-            {
-                lastLookupResult.Value = BeatmapSetLookupResult.Completed(null);
-                return;
-            }
-
-            lastLookupResult.Value = BeatmapSetLookupResult.InProgress();
-            onlineLookupCancellation = new CancellationTokenSource();
-            currentOnlineLookup = onlineLookupSource.GetBeatmapSetAsync(beatmapSetInfo.OnlineID, onlineLookupCancellation.Token);
-            currentOnlineLookup.ContinueWith(t =>
-            {
-                if (t.IsCompletedSuccessfully)
-                    Schedule(() => lastLookupResult.Value = BeatmapSetLookupResult.Completed(t.GetResultSafely()));
-
-                if (t.Exception != null)
-                {
-                    Logger.Log($"Error when fetching online beatmap set: {t.Exception}", LoggingTarget.Network);
-                    Schedule(() => lastLookupResult.Value = BeatmapSetLookupResult.Completed(null));
-                }
-            });
         }
 
         #endregion
@@ -1158,9 +1067,6 @@ namespace osu.Game.Screens.Select
         #region Beatmap management
 
         [Resolved]
-        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
-
-        [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
         public virtual IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
@@ -1169,26 +1075,7 @@ namespace osu.Game.Screens.Select
             {
                 Icon = FontAwesome.Solid.Check
             };
-
-            yield return new OsuMenuItemSpacer();
-
-            foreach (var i in CreateCollectionMenuActions(beatmap))
-                yield return i;
         }
-
-        protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
-        {
-            var collectionItems = realm.Realm.All<BeatmapCollection>()
-                                       .OrderBy(c => c.Name)
-                                       .AsEnumerable()
-                                       .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
-
-            collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
-
-            yield return new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems };
-        }
-
-        public void ManageCollections() => collectionsDialog?.Show();
 
         public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
 

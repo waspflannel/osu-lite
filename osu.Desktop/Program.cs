@@ -3,9 +3,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.Versioning;
-using osu.Desktop.LegacyIpc;
-using osu.Desktop.Windows;
 using osu.Framework;
 using osu.Framework.Development;
 using osu.Framework.Logging;
@@ -13,7 +10,6 @@ using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.IPC;
 using SDL;
-using Velopack;
 
 namespace osu.Desktop
 {
@@ -25,18 +21,9 @@ namespace osu.Desktop
         private const string base_game_name = @"osu";
 #endif
 
-        private static LegacyTcpIpcProvider? legacyIpc;
-
-        private static bool isFirstRun;
-
         [STAThread]
         public static void Main(string[] args)
         {
-            // IMPORTANT DON'T IGNORE: For general sanity, velopack's setup needs to run before anything else.
-            // This has bitten us in the rear before (bricked updater), and although the underlying issue from
-            // last time has been fixed, let's not tempt fate.
-            setupVelopack(args);
-
             if (OperatingSystem.IsWindows())
             {
                 var windowsVersion = Environment.OSVersion.Version;
@@ -117,25 +104,7 @@ namespace osu.Desktop
                     }
                 }
 
-                if (host.IsPrimaryInstance)
-                {
-                    try
-                    {
-                        Logger.Log("Starting legacy IPC provider...");
-                        legacyIpc = new LegacyTcpIpcProvider();
-                        legacyIpc.Bind();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex, "Failed to start legacy IPC provider");
-                    }
-                }
-
-                host.Run(new OsuGameDesktop(args)
-                {
-                    IsFirstRun = isFirstRun,
-                    EnableWebSocketServer = Environment.GetEnvironmentVariable("OSU_WEBSOCKET_SERVER") == "1",
-                });
+                host.Run(new OsuGameDesktop(args));
             }
         }
 
@@ -165,44 +134,6 @@ namespace osu.Desktop
             }
 
             return false;
-        }
-
-        private static void setupVelopack(string[] args)
-        {
-            // Arguments being present indicate the user is running with pending imports via file association or otherwise.
-            //
-            // In this scenario, we'd hope the game does not attempt to update.
-            //
-            // Special consideration for velopack startup arguments, which must be handled during update.
-            // See https://docs.velopack.io/integrating/hooks#command-line-hooks.
-            if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
-            {
-                Logger.Log("Handling arguments, skipping velopack setup.");
-                return;
-            }
-
-            if (OsuGameDesktop.IsPackageManaged)
-            {
-                Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
-                return;
-            }
-
-            var app = VelopackApp.Build();
-
-            app.OnFirstRun(_ => isFirstRun = true);
-
-            if (OperatingSystem.IsWindows())
-                configureWindows(app);
-
-            app.Run();
-        }
-
-        [SupportedOSPlatform("windows")]
-        private static void configureWindows(VelopackApp app)
-        {
-            app.OnFirstRun(_ => WindowsAssociationManager.InstallAssociations());
-            app.OnAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
-            app.OnBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
         }
     }
 }

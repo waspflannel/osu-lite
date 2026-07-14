@@ -35,7 +35,6 @@ using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select;
-using osu.Game.Seasonal;
 using osuTK;
 using osuTK.Graphics;
 
@@ -95,7 +94,6 @@ namespace osu.Game.Screens.Menu
         private Container logoTarget;
         private MenuTipDisplay menuTipDisplay;
         private FillFlowContainer bottomElementsFlow;
-        private SupporterDisplay supporterDisplay;
 
         private Sample reappearSampleSwoosh;
 
@@ -122,7 +120,6 @@ namespace osu.Game.Screens.Menu
 
             AddRangeInternal(new[]
             {
-                SeasonalUIConfig.ENABLED ? new MainMenuSeasonalLighting() : Empty(),
                 new GlobalScrollAdjustsVolume(),
                 buttonsContainer = new ParallaxContainer
                 {
@@ -141,15 +138,14 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 logoTarget = new Container { RelativeSizeAxes = Axes.Both, },
-                sideFlashes = SeasonalUIConfig.ENABLED ? new SeasonalMenuSideFlashes() : new MenuSideFlashes(),
+                sideFlashes = new MenuSideFlashes(),
                 songTicker = new SongTicker
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
-                // For now, this is too much alongside the seasonal lighting.
-                SeasonalUIConfig.ENABLED ? Empty() : new KiaiMenuFountains(),
+                new KiaiMenuFountains(),
                 bottomElementsFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -166,16 +162,10 @@ namespace osu.Game.Screens.Menu
                         }
                     }
                 },
-                supporterDisplay = new SupporterDisplay
-                {
-                    Margin = new MarginPadding(5),
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                },
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
-            float baseDim = SeasonalUIConfig.ENABLED ? 0.84f : 1;
+            const float baseDim = 1;
 
             Buttons.StateChanged += state =>
             {
@@ -313,9 +303,6 @@ namespace osu.Game.Screens.Menu
                 .ScaleTo(0.9f, 1000, Easing.OutQuint)
                 .FadeOut(500, Easing.OutQuint);
 
-            supporterDisplay
-                .FadeOut(500, Easing.OutQuint);
-
             samplePlaybackDisabled.Value = true;
         }
 
@@ -384,9 +371,6 @@ namespace osu.Game.Screens.Menu
             this.FadeOut(3000);
 
             bottomElementsFlow
-                .FadeOut(500, Easing.OutQuint);
-
-            supporterDisplay
                 .FadeOut(500, Easing.OutQuint);
 
             return base.OnExiting(e);

@@ -5,19 +5,14 @@ using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
-using osu.Game.Online;
-using osu.Game.Online.API;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
@@ -27,23 +22,10 @@ namespace osu.Game.Screens.Select
     {
         private MetadataDisplay creator = null!;
         private MetadataDisplay source = null!;
-        private MetadataDisplay genre = null!;
-        private MetadataDisplay language = null!;
         private MetadataDisplay userTags = null!;
         private MetadataDisplay mapperTags = null!;
         private MetadataDisplay submitted = null!;
         private MetadataDisplay ranked = null!;
-
-        private Drawable ratingsWedge = null!;
-        private SuccessRateDisplay successRateDisplay = null!;
-        private UserRatingDisplay userRatingDisplay = null!;
-        private RatingSpreadDisplay ratingSpreadDisplay = null!;
-
-        private Drawable failRetryWedge = null!;
-        private FailRetryDisplay failRetryDisplay = null!;
-
-        public bool RatingsVisible => ratingsWedge.Alpha > 0;
-        public bool FailRetryVisible => failRetryWedge.Alpha > 0;
 
         protected override bool StartHidden => true;
 
@@ -51,27 +33,13 @@ namespace osu.Game.Screens.Select
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private IBindable<SongSelect.BeatmapSetLookupResult> onlineLookupResult { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
         private RealmAccess realm { get; set; } = null!;
-
-        private IBindable<APIState> apiState = null!;
-
-        [Resolved]
-        private ILinkHandler? linkHandler { get; set; }
 
         [Resolved]
         private ISongSelect? songSelect { get; set; }
 
-        private Sample? wedgeAppearSample;
-        private Sample? wedgeHideSample;
-
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -139,7 +107,6 @@ namespace osu.Game.Screens.Select
                                                             Children = new[]
                                                             {
                                                                 creator = new MetadataDisplay(EditorSetupStrings.Creator),
-                                                                genre = new MetadataDisplay(BeatmapsetsStrings.ShowInfoGenre),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -151,7 +118,6 @@ namespace osu.Game.Screens.Select
                                                             Children = new[]
                                                             {
                                                                 source = new MetadataDisplay(BeatmapsetsStrings.ShowInfoSource),
-                                                                language = new MetadataDisplay(BeatmapsetsStrings.ShowInfoLanguage),
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -180,80 +146,14 @@ namespace osu.Game.Screens.Select
                             },
                         },
                     }),
-                    new ShearAligningWrapper(ratingsWedge = new Container
-                    {
-                        Alpha = 0f,
-                        CornerRadius = 10,
-                        Masking = true,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            new WedgeBackground(),
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Shear = -OsuGame.SHEAR,
-                                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, 10),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, 10),
-                                    new Dimension(),
-                                },
-                                Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 40f, Vertical = 16 },
-                                Content = new[]
-                                {
-                                    new[]
-                                    {
-                                        successRateDisplay = new SuccessRateDisplay(),
-                                        Empty(),
-                                        userRatingDisplay = new UserRatingDisplay(),
-                                        Empty(),
-                                        ratingSpreadDisplay = new RatingSpreadDisplay(),
-                                    },
-                                },
-                            },
-                        }
-                    }),
-                    new ShearAligningWrapper(failRetryWedge = new Container
-                    {
-                        Alpha = 0f,
-                        CornerRadius = 10,
-                        Masking = true,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            new WedgeBackground(),
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Shear = -OsuGame.SHEAR,
-                                Padding = new MarginPadding { Left = SongSelect.WEDGE_CONTENT_MARGIN, Right = 40f, Vertical = 16 },
-                                Child = failRetryDisplay = new FailRetryDisplay(),
-                            },
-                        },
-                    }),
                 }
             };
-
-            wedgeAppearSample = audio.Samples.Get(@"SongSelect/metadata-wedge-pop-in");
-            wedgeHideSample = audio.Samples.Get(@"SongSelect/metadata-wedge-pop-out");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmap.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
-            onlineLookupResult.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
-
-            apiState = api.State.GetBoundCopy();
-            apiState.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay), true);
+            beatmap.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay), true);
         }
 
         private const double transition_duration = 300;
@@ -262,84 +162,12 @@ namespace osu.Game.Screens.Select
         {
             this.FadeIn(transition_duration, Easing.OutQuint)
                 .MoveToX(0, transition_duration, Easing.OutQuint);
-
-            updateSubWedgeVisibility();
         }
 
         protected override void PopOut()
         {
             this.FadeOut(transition_duration, Easing.OutQuint)
                 .MoveToX(-100, transition_duration, Easing.OutQuint);
-
-            updateSubWedgeVisibility();
-        }
-
-        private void updateSubWedgeVisibility()
-        {
-            // We could consider hiding individual wedges based on zero data in the future.
-            // Needs some experimentation on what looks good.
-
-            var beatmapInfo = beatmap.Value.BeatmapInfo;
-            var currentOnlineBeatmap = onlineLookupResult.Value?.Result?.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
-
-            if (State.Value == Visibility.Visible && currentOnlineBeatmap != null)
-            {
-                // play show sounds only if the wedges were previously hidden
-                if (ratingsWedge.Alpha < 1)
-                    playWedgeAppearSound();
-
-                ratingsWedge.FadeIn(transition_duration, Easing.OutQuint)
-                            .MoveToX(0, transition_duration, Easing.OutQuint);
-
-                failRetryWedge.Delay(100)
-                              .FadeIn(transition_duration, Easing.OutQuint)
-                              .MoveToX(0, transition_duration, Easing.OutQuint);
-            }
-            else
-            {
-                // play hide sounds only if the wedges were previously visible
-                if (ratingsWedge.Alpha > 0)
-                    playWedgeHideSound();
-
-                failRetryWedge.FadeOut(transition_duration, Easing.OutQuint)
-                              .MoveToX(-50, transition_duration, Easing.OutQuint);
-
-                ratingsWedge.Delay(100)
-                            .FadeOut(transition_duration, Easing.OutQuint)
-                            .MoveToX(-50, transition_duration, Easing.OutQuint);
-            }
-        }
-
-        private void playWedgeAppearSound()
-        {
-            var wedgeAppearChannel1 = wedgeAppearSample?.GetChannel();
-            if (wedgeAppearChannel1 == null)
-                return;
-
-            wedgeAppearChannel1.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
-            wedgeAppearChannel1.Frequency.Value = 0.98f + RNG.NextDouble(0.04f);
-            wedgeAppearChannel1.Play();
-
-            Scheduler.AddDelayed(() =>
-            {
-                var wedgeAppearChannel2 = wedgeAppearSample?.GetChannel();
-                if (wedgeAppearChannel2 == null)
-                    return;
-
-                wedgeAppearChannel2.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
-                wedgeAppearChannel2.Frequency.Value = 0.90f + RNG.NextDouble(0.05f);
-                wedgeAppearChannel2.Play();
-            }, 100);
-        }
-
-        private void playWedgeHideSound()
-        {
-            var wedgeHideChannel = wedgeHideSample?.GetChannel();
-            if (wedgeHideChannel == null)
-                return;
-
-            wedgeHideChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH / 2;
-            wedgeHideChannel.Play();
         }
 
         private void updateDisplay()
@@ -347,7 +175,8 @@ namespace osu.Game.Screens.Select
             var metadata = beatmap.Value.Metadata;
             var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
 
-            creator.Data = (metadata.Author.Username, () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, metadata.Author)));
+            // osu! lite is offline: mapper identity is plain local metadata, not a clickable profile link.
+            creator.Data = (metadata.Author.Username, null);
 
             if (!string.IsNullOrEmpty(metadata.Source))
                 source.Data = (metadata.Source, () => songSelect?.Search(metadata.Source));
@@ -362,45 +191,7 @@ namespace osu.Game.Screens.Select
             submitted.Date = beatmapSetInfo.DateSubmitted;
             ranked.Date = beatmapSetInfo.DateRanked;
 
-            updateOnlineDisplay();
-        }
-
-        private void updateOnlineDisplay()
-        {
-            if (onlineLookupResult.Value?.Status != SongSelect.BeatmapSetLookupStatus.Completed)
-            {
-                genre.Data = null;
-                language.Data = null;
-                userTags.Tags = null;
-                return;
-            }
-
-            if (onlineLookupResult.Value.Result == null)
-            {
-                genre.Data = ("-", null);
-                language.Data = ("-", null);
-            }
-            else
-            {
-                var beatmapInfo = beatmap.Value.BeatmapInfo;
-
-                var onlineBeatmapSet = onlineLookupResult.Value.Result;
-                var onlineBeatmap = onlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
-
-                genre.Data = (onlineBeatmapSet.Genre.Name, () => songSelect?.Search(onlineBeatmapSet.Genre.Name));
-                language.Data = (onlineBeatmapSet.Language.Name, () => songSelect?.Search(onlineBeatmapSet.Language.Name));
-
-                if (onlineBeatmap != null)
-                {
-                    userRatingDisplay.Data = onlineBeatmapSet.Ratings;
-                    ratingSpreadDisplay.Data = onlineBeatmapSet.Ratings;
-                    successRateDisplay.Data = (onlineBeatmap.PassCount, onlineBeatmap.PlayCount);
-                    failRetryDisplay.Data = onlineBeatmap.FailTimes ?? new APIFailTimes();
-                }
-            }
-
             updateUserTags();
-            updateSubWedgeVisibility();
         }
 
         private CancellationTokenSource? userTagsCancellationSource;

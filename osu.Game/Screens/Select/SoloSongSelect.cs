@@ -52,8 +52,6 @@ namespace osu.Game.Screens.Select
         private void load(AudioManager audio)
         {
             sampleConfirmSelection = audio.Samples.Get(@"SongSelect/confirm-selection");
-
-            AddInternal(new SongSelectTouchInputDetector());
         }
 
         public override IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap)
@@ -61,9 +59,6 @@ namespace osu.Game.Screens.Select
             yield return new OsuMenuItem(ButtonSystemStrings.Play.ToSentence(), MenuItemType.Highlighted, () => SelectAndRun(beatmap, OnStart)) { Icon = FontAwesome.Solid.Check };
 
             yield return new OsuMenuItemSpacer();
-
-            foreach (var i in CreateCollectionMenuActions(beatmap))
-                yield return i;
 
             if (beatmap.LastPlayed == null)
                 yield return new OsuMenuItem(SongSelectStrings.MarkAsPlayed, MenuItemType.Standard, () => beatmaps.MarkPlayed(beatmap)) { Icon = FontAwesome.Solid.TimesCircle };

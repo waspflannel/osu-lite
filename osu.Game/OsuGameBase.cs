@@ -199,9 +199,6 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
         private IBeatmapUpdater beatmapUpdater;
 
-        private UserLookupCache userCache;
-        private BeatmapLookupCache beatmapCache;
-
         private RulesetConfigCache rulesetConfigCache;
 
         private SessionAverageHitErrorTracker hitErrorTracker;
@@ -321,12 +318,6 @@ namespace osu.Game
 
             BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
 
-            dependencies.Cache(userCache = new UserLookupCache());
-            base.Content.Add(userCache);
-
-            dependencies.Cache(beatmapCache = new BeatmapLookupCache());
-            base.Content.Add(beatmapCache);
-
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
@@ -339,7 +330,7 @@ namespace osu.Game
 
             RegisterImportHandler(BeatmapManager);
             RegisterImportHandler(ScoreManager);
-            RegisterImportHandler(SkinManager);
+            // osu! lite is locked to the Argon skin; user skin import is not supported.
 
             // drop track volume game-wide to leave some head-room for UI effects / samples.
             // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
@@ -392,7 +383,6 @@ namespace osu.Game
                 })
             });
 
-            base.Content.Add(new TouchInputInterceptor());
             base.Content.Add(hitErrorTracker);
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
@@ -601,7 +591,7 @@ namespace osu.Game
             }
         }
 
-        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache, API, Storage);
+        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache, Storage);
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
@@ -638,9 +628,6 @@ namespace osu.Game
 
                 case JoystickHandler jh:
                     return new JoystickSettings(jh);
-
-                case TouchHandler th:
-                    return new TouchSettings(th);
 
                 case PenHandler ph:
                     return new PenSettings(ph);

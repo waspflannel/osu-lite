@@ -19,7 +19,5 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.System;
         public override LocalisableString Description => "Score set on earlier osu! versions with the V2 scoring algorithm active.";
         public override bool UserPlayable => false;
-        public override bool ValidForMultiplayer => false;
-        public override bool ValidForMultiplayerAsFreeMod => false;
     }
 }

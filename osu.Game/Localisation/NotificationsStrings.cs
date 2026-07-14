@@ -84,11 +84,6 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
 
         /// <summary>
-        /// "{0} invited you to the multiplayer match &quot;{1}&quot;! Click to join."
-        /// </summary>
-        public static LocalisableString InvitedYouToTheMultiplayer(string username, string roomName) => new TranslatableString(getKey(@"invited_you_to_the_multiplayer"), @"{0} invited you to the multiplayer match ""{1}""! Click to join.", username, roomName);
-
-        /// <summary>
         /// "You do not have the beatmap for this replay."
         /// </summary>
         public static LocalisableString MissingBeatmapForReplay => new TranslatableString(getKey(@"missing_beatmap_for_replay"), @"You do not have the beatmap for this replay.");
@@ -102,33 +97,6 @@ Please try changing your audio device to a working setting.");
         /// "Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it."
         /// </summary>
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
-
-        /// <summary>
-        /// "You are now running osu! {0}.
-        /// Click to see what&#39;s new!"
-        /// </summary>
-        public static LocalisableString GameVersionAfterUpdate(string version) => new TranslatableString(getKey(@"game_version_after_update"), @"You are now running osu! {0}.
-Click to see what's new!", version);
-
-        /// <summary>
-        /// "Update ready to install. Click to restart!"
-        /// </summary>
-        public static LocalisableString UpdateReadyToInstall => new TranslatableString(getKey(@"update_ready_to_install"), @"Update ready to install. Click to restart!");
-
-        /// <summary>
-        /// "This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended."
-        /// </summary>
-        public static LocalisableString NotOfficialBuild => new TranslatableString(getKey(@"not_official_build"), @"This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended.");
-
-        /// <summary>
-        /// "Downloading update..."
-        /// </summary>
-        public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
-
-        /// <summary>
-        /// "This multiplayer room has ended. Click to display room results."
-        /// </summary>
-        public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
 
         /// <summary>
         /// "Mention"
@@ -171,46 +139,6 @@ Click to see what's new!", version);
         public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
 
         /// <summary>
-        /// "Collections import is initialising..."
-        /// </summary>
-        public static LocalisableString CollectionsImportInitialising => new TranslatableString(getKey(@"collections_import_initialising"), @"Collections import is initialising...");
-
-        /// <summary>
-        /// "Reading collections..."
-        /// </summary>
-        public static LocalisableString ReadingCollections => new TranslatableString(getKey(@"reading_collections"), @"Reading collections...");
-
-        /// <summary>
-        /// "Imported {0} collections"
-        /// </summary>
-        public static LocalisableString CollectionsImportProgress(int count) => new TranslatableString(getKey(@"collections_import_progress"), @"Imported {0} collections", count);
-
-        /// <summary>
-        /// "Imported {0} of {1} collections"
-        /// </summary>
-        public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
-
-        /// <summary>
-        /// "This error has been automatically reported to the dev team."
-        /// </summary>
-        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
-
-        /// <summary>
-        /// "A newer release of osu! has been found ({0} → {1})."
-        /// </summary>
-        public static LocalisableString UpdateAvailable(string oldVersion, string newVersion) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", oldVersion, newVersion);
-
-        /// <summary>
-        /// "Click here to download the new version, which can be installed over the top of your existing installation."
-        /// </summary>
-        public static LocalisableString UpdateAvailableManualInstall => new TranslatableString(getKey(@"update_available_manual_install"), @"Click here to download the new version, which can be installed over the top of your existing installation.");
-
-        /// <summary>
-        /// "Check with your package manager / provider to bring osu! up-to-date!"
-        /// </summary>
-        public static LocalisableString UpdateAvailablePackageManaged => new TranslatableString(getKey(@"update_available_package_managed"), @"Check with your package manager / provider to bring osu! up-to-date!");
-
-        /// <summary>
         /// "An action was interrupted due to a dialog being displayed."
         /// </summary>
         public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
@@ -251,26 +179,6 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot saved! Click to view.
 {0}", filename);
-
-        /// <summary>
-        /// "The multiplayer server will be right back..."
-        /// </summary>
-        public static LocalisableString MultiplayerServerShuttingDownImmediately => new TranslatableString(getKey(@"multiplayer_server_shutting_down_immediately"), @"The multiplayer server will be right back...");
-
-        /// <summary>
-        /// "The multiplayer server is restarting in {0}."
-        /// </summary>
-        public static LocalisableString MultiplayerServerShuttingDownRemaining(string remainingTime) => new TranslatableString(getKey(@"multiplayer_server_shutting_down_remaining"), @"The multiplayer server is restarting in {0}.", remainingTime);
-
-        /// <summary>
-        /// "Created new collection &quot;{0}&quot; with {1} beatmaps."
-        /// </summary>
-        public static LocalisableString CollectionCreated(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_created"), @"Created new collection ""{0}"" with {1} beatmaps.", name, beatmapsCount);
-
-        /// <summary>
-        /// "Added {0} beatmaps to collection &quot;{1}&quot;."
-        /// </summary>
-        public static LocalisableString CollectionBeatmapsAdded(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_beatmaps_added"), @"Added {0} beatmaps to collection ""{1}"".", beatmapsCount, name);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

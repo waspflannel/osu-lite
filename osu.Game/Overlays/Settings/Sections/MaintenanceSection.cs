@@ -25,10 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new GeneralSettings(),
                 new BeatmapSettings(),
-                new SkinSettings(),
-                new CollectionsSettings(),
                 new ScoreSettings(),
-                new ModPresetSettings()
             };
         }
     }

@@ -14,7 +14,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -47,13 +46,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
 
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
-            SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
-            SetDefault(OsuSetting.ModSelectTextSearchStartsActive, true);
 
 
-            SetDefault(OsuSetting.BeatmapListingFeaturedArtistFilter, true);
-
-            SetDefault(OsuSetting.ProfileCoverExpanded, true);
 
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
@@ -62,8 +56,6 @@ namespace osu.Game.Configuration
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
-
-            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, true);
 
             SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
             {
@@ -85,12 +77,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ExternalLinkWarning, true);
             SetDefault(OsuSetting.PreferNoVideo, false);
 
-            SetDefault(OsuSetting.ShowOnlineExplicitContent, false);
-
-            SetDefault(OsuSetting.NotifyOnUsernameMentioned, true);
-            SetDefault(OsuSetting.NotifyOnPrivateMessage, true);
-            SetDefault(OsuSetting.NotifyOnFriendPresenceChange, true);
-
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
@@ -105,14 +91,11 @@ namespace osu.Game.Configuration
             // Input
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
-            SetDefault(OsuSetting.GameplayCursorDuringTouch, false);
             SetDefault(OsuSetting.AutoCursorSize, false);
 
             SetDefault(OsuSetting.MouseDisableButtons, false);
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
-
-            SetDefault(OsuSetting.TouchDisableGameplayTaps, false);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
@@ -154,9 +137,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.IncreaseFirstObjectVisibility, true);
             SetDefault(OsuSetting.GameplayDisableWinKey, true);
 
-            // Update
-            SetDefault(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
-
             SetDefault(OsuSetting.Version, string.Empty);
 
             SetDefault(OsuSetting.ShowFirstRunSetup, true);
@@ -185,27 +165,18 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             SetDefault(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
-            SetDefault(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
-
-            SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
             SetDefault(OsuSetting.HideCountryFlags, false);
-
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
-            SetDefault(OsuSetting.UserOnlineStatus, UserStatus.Online);
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
 
-            SetDefault(OsuSetting.WasSupporter, false);
-
             // intentionally uses `DateTime?` and not `DateTimeOffset?` because the latter fails due to `DateTimeOffset` not implementing `IConvertible`
             SetDefault(OsuSetting.LastOnlineTagsPopulation, (DateTime?)null);
-
-            SetDefault(OsuSetting.DashboardDisplayStyle, OverlayPanelDisplayStyle.Card);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -283,7 +254,6 @@ namespace osu.Game.Configuration
         MenuCursorSize,
         GameplayCursorSize,
         AutoCursorSize,
-        GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
         LightenDuringBreaks,
@@ -321,7 +291,6 @@ namespace osu.Game.Configuration
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
         Username,
-        ReleaseStream,
         SavePassword,
         SaveUsername,
         DisplayStarsMinimum,
@@ -329,7 +298,6 @@ namespace osu.Game.Configuration
         SongSelectGroupMode,
         SongSelectSortingMode,
         RandomSelectAlgorithm,
-        ModSelectHotkeyStyle,
         ShowFpsDisplay,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
@@ -354,50 +322,25 @@ namespace osu.Game.Configuration
         ScalingBackgroundDim,
         UIScale,
         IntroSequence,
-        NotifyOnUsernameMentioned,
-        NotifyOnPrivateMessage,
-        NotifyOnFriendPresenceChange,
         UIHoldActivationDelay,
         HitLighting,
         StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
-        SeasonalBackgroundMode,
-        DiscordRichPresence,
 
-        ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
-        ProfileCoverExpanded,
         ReplaySettingsOverlay,
         ReplayPlaybackControlsExpanded,
-        AutomaticallyDownloadMissingBeatmaps,
-        TouchDisableGameplayTaps,
-        ModSelectTextSearchStartsActive,
-
-        /// <summary>
-        /// The status for the current user to broadcast to other players.
-        /// </summary>
-        UserOnlineStatus,
 
         HideCountryFlags,
         AlwaysShowHoldForMenuButton,
         AlwaysRequireHoldingForPause,
-        BeatmapListingFeaturedArtistFilter,
         ShowMobileDisclaimer,
-
-        /// <summary>
-        /// Cached state of whether local user is a supporter.
-        /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
-        /// </summary>
-        WasSupporter,
 
         LastOnlineTagsPopulation,
 
         AutomaticallyAdjustBeatmapOffset,
-
-        DashboardSortMode,
-        DashboardDisplayStyle,
     }
 }

@@ -90,16 +90,6 @@ namespace osu.Game.Localisation
         public static LocalisableString SkinEditor(LocalisableString keybind) => new TranslatableString(getKey(@"skin_editor"), @"Your gameplay HUD can be customised by using the skin layout editor. Open it at any time via {0}!", keybind);
 
         /// <summary>
-        /// "You can create mod presets to make toggling your favourite mod combinations easier!"
-        /// </summary>
-        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"You can create mod presets to make toggling your favourite mod combinations easier!");
-
-        /// <summary>
-        /// "Many mods have customisation settings that drastically change how they function. Click the Customise button in mod select to view settings!"
-        /// </summary>
-        public static LocalisableString ModCustomisationSettings => new TranslatableString(getKey(@"mod_customisation_settings"), @"Many mods have customisation settings that drastically change how they function. Click the Customise button in mod select to view settings!");
-
-        /// <summary>
         /// "Press {0} to switch to a random skin! You can also use {1} and {2} to cycle through skins."
         /// </summary>
         public static LocalisableString SkinChangeShortcuts(LocalisableString[] keybind) => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press {0} to switch to a random skin! You can also use {1} and {2} to cycle through skins.", keybind[0], keybind[1], keybind[2]);

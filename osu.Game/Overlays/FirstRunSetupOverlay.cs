@@ -3,12 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Overlays.FirstRunSetup;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 
@@ -19,9 +17,6 @@ namespace osu.Game.Overlays
     {
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;
-
-        [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -36,11 +31,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(LegacyImportManager? legacyImportManager)
         {
-            AddStep<ScreenWelcome>();
-            AddStep<ScreenUIScale>();
             if (legacyImportManager?.SupportsImportFromStable == true)
                 AddStep<ScreenImportFromStable>();
-            AddStep<ScreenBehaviour>();
 
             Header.Title = FirstRunSetupOverlayStrings.FirstRunSetupTitle;
             Header.Description = FirstRunSetupOverlayStrings.FirstRunSetupDescription;
@@ -66,25 +58,6 @@ namespace osu.Game.Overlays
 
                 base.Show();
             }, new[] { typeof(MainMenu) });
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-
-            if (CurrentStepIndex != null)
-            {
-                notificationOverlay.Post(new SimpleNotification
-                {
-                    Text = FirstRunSetupOverlayStrings.ClickToResumeFirstRunSetupAtAnyPoint,
-                    Icon = FontAwesome.Solid.Redo,
-                    Activated = () =>
-                    {
-                        Show();
-                        return true;
-                    },
-                });
-            }
         }
 
         protected override void ShowNextStep()

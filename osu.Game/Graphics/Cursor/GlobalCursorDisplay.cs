@@ -1,14 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.StateChanges;
-using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -31,14 +28,9 @@ namespace osu.Game.Graphics.Cursor
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        private Bindable<bool> showDuringTouch = null!;
-
         private InputManager inputManager = null!;
 
         private IProvideCursor? currentOverrideProvider;
-
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
 
         public GlobalCursorDisplay()
         {
@@ -54,7 +46,6 @@ namespace osu.Game.Graphics.Cursor
             base.LoadComplete();
 
             inputManager = GetContainingInputManager()!;
-            showDuringTouch = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch);
         }
 
         protected override void Update()
@@ -62,7 +53,7 @@ namespace osu.Game.Graphics.Cursor
             base.Update();
 
             var lastMouseSource = inputManager.CurrentState.Mouse.LastSource;
-            bool hasValidInput = lastMouseSource != null && (showDuringTouch.Value || lastMouseSource is not ISourcedFromTouch);
+            bool hasValidInput = lastMouseSource != null && lastMouseSource is not ISourcedFromTouch;
 
             if (!hasValidInput || !ShowCursor)
             {

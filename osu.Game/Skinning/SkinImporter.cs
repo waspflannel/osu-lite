@@ -36,7 +36,8 @@ namespace osu.Game.Skinning
             modelManager = new ModelManager<SkinInfo>(storage, realm);
         }
 
-        public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
+        // osu! lite does not support user skin import; no archive extensions are handled.
+        public override IEnumerable<string> HandledExtensions => Array.Empty<string>();
 
         protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 

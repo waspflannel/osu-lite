@@ -69,10 +69,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString BackgroundSource => new TranslatableString(getKey(@"background_source"), @"Background source");
 
-        /// <summary>
-        /// "Seasonal backgrounds"
-        /// </summary>
-        public static LocalisableString SeasonalBackgrounds => new TranslatableString(getKey(@"seasonal_backgrounds"), @"Seasonal backgrounds");
 
         /// <summary>
         /// "Changes to this setting will only apply with an active osu!supporter tag."
@@ -115,16 +111,6 @@ namespace osu.Game.Localisation
         public static LocalisableString RandomSelectionAlgorithm => new TranslatableString(getKey(@"random_selection_algorithm"), @"Random selection algorithm");
 
         /// <summary>
-        /// "Mod select hotkey style"
-        /// </summary>
-        public static LocalisableString ModSelectHotkeyStyle => new TranslatableString(getKey(@"mod_select_hotkey_style"), @"Mod select hotkey style");
-
-        /// <summary>
-        /// "Automatically focus search text box in mod select"
-        /// </summary>
-        public static LocalisableString ModSelectTextSearchStartsActive => new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
-
-        /// <summary>
         /// "no limit"
         /// </summary>
         public static LocalisableString NoLimit => new TranslatableString(getKey(@"no_limit"), @"no limit");
@@ -133,31 +119,6 @@ namespace osu.Game.Localisation
         /// "Beatmap (with storyboard / video)"
         /// </summary>
         public static LocalisableString BeatmapWithStoryboard => new TranslatableString(getKey(@"beatmap_with_storyboard"), @"Beatmap (with storyboard / video)");
-
-        /// <summary>
-        /// "Always"
-        /// </summary>
-        public static LocalisableString AlwaysSeasonalBackground => new TranslatableString(getKey(@"always_seasonal_backgrounds"), @"Always");
-
-        /// <summary>
-        /// "Never"
-        /// </summary>
-        public static LocalisableString NeverSeasonalBackground => new TranslatableString(getKey(@"never_seasonal_backgrounds"), @"Never");
-
-        /// <summary>
-        /// "Sometimes"
-        /// </summary>
-        public static LocalisableString SometimesSeasonalBackground => new TranslatableString(getKey(@"sometimes_seasonal_backgrounds"), @"Sometimes");
-
-        /// <summary>
-        /// "Sequential"
-        /// </summary>
-        public static LocalisableString SequentialHotkeyStyle => new TranslatableString(getKey(@"mods_sequential_hotkeys"), @"Sequential");
-
-        /// <summary>
-        /// "Classic"
-        /// </summary>
-        public static LocalisableString ClassicHotkeyStyle => new TranslatableString(getKey(@"mods_classic_hotkeys"), @"Classic");
 
         /// <summary>
         /// "Never repeat"

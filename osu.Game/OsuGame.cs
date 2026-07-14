@@ -36,7 +36,6 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -50,7 +49,6 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
@@ -64,14 +62,11 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Seasonal;
 using osu.Game.Skinning;
-using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
-using Sentry;
 using IntroScreen = osu.Game.Screens.Menu.IntroScreen;
 
 namespace osu.Game
@@ -136,15 +131,11 @@ namespace osu.Game
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
-        private DifficultyRecommender difficultyRecommender;
-
         [Cached]
         private readonly LegacyImportManager legacyImportManager = new LegacyImportManager();
 
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
-
-        private SentryLogger sentryLogger;
 
         public virtual StableStorage GetStorageForStableInstall() => null;
 
@@ -196,8 +187,6 @@ namespace osu.Game
         private Bindable<float> uiScale;
 
         private Bindable<UserActivity> configUserActivity;
-
-        private Bindable<string> configSkin;
 
         private RealmDetachedBeatmapStore detachedBeatmapStore;
 
@@ -322,12 +311,6 @@ namespace osu.Game
         private readonly List<string> dragDropFiles = new List<string>();
         private ScheduledDelegate dragDropImportSchedule;
 
-        public override void SetupLogging(Storage gameStorage, Storage cacheStorage)
-        {
-            base.SetupLogging(gameStorage, cacheStorage);
-            sentryLogger = new SentryLogger(this, cacheStorage);
-        }
-
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
@@ -377,12 +360,7 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            sentryLogger.AttachUser(API.LocalUser);
-
-            if (SeasonalUIConfig.ENABLED)
-                dependencies.CacheAs(osuLogo = new OsuLogoChristmas { Alpha = 0 });
-            else
-                dependencies.CacheAs(osuLogo = new OsuLogo { Alpha = 0 });
+            dependencies.CacheAs(osuLogo = new OsuLogo { Alpha = 0 });
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
@@ -405,13 +383,7 @@ namespace osu.Game
 
             configUserActivity = SessionStatics.GetBindable<UserActivity>(Static.UserOnlineActivity);
 
-            configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
-
-            // Transfer skin from config to realm instance once on startup.
-            SkinManager.SetSkinFromConfiguration(configSkin.Value);
-
-            // Transfer any runtime changes back to configuration file.
-            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
+            // osu! lite is locked to the Argon skin; SkinManager defaults to it and no runtime selection is persisted.
 
             UserPlayingState.BindValueChanged(p =>
             {
@@ -555,23 +527,6 @@ namespace osu.Game
         }
 
         /// <summary>
-        /// Present a skin select immediately.
-        /// </summary>
-        /// <param name="skin">The skin to select.</param>
-        public void PresentSkin(SkinInfo skin)
-        {
-            var databasedSkin = SkinManager.Query(s => s.ID == skin.ID);
-
-            if (databasedSkin == null)
-            {
-                Logger.Log("The requested skin could not be loaded.", LoggingTarget.Information);
-                return;
-            }
-
-            SkinManager.CurrentSkinInfo.Value = databasedSkin;
-        }
-
-        /// <summary>
         /// Present a beatmap at song select immediately.
         /// The user should have already requested this interactively.
         /// </summary>
@@ -580,7 +535,6 @@ namespace osu.Game
         /// <remarks>
         /// Among items satisfying the predicate, the order of preference is:
         /// <list type="bullet">
-        /// <item>beatmap with recommended difficulty, as provided by <see cref="DifficultyRecommender"/>,</item>
         /// <item>first beatmap from the current ruleset,</item>
         /// <item>first beatmap from any ruleset.</item>
         /// </list>
@@ -619,9 +573,8 @@ namespace osu.Game
                 if (beatmaps.Count == 0)
                     beatmaps = detachedSet.Beatmaps.ToList();
 
-                // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
-                var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
-                                ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
+                // Prefer a beatmap matching the current ruleset, else fall back to a sane selection.
+                var selection = beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
                                 ?? beatmaps.First();
 
                 if (screen is IHandlePresentBeatmap presentableScreen)
@@ -746,8 +699,6 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
-        protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
-
         /// <summary>
         /// Adjust the globally applied <see cref="DrawSizePreservingFillContainer.TargetDrawSize"/> in every <see cref="ScalingContainer"/>.
         /// Useful for changing how the game handles different aspect ratios.
@@ -842,8 +793,6 @@ namespace osu.Game
 
             base.Dispose(isDisposing);
 
-            sentryLogger.Dispose();
-
             if (Host?.Window != null)
                 Host.Window.DragDrop -= onWindowDragDrop;
 
@@ -875,9 +824,6 @@ namespace osu.Game
             GlobalCursorDisplay.ShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
-            SkinManager.PostNotification = n => Notifications.Post(n);
-            SkinManager.PresentImport = items => PresentSkin(items.First().Value);
-
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
@@ -977,7 +923,6 @@ namespace osu.Game
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
 
-            loadComponentSingleFile(difficultyRecommender = new DifficultyRecommender(), Add, true);
             loadComponentSingleFile(Toolbar = new Toolbar
             {
                 OnHome = delegate
@@ -1008,12 +953,8 @@ namespace osu.Game
 
             loadComponentSingleFile(screenshotManager, Add);
 
-            // dependency on notification overlay, dependent by settings overlay
-            loadComponentSingleFile(CreateUpdateManager(), Add, true);
-
             // overlay elements
             loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), footerBasedOverlayContent.Add, true);
-            loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new NowPlayingOverlay
@@ -1053,17 +994,10 @@ namespace osu.Game
 
             applyConfigMigrations();
 
-            string lastVersion = LocalConfig.Get<string>(OsuSetting.Version);
-            string version = Version;
-
-            // only show a notification if we've previously saved a version to the config file (ie. not the first run).
-            if (IsDeployedBuild && !string.IsNullOrEmpty(lastVersion) && version != lastVersion)
-                Notifications.Post(new UpdateCompleteNotification(version));
-
             // finally, update the version stored to the configuration.
             // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
             // debug / local compilations will reset to a non-release string.
-            LocalConfig.SetValue(OsuSetting.Version, version);
+            LocalConfig.SetValue(OsuSetting.Version, Version);
         }
 
         /// <summary>
@@ -1177,19 +1111,11 @@ namespace osu.Game
         {
             if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
 
-            if (entry.Exception is SentryOnlyDiagnosticsException)
-                return;
-
             const int short_term_display_limit = 3;
 
             if (generalLogRecentCount < short_term_display_limit)
             {
-                LocalisableString message;
-
-                if (entry.Exception != null && IsDeployedBuild)
-                    message = LocalisableString.Interpolate($"{entry.Message.Truncate(256)}\n\n{NotificationsStrings.ErrorAutomaticallyReported}");
-                else
-                    message = entry.Message.Truncate(256);
+                LocalisableString message = entry.Message.Truncate(256);
 
                 Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {
@@ -1464,17 +1390,6 @@ namespace osu.Game
 
         protected virtual void ScreenChanged([CanBeNull] IOsuScreen current, [CanBeNull] IOsuScreen newScreen)
         {
-            SentrySdk.ConfigureScope(scope =>
-            {
-                scope.Contexts[@"screen stack"] = new
-                {
-                    Current = newScreen?.GetType().ReadableName(),
-                    Previous = current?.GetType().ReadableName(),
-                };
-
-                scope.SetTag(@"screen", newScreen?.GetType().ReadableName() ?? @"none");
-            });
-
             switch (current)
             {
                 case Player player:

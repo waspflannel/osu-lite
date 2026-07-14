@@ -51,12 +51,6 @@ namespace osu.Game.Online.API
         bool IsLoggedIn { get; }
 
         /// <summary>
-        /// The last username provided by the end-user.
-        /// May not be authenticated.
-        /// </summary>
-        string ProvidedUsername { get; }
-
-        /// <summary>
         /// Holds configuration for online endpoints.
         /// </summary>
         EndpointConfiguration Endpoints { get; }
@@ -67,20 +61,10 @@ namespace osu.Game.Online.API
         int APIVersion { get; }
 
         /// <summary>
-        /// The last login error that occurred, if any.
-        /// </summary>
-        Exception? LastLoginError { get; }
-
-        /// <summary>
         /// The current connection state of the API.
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<APIState> State { get; }
-
-        /// <summary>
-        /// When servers are on fire, this will contain a message which can be displayed to an end user.
-        /// </summary>
-        IBindable<string?> UserFacingOutageMessage { get; }
 
         /// <summary>
         /// Queue a new request.
@@ -107,40 +91,8 @@ namespace osu.Game.Online.API
         Task PerformAsync(APIRequest request);
 
         /// <summary>
-        /// Attempt to login using the provided credentials. This is a non-blocking operation.
-        /// </summary>
-        /// <param name="username">The user's username.</param>
-        /// <param name="password">The user's password.</param>
-        void Login(string username, string password);
-
-        /// <summary>
-        /// The <see cref="SessionVerificationMethod"/> requested by the server to complete verification.
-        /// </summary>
-        SessionVerificationMethod? SessionVerificationMethod { get; }
-
-        /// <summary>
-        /// Provide a second-factor authentication code for authentication.
-        /// </summary>
-        /// <paramref name="code">The 2FA code.</paramref>
-        void AuthenticateSecondFactor(string code);
-
-        /// <summary>
-        /// Log out the current user.
-        /// </summary>
-        void Logout();
-
-        /// <summary>
         /// Schedule a callback to run on the update thread.
         /// </summary>
         internal void Schedule(Action action);
-
-        /// <summary>
-        /// Create a new user account. This is a blocking operation.
-        /// </summary>
-        /// <param name="email">The email to create the account with.</param>
-        /// <param name="username">The username to create the account with.</param>
-        /// <param name="password">The password to create the account with.</param>
-        /// <returns>Any errors encoutnered during account creation.</returns>
-        RegistrationRequest.RegistrationRequestErrors? CreateAccount(string email, string username, string password);
     }
 }

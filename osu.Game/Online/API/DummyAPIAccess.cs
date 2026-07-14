@@ -1,18 +1,19 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Localisation;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API
 {
+    /// <summary>
+    /// osu! lite is fully offline. This provider never connects: the local user is always a guest,
+    /// <see cref="IsLoggedIn"/> is always false, and API requests are not serviced.
+    /// </summary>
     public partial class DummyAPIAccess : Component, IAPIProvider
     {
         public const int DUMMY_USER_ID = 1001;
@@ -34,8 +35,6 @@ namespace osu.Game.Online.API
 
         public bool IsLoggedIn => State.Value > APIState.Offline;
 
-        public string ProvidedUsername => LocalUser.Value.Username;
-
         public EndpointConfiguration Endpoints { get; } = new EndpointConfiguration
         {
             APIUrl = "http://localhost",
@@ -44,140 +43,29 @@ namespace osu.Game.Online.API
 
         public int APIVersion => int.Parse(DateTime.Now.ToString("yyyyMMdd"));
 
-        public Exception? LastLoginError { get; private set; }
-
-        /// <summary>
-        /// Provide handling logic for an arbitrary API request.
-        /// Should return true is a request was handled. If null or false return, the request will be failed with a <see cref="NotSupportedException"/>.
-        /// </summary>
-        public Func<APIRequest, bool>? HandleRequest;
-
-        private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Online);
-
-        private bool shouldFailNextLogin;
-        private bool stayConnectingNextLogin;
-
-        public SessionVerificationMethod? SessionVerificationMethod { get; set; } = Requests.Responses.SessionVerificationMethod.EmailMessage;
+        // osu! lite is offline: the API never connects, so IsLoggedIn is always false and the local user stays a guest.
+        private readonly Bindable<APIState> state = new Bindable<APIState>(APIState.Offline);
 
         /// <summary>
         /// The current connectivity state of the API.
         /// </summary>
         public IBindable<APIState> State => state;
 
-        public IBindable<string?> UserFacingOutageMessage { get; } = new Bindable<string?>();
-
-        public virtual void Queue(APIRequest request)
+        public void Queue(APIRequest request)
         {
             request.AttachAPI(this);
-
-            Schedule(() =>
-            {
-                if (HandleRequest?.Invoke(request) != true)
-                    request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} cannot process this request."));
-            });
+            Schedule(() => request.Fail(new InvalidOperationException($@"{nameof(DummyAPIAccess)} is offline and cannot process requests.")));
         }
 
         void IAPIProvider.Schedule(Action action) => base.Schedule(action);
 
-        public void Perform(APIRequest request)
-        {
-            request.AttachAPI(this);
-            HandleRequest?.Invoke(request);
-        }
+        public void Perform(APIRequest request) => request.AttachAPI(this);
 
         public Task PerformAsync(APIRequest request)
         {
             request.AttachAPI(this);
-            HandleRequest?.Invoke(request);
             return Task.CompletedTask;
         }
-
-        public void Login(string username, string password)
-        {
-            state.Value = APIState.Connecting;
-
-            if (stayConnectingNextLogin)
-            {
-                stayConnectingNextLogin = false;
-                return;
-            }
-
-            if (shouldFailNextLogin)
-            {
-                LastLoginError = new APIException("Not powerful enough to login.", new ArgumentException(nameof(shouldFailNextLogin)));
-
-                state.Value = APIState.Offline;
-                shouldFailNextLogin = false;
-                return;
-            }
-
-            LastLoginError = null;
-            LocalUser.Value = new APIUser
-            {
-                Username = username,
-                Id = DUMMY_USER_ID,
-            };
-
-            if (SessionVerificationMethod != null)
-            {
-                state.Value = APIState.RequiresSecondFactorAuth;
-            }
-            else
-            {
-                onSuccessfulLogin();
-                SessionVerificationMethod = null;
-            }
-        }
-
-        public void AuthenticateSecondFactor(string code)
-        {
-            state.Value = APIState.Connecting;
-            LastLoginError = null;
-            onSuccessfulLogin();
-        }
-
-        private void onSuccessfulLogin()
-        {
-            state.Value = APIState.Online;
-        }
-
-        public void Logout()
-        {
-            state.Value = APIState.Offline;
-            // must happen after `state.Value` is changed such that subscribers to that bindable's value changes see the correct user.
-            LocalUser.Value = new APIUser { Username = @"Guest", Id = APIUser.SYSTEM_USER_ID };
-        }
-
-        public void UpdateLocalFriends()
-        {
-        }
-
-        public void UpdateLocalBlocks()
-        {
-        }
-
-        public RegistrationRequest.RegistrationRequestErrors? CreateAccount(string email, string username, string password)
-        {
-            Thread.Sleep(200);
-            return null;
-        }
-
-        public void SetState(APIState newState) => state.Value = newState;
-
-        /// <summary>
-        /// Skip 2FA requirement for next login.
-        /// </summary>
-        public void SkipSecondFactor() => SessionVerificationMethod = null;
-
-        /// <summary>
-        /// During the next simulated login, the process will fail immediately.
-        /// </summary>
-        public void FailNextLogin() => shouldFailNextLogin = true;
-
-        /// <summary>
-        /// During the next simulated login, the process will pause indefinitely at "connecting".
-        /// </summary>
-        public void PauseOnConnectingNextLogin() => stayConnectingNextLogin = true;
 
         protected override void Dispose(bool isDisposing)
         {

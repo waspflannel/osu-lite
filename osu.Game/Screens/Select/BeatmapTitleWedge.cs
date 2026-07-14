@@ -43,9 +43,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<SongSelect.BeatmapSetLookupResult?> onlineLookupResult { get; set; } = null!;
-
         public float TopPadding { get; init; }
 
         protected override bool StartHidden => true;
@@ -61,7 +58,6 @@ namespace osu.Game.Screens.Select
         internal string DisplayedTitle { get; private set; } = string.Empty;
         internal string DisplayedArtist { get; private set; } = string.Empty;
 
-        private StatisticPlayCount playCount = null!;
         private Statistic lengthStatistic = null!;
         private Statistic bpmStatistic = null!;
 
@@ -70,9 +66,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private LocalisationManager localisation { get; set; } = null!;
-
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
 
         private FillFlowContainer statisticsFlow = null!;
 
@@ -152,11 +145,10 @@ namespace osu.Game.Screens.Select
                             Spacing = new Vector2(2f, 0f),
                             Children = new Drawable[]
                             {
-                                playCount = new StatisticPlayCount(background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 50f)
+                                lengthStatistic = new Statistic(OsuIcon.Clock, background: true, leftPadding: SongSelect.WEDGE_CONTENT_MARGIN, minSize: 50f)
                                 {
                                     Margin = new MarginPadding { Left = -SongSelect.WEDGE_CONTENT_MARGIN },
                                 },
-                                lengthStatistic = new Statistic(OsuIcon.Clock),
                                 bpmStatistic = new Statistic(OsuIcon.Metronome)
                                 {
                                     TooltipText = BeatmapsetsStrings.ShowStatsBpm,
@@ -184,7 +176,6 @@ namespace osu.Game.Screens.Select
 
             working.BindValueChanged(_ => updateDisplay());
             ruleset.BindValueChanged(_ => updateDisplay());
-            onlineLookupResult.BindValueChanged(_ => updateDisplay());
 
             mods.BindValueChanged(m =>
             {
@@ -242,7 +233,6 @@ namespace osu.Game.Screens.Select
             DisplayedArtist = artistText.ToString();
 
             updateLengthAndBpmStatistics();
-            updateOnlineDisplay();
         }
 
         private CancellationTokenSource? lengthBpmCancellationSource;
@@ -284,58 +274,5 @@ namespace osu.Game.Screens.Select
             }, token);
         }
 
-        private CancellationTokenSource? onlineDisplayCancellationSource;
-
-        private void updateOnlineDisplay()
-        {
-            onlineDisplayCancellationSource?.Cancel();
-            onlineDisplayCancellationSource = null;
-
-            if (onlineLookupResult.Value?.Status != SongSelect.BeatmapSetLookupStatus.Completed)
-            {
-                playCount.Value = null;
-            }
-            else
-            {
-                var onlineBeatmap = onlineLookupResult.Value.Result?.Beatmaps.SingleOrDefault(b => b.OnlineID == working.Value.BeatmapInfo.OnlineID);
-                playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
-
-                onlineDisplayCancellationSource = new CancellationTokenSource();
-                var token = onlineDisplayCancellationSource.Token;
-
-                // the online fetch may have also updated the beatmap's status.
-                // this needs to be checked against the *local* beatmap model rather than the online one, because it's not known here whether the status change has occurred or not
-                // (think scenarios like the beatmap being locally modified).
-                // it also has to be handled explicitly like this because the working beatmap's `BeatmapInfo` will not receive these updates due to being detached
-                // (and because of https://github.com/ppy/osu/blob/4b73afd1957a9161e2956fc4191c8114d9958372/osu.Game/Screens/SelectV2/SongSelect.cs#L487-L488
-                // which prevents working beatmap refetches caused by changes to the realm model of perceived low importance).
-                realm.RunAsync(r =>
-                {
-                    var refetchedBeatmap = r.Find<BeatmapInfo>(working.Value.BeatmapInfo.ID);
-                    return refetchedBeatmap?.Status;
-                }, token).ContinueWith(t =>
-                {
-                    var status = t.GetResultSafely();
-
-                    if (status != null)
-                    {
-                        Schedule(() =>
-                        {
-                            if (token.IsCancellationRequested)
-                                return;
-
-                            statusPill.Status = status.Value;
-                        });
-                    }
-                }, token);
-            }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            onlineDisplayCancellationSource?.Dispose();
-            onlineDisplayCancellationSource = null;
-            base.Dispose(isDisposing);
-        }
     }
 }

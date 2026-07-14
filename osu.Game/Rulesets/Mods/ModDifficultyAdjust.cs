@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool RequiresConfiguration => true;
 
-        public override bool ValidForFreestyleAsRequiredMod => true;
-
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
         protected const int FIRST_SETTING_ORDER = 1;

@@ -109,13 +109,8 @@ namespace osu.Game.Input.Bindings
 
         private static IEnumerable<KeyBinding> overlayKeyBindings => new[]
         {
-            new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F6, GlobalAction.ToggleNowPlaying),
-            new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
-            new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
-            new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.ToggleProfile),
         };
 
         private static IEnumerable<KeyBinding> editorKeyBindings => new[]
@@ -204,13 +199,9 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(new[] { InputKey.Shift, InputKey.Enter }, GlobalAction.ToggleCurrentGroup),
 
-            new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
             new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
-            new KeyBinding(InputKey.BackSpace, GlobalAction.DeselectAllMods),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Up }, GlobalAction.IncreaseModSpeed),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Down }, GlobalAction.DecreaseModSpeed),
             new KeyBinding(InputKey.None, GlobalAction.AbsoluteScrollSongList),
         };
 
@@ -239,10 +230,10 @@ namespace osu.Game.Input.Bindings
     /// </remarks>
     public enum GlobalAction
     {
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChat))]
+        // Tombstoned: online chat overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         ToggleChat,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSocial))]
+        // Tombstoned: online social overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         ToggleSocial,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ResetInputSettings))]
@@ -254,7 +245,7 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSettings))]
         ToggleSettings,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleBeatmapListing))]
+        // Tombstoned: online beatmap listing overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         ToggleBeatmapListing,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseVolume))]
@@ -314,7 +305,7 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Home))]
         Home,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleNotifications))]
+        // Tombstoned: permanent notification drawer was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         ToggleNotifications,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PauseGameplay))]
@@ -341,7 +332,7 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleInGameInterface))]
         ToggleInGameInterface,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleModSelection))]
+        // Tombstoned: mod-select overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         ToggleModSelection,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextRandom))]
@@ -401,7 +392,7 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ActivateNextSet))]
         ActivateNextSet,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DeselectAllMods))]
+        // Tombstoned: mod-select overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         DeselectAllMods,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTapForBPM))]
@@ -410,7 +401,7 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleFPSCounter))]
         ToggleFPSDisplay,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleProfile))]
+        // Tombstoned: online profile overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         ToggleProfile,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCloneSelection))]
@@ -449,10 +440,10 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.StepReplayBackward))]
         StepReplayBackward,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseModSpeed))]
+        // Tombstoned: mod-select speed-change UI was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         IncreaseModSpeed,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseModSpeed))]
+        // Tombstoned: mod-select speed-change UI was removed. Do not reuse this ordinal (persisted in Realm keybindings).
         DecreaseModSpeed,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleScaleControl))]

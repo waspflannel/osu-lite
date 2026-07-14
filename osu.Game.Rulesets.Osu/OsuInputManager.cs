@@ -3,14 +3,11 @@
 
 using System.ComponentModel;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Lists;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
@@ -54,15 +51,9 @@ namespace osu.Game.Rulesets.Osu
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Add(new OsuTouchInputMapper(this) { RelativeSizeAxes = Axes.Both });
-        }
-
         protected override bool Handle(UIEvent e)
         {
-            if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
+            if (e is MouseMoveEvent && !AllowUserCursorMovement) return false;
 
             return base.Handle(e);
         }

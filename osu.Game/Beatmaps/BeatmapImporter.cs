@@ -13,7 +13,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
@@ -30,7 +29,7 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>
     {
-        public override IEnumerable<string> HandledExtensions => new[] { ".osz", ".olz" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
@@ -86,8 +85,6 @@ namespace osu.Game.Beatmaps
                     // Transfer local values which should be persisted across a beatmap update.
                     updated.DateAdded = originalDateAdded;
 
-                    transferCollectionReferences(realm, original, updated);
-
                     foreach (var beatmap in original.Beatmaps.ToArray())
                     {
                         var updatedBeatmap = updated.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.Hash);
@@ -135,31 +132,6 @@ namespace osu.Game.Beatmaps
             });
 
             return first;
-        }
-
-        private static void transferCollectionReferences(Realm realm, BeatmapSetInfo original, BeatmapSetInfo updated)
-        {
-            // First check if every beatmap in the original set is in any collections.
-            // In this case, we will assume they also want any newly added difficulties added to the collection.
-            foreach (var c in realm.All<BeatmapCollection>())
-            {
-                if (original.Beatmaps.Select(b => b.MD5Hash).All(c.BeatmapMD5Hashes.Contains))
-                {
-                    foreach (var b in original.Beatmaps)
-                        c.BeatmapMD5Hashes.Remove(b.MD5Hash);
-
-                    foreach (var b in updated.Beatmaps)
-                        c.BeatmapMD5Hashes.Add(b.MD5Hash);
-                }
-            }
-
-            // Handle collections using permissive difficulty name to track difficulties.
-            foreach (var originalBeatmap in original.Beatmaps)
-            {
-                updated.Beatmaps
-                       .FirstOrDefault(b => b.DifficultyName == originalBeatmap.DifficultyName)?
-                       .TransferCollectionReferences(realm, originalBeatmap.MD5Hash);
-            }
         }
 
         protected override bool ShouldDeleteArchive(string path) => HandledExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());

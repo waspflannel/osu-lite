@@ -10,16 +10,6 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.GlobalActionKeyBinding";
 
         /// <summary>
-        /// "Toggle chat overlay"
-        /// </summary>
-        public static LocalisableString ToggleChat => new TranslatableString(getKey(@"toggle_chat"), @"Toggle chat overlay");
-
-        /// <summary>
-        /// "Toggle social overlay"
-        /// </summary>
-        public static LocalisableString ToggleSocial => new TranslatableString(getKey(@"toggle_social"), @"Toggle social overlay");
-
-        /// <summary>
         /// "Reset input settings"
         /// </summary>
         public static LocalisableString ResetInputSettings => new TranslatableString(getKey(@"reset_input_settings"), @"Reset input settings");
@@ -33,11 +23,6 @@ namespace osu.Game.Localisation
         /// "Toggle settings"
         /// </summary>
         public static LocalisableString ToggleSettings => new TranslatableString(getKey(@"toggle_settings"), @"Toggle settings");
-
-        /// <summary>
-        /// "Toggle beatmap listing"
-        /// </summary>
-        public static LocalisableString ToggleBeatmapListing => new TranslatableString(getKey(@"toggle_beatmap_listing"), @"Toggle beatmap listing");
 
         /// <summary>
         /// "Increase volume"
@@ -160,16 +145,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Home => new TranslatableString(getKey(@"home"), @"Home");
 
         /// <summary>
-        /// "Toggle notifications"
-        /// </summary>
-        public static LocalisableString ToggleNotifications => new TranslatableString(getKey(@"toggle_notifications"), @"Toggle notifications");
-
-        /// <summary>
-        /// "Toggle profile"
-        /// </summary>
-        public static LocalisableString ToggleProfile => new TranslatableString(getKey(@"toggle_profile"), @"Toggle profile");
-
-        /// <summary>
         /// "Pause / resume gameplay"
         /// </summary>
         public static LocalisableString PauseGameplay => new TranslatableString(getKey(@"pause_gameplay"), @"Pause / resume gameplay");
@@ -253,16 +228,6 @@ namespace osu.Game.Localisation
         /// "Toggle in-game leaderboard"
         /// </summary>
         public static LocalisableString ToggleInGameLeaderboard => new TranslatableString(getKey(@"toggle_in_game_leaderboard"), @"Toggle in-game leaderboard");
-
-        /// <summary>
-        /// "Toggle mod select"
-        /// </summary>
-        public static LocalisableString ToggleModSelection => new TranslatableString(getKey(@"toggle_mod_selection"), @"Toggle mod select");
-
-        /// <summary>
-        /// "Deselect all mods"
-        /// </summary>
-        public static LocalisableString DeselectAllMods => new TranslatableString(getKey(@"deselect_all_mods"), @"Deselect all mods");
 
         /// <summary>
         /// "Random"
@@ -428,16 +393,6 @@ namespace osu.Game.Localisation
         /// "Quick exit to current time"
         /// </summary>
         public static LocalisableString EditorTestPlayQuickExitToCurrentTime => new TranslatableString(getKey(@"editor_test_play_quick_exit_to_current_time"), @"Quick exit to current time");
-
-        /// <summary>
-        /// "Increase mod speed"
-        /// </summary>
-        public static LocalisableString IncreaseModSpeed => new TranslatableString(getKey(@"increase_mod_speed"), @"Increase mod speed");
-
-        /// <summary>
-        /// "Decrease mod speed"
-        /// </summary>
-        public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
 
         /// <summary>
         /// "Seek to previous hit object"

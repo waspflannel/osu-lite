@@ -14,9 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Collections;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -46,7 +44,6 @@ namespace osu.Game.Screens.Select
         private DifficultyRangeSlider difficultyRangeSlider = null!;
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupModeDropdownItem> groupDropdown = null!;
-        private CollectionDropdown collectionDropdown = null!;
 
         /// <summary>
         /// An optional method which can force certain criteria adjustments.
@@ -65,9 +62,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
         private IBindable<APIUser> localUser = null!;
         private readonly IBindableList<int> localUserFavouriteBeatmapSets = new BindableList<int>();
 
@@ -80,8 +74,6 @@ namespace osu.Game.Screens.Select
         public event Action<FilterCriteria>? CriteriaChanged;
 
         private FilterCriteria currentCriteria = null!;
-
-        private IDisposable? collectionsSubscription;
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
@@ -177,9 +169,7 @@ namespace osu.Game.Screens.Select
                                         new Dimension(maxSize: 180),
                                         new Dimension(GridSizeMode.Absolute, 5),
                                         new Dimension(maxSize: 180),
-                                        new Dimension(GridSizeMode.Absolute, 5),
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.AutoSize),
                                     },
                                     Content = new[]
                                     {
@@ -196,10 +186,6 @@ namespace osu.Game.Screens.Select
                                                 RelativeSizeAxes = Axes.X,
                                             },
                                             Empty(),
-                                            collectionDropdown = new CollectionDropdown
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                            },
                                         }
                                     }
                                 },
@@ -261,32 +247,12 @@ namespace osu.Game.Screens.Select
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
-            collectionDropdown.Current.BindValueChanged(v =>
-            {
-                // The hope would be that this never arrives here, but due to bindings receiving changes before
-                // local ValueChanged events, that's not the case (see https://github.com/ppy/osu-framework/pull/1545).
-                if (v.NewValue is ManageCollectionsFilterMenuItem || v.OldValue is ManageCollectionsFilterMenuItem)
-                    return;
-
-                updateCriteria();
-            });
-            collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (_, changeSet) =>
-            {
-                if (changeSet != null && groupDropdown.Current.Value.Value == GroupMode.Collections)
-                    updateCriteria();
-            });
 
             localUser.BindValueChanged(_ => updateCriteria());
             localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
             ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
             updateCriteria();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            collectionsSubscription?.Dispose();
         }
 
         /// <summary>
@@ -305,7 +271,6 @@ namespace osu.Game.Screens.Select
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                Collection = collectionDropdown.Current.Value?.Collection,
                 LocalUserId = isValidUser ? localUser.Value.Id : null,
                 LocalUserUsername = isValidUser ? localUser.Value.Username : null,
             };

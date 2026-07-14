@@ -189,13 +189,6 @@ namespace osu.Game.Screens.Select
                 }
             }
 
-            if (!string.IsNullOrEmpty(filter?.SearchText))
-            {
-                addBulletPoint();
-                textFlow.AddText("Try ");
-                textFlow.AddLink("searching online", LinkAction.SearchBeatmapSet, filter.SearchText);
-                textFlow.AddText($" for \"{filter.SearchText}\".");
-            }
             // TODO: add clickable link to reset criteria.
         }
 

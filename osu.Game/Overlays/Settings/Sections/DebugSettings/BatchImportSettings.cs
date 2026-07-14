@@ -12,9 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         protected override LocalisableString Header => @"Batch Import";
 
         private SettingsButtonV2 importBeatmapsButton = null!;
-        private SettingsButtonV2 importCollectionsButton = null!;
         private SettingsButtonV2 importScoresButton = null!;
-        private SettingsButtonV2 importSkinsButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(LegacyImportManager? legacyImportManager)
@@ -31,24 +29,6 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                     {
                         importBeatmapsButton.Enabled.Value = false;
                         legacyImportManager.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(_ => Schedule(() => importBeatmapsButton.Enabled.Value = true));
-                    }
-                },
-                importSkinsButton = new SettingsButtonV2
-                {
-                    Text = @"Import skins from stable",
-                    Action = () =>
-                    {
-                        importSkinsButton.Enabled.Value = false;
-                        legacyImportManager.ImportFromStableAsync(StableContent.Skins).ContinueWith(_ => Schedule(() => importSkinsButton.Enabled.Value = true));
-                    }
-                },
-                importCollectionsButton = new SettingsButtonV2
-                {
-                    Text = @"Import collections from stable",
-                    Action = () =>
-                    {
-                        importCollectionsButton.Enabled.Value = false;
-                        legacyImportManager.ImportFromStableAsync(StableContent.Collections).ContinueWith(_ => Schedule(() => importCollectionsButton.Enabled.Value = true));
                     }
                 },
                 importScoresButton = new SettingsButtonV2

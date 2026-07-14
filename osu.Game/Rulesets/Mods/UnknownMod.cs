@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "This mod could not be resolved by the game.";
 
         public override bool UserPlayable => false;
-        public override bool ValidForMultiplayer => false;
-        public override bool ValidForMultiplayerAsFreeMod => false;
 
         public override ModType Type => ModType.System;
 

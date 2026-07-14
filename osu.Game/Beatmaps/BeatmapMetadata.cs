@@ -46,9 +46,8 @@ namespace osu.Game.Beatmaps
         public string Tags { get; set; } = string.Empty;
 
         /// <summary>
-        /// The list of user-voted tags applicable to this beatmap.
-        /// This information is populated from online sources (<see cref="RealmPopulatingOnlineLookupSource"/>)
-        /// and can meaningfully differ between beatmaps of a single set.
+        /// The list of user-voted tags applicable to this beatmap, as bundled with the local beatmap import.
+        /// Can meaningfully differ between beatmaps of a single set.
         /// </summary>
         public IList<string> UserTags { get; } = null!;
 

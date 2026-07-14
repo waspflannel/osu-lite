@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Backgrounds
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> source;
         private Bindable<IntroSequence> introSequence;
-        private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -49,8 +48,6 @@ namespace osu.Game.Screens.Backgrounds
             skin = skinManager.CurrentSkin.GetBoundCopy();
             source = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
-
-            AddInternal(seasonalBackgroundLoader);
         }
 
         protected override void LoadComplete()
@@ -62,7 +59,6 @@ namespace osu.Game.Screens.Backgrounds
             source.ValueChanged += _ => Scheduler.AddOnce(next);
             beatmap.ValueChanged += _ => Scheduler.AddOnce(next);
             introSequence.ValueChanged += _ => Scheduler.AddOnce(next);
-            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(next);
 
             currentDisplay = RNG.Next(0, background_count);
             Next();
@@ -140,10 +136,9 @@ namespace osu.Game.Screens.Backgrounds
 
         private Background createBackground()
         {
-            // seasonal background loading gets highest priority.
-            Background newBackground = seasonalBackgroundLoader.LoadNextBackground();
+            Background newBackground = null;
 
-            if (newBackground == null && user.Value?.IsSupporter == true)
+            if (user.Value?.IsSupporter == true)
             {
                 switch (source.Value)
                 {

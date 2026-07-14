@@ -100,16 +100,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Skins => new TranslatableString(getKey(@"skins"), @"Skins");
 
         /// <summary>
-        /// "Collections"
-        /// </summary>
-        public static LocalisableString Collections => new TranslatableString(getKey(@"collections"), @"Collections");
-
-        /// <summary>
-        /// "Mod presets"
-        /// </summary>
-        public static LocalisableString ModPresets => new TranslatableString(getKey(@"mod_presets"), @"Mod presets");
-
-        /// <summary>
         /// "Name"
         /// </summary>
         public static LocalisableString Name => new TranslatableString(getKey(@"name"), @"Name");

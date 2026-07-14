@@ -218,9 +218,6 @@ namespace osu.Game.Screens.Ranking
                     },
                 });
             }
-
-            if (Score?.BeatmapInfo != null)
-                buttons.Add(new CollectionButton(Score.BeatmapInfo));
         }
 
         protected override void LoadComplete()

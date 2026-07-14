@@ -25,7 +25,6 @@ using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osuTK;
-using osu.Game.Online;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
@@ -66,8 +65,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                 },
                 new ImportCheckbox(CommonStrings.Beatmaps, StableContent.Beatmaps),
                 new ImportCheckbox(CommonStrings.Scores, StableContent.Scores),
-                new ImportCheckbox(CommonStrings.Skins, StableContent.Skins),
-                new ImportCheckbox(CommonStrings.Collections, StableContent.Collections),
                 copyInformation = new LinkFlowContainer(cp => cp.Font = OsuFont.Default.With(size: CONTENT_FONT_SIZE))
                 {
                     Colour = OverlayColourProvider.Content1,
@@ -127,8 +124,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             if (available)
             {
                 copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.DataMigrationNoExtraSpace;
-                copyInformation.AddText(@" "); // just to ensure correct spacing
-                copyInformation.AddLink(FirstRunOverlayImportFromStableScreenStrings.LearnAboutHardLinks, LinkAction.OpenWiki, @"Client/Release_stream/Lazer/File_storage#via-hard-links");
             }
             else if (!RuntimeInfo.IsDesktop)
                 copyInformation.Text = FirstRunOverlayImportFromStableScreenStrings.LightweightLinkingNotSupported;

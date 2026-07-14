@@ -27,11 +27,6 @@ namespace osu.Game.Screens.Select
         void RestoreAllHidden(BeatmapSetInfo beatmapSet);
 
         /// <summary>
-        /// Opens the manage collections dialog.
-        /// </summary>
-        void ManageCollections();
-
-        /// <summary>
         /// Whether <see cref="PresentScore"/> can be performed by this screen.
         /// If <see langword="false"/>, <see cref="PresentScore"/> will have no effect.
         /// </summary>
