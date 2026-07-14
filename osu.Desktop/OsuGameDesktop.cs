@@ -116,8 +116,6 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            LoadComponentAsync(new DiscordRichPresence(), Add);
-
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:

@@ -169,15 +169,11 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
 
-            SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
-
             SetDefault(OsuSetting.HideCountryFlags, false);
-
 
             SetDefault(OsuSetting.LastProcessedMetadataId, -1);
 
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
-            SetDefault(OsuSetting.UserOnlineStatus, UserStatus.Online);
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
@@ -335,7 +331,6 @@ namespace osu.Game.Configuration
         StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
-        DiscordRichPresence,
 
         LastProcessedMetadataId,
         SafeAreaConsiderations,
@@ -343,11 +338,6 @@ namespace osu.Game.Configuration
         ReplaySettingsOverlay,
         ReplayPlaybackControlsExpanded,
         TouchDisableGameplayTaps,
-
-        /// <summary>
-        /// The status for the current user to broadcast to other players.
-        /// </summary>
-        UserOnlineStatus,
 
         HideCountryFlags,
         AlwaysShowHoldForMenuButton,
