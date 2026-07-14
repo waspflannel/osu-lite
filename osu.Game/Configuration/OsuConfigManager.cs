@@ -48,9 +48,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
 
 
-            SetDefault(OsuSetting.BeatmapListingFeaturedArtistFilter, true);
-
-            SetDefault(OsuSetting.ProfileCoverExpanded, true);
 
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
@@ -59,8 +56,6 @@ namespace osu.Game.Configuration
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
-
-            SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, true);
 
             SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
             {
@@ -81,12 +76,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ExternalLinkWarning, true);
             SetDefault(OsuSetting.PreferNoVideo, false);
-
-            SetDefault(OsuSetting.ShowOnlineExplicitContent, false);
-
-            SetDefault(OsuSetting.NotifyOnUsernameMentioned, true);
-            SetDefault(OsuSetting.NotifyOnPrivateMessage, true);
-            SetDefault(OsuSetting.NotifyOnFriendPresenceChange, true);
 
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -195,8 +184,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
-
-            SetDefault(OsuSetting.WasSupporter, false);
 
             // intentionally uses `DateTime?` and not `DateTimeOffset?` because the latter fails due to `DateTimeOffset` not implementing `IConvertible`
             SetDefault(OsuSetting.LastOnlineTagsPopulation, (DateTime?)null);
@@ -347,9 +334,6 @@ namespace osu.Game.Configuration
         ScalingBackgroundDim,
         UIScale,
         IntroSequence,
-        NotifyOnUsernameMentioned,
-        NotifyOnPrivateMessage,
-        NotifyOnFriendPresenceChange,
         UIHoldActivationDelay,
         HitLighting,
         StarFountains,
@@ -357,14 +341,11 @@ namespace osu.Game.Configuration
         GameplayDisableWinKey,
         DiscordRichPresence,
 
-        ShowOnlineExplicitContent,
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
-        ProfileCoverExpanded,
         ReplaySettingsOverlay,
         ReplayPlaybackControlsExpanded,
-        AutomaticallyDownloadMissingBeatmaps,
         TouchDisableGameplayTaps,
 
         /// <summary>
@@ -375,19 +356,10 @@ namespace osu.Game.Configuration
         HideCountryFlags,
         AlwaysShowHoldForMenuButton,
         AlwaysRequireHoldingForPause,
-        BeatmapListingFeaturedArtistFilter,
         ShowMobileDisclaimer,
-
-        /// <summary>
-        /// Cached state of whether local user is a supporter.
-        /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
-        /// </summary>
-        WasSupporter,
 
         LastOnlineTagsPopulation,
 
         AutomaticallyAdjustBeatmapOffset,
-
-        DashboardSortMode,
     }
 }
