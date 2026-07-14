@@ -15,12 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString GetStarted => new TranslatableString(getKey(@"get_started"), @"Get started");
 
         /// <summary>
-        /// "Click to resume first-run setup at any point"
-        /// </summary>
-        public static LocalisableString ClickToResumeFirstRunSetupAtAnyPoint =>
-            new TranslatableString(getKey(@"click_to_resume_first_run_setup_at_any_point"), @"Click to resume first-run setup at any point");
-
-        /// <summary>
         /// "First-run setup"
         /// </summary>
         public static LocalisableString FirstRunSetupTitle => new TranslatableString(getKey(@"first_run_setup_title"), @"First-run setup");

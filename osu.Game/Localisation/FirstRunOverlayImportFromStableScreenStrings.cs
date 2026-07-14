@@ -50,11 +50,6 @@ namespace osu.Game.Localisation
         public static LocalisableString DataMigrationNoExtraSpace => new TranslatableString(getKey(@"data_migration_no_extra_space"), @"Data migration will use ""hard links"". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.");
 
         /// <summary>
-        /// "Learn more about how &quot;hard links&quot; work"
-        /// </summary>
-        public static LocalisableString LearnAboutHardLinks => new TranslatableString(getKey(@"learn_about_hard_links"), @"Learn more about how ""hard links"" work");
-
-        /// <summary>
         /// "Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import."
         /// </summary>
         public static LocalisableString LightweightLinkingNotSupported => new TranslatableString(getKey(@"lightweight_linking_not_supported"), @"Lightweight linking of files is not supported on your operating system yet, so a copy of all files will be made during import.");

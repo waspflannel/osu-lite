@@ -24,9 +24,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
     public partial class QuickActionSettings : SettingsSubsection
     {
         [Resolved(CanBeNull = true)]
-        private FirstRunSetupOverlay? firstRunSetupOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private OsuGame? game { get; set; }
 
         protected override LocalisableString Header => GeneralSettingsStrings.QuickActionsHeader;
@@ -36,13 +33,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             AddRange(new Drawable[]
             {
-                new SettingsButtonV2
-                {
-                    Text = GeneralSettingsStrings.RunSetupWizard,
-                    Keywords = new[] { @"first run", @"initial", @"getting started", @"import", @"tutorial", @"recommended beatmaps" },
-                    TooltipText = FirstRunSetupOverlayStrings.FirstRunSetupDescription,
-                    Action = () => firstRunSetupOverlay?.Show(),
-                },
                 new SettingsButtonV2
                 {
                     Text = GeneralSettingsStrings.ReportIssue,

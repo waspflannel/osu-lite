@@ -17,7 +17,6 @@ using osu.Game.IO;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Scoring;
-using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
@@ -26,9 +25,6 @@ namespace osu.Game.Database
     /// </summary>
     public partial class LegacyImportManager : Component
     {
-        [Resolved]
-        private SkinManager skins { get; set; } = null!;
-
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
@@ -120,9 +116,6 @@ namespace osu.Game.Database
                 case StableContent.Beatmaps:
                     return await new LegacyBeatmapImporter(beatmaps).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
-                case StableContent.Skins:
-                    return await new LegacySkinImporter(skins).GetAvailableCount(stableStorage).ConfigureAwait(false);
-
                 case StableContent.Scores:
                     return await new LegacyScoreImporter(scores).GetAvailableCount(stableStorage).ConfigureAwait(false);
 
@@ -157,9 +150,6 @@ namespace osu.Game.Database
             if (content.HasFlag(StableContent.Beatmaps))
                 importTasks.Add(beatmapImportTask = new LegacyBeatmapImporter(beatmaps).ImportFromStableAsync(stableStorage));
 
-            if (content.HasFlag(StableContent.Skins))
-                importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
-
             if (content.HasFlag(StableContent.Scores))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
@@ -184,7 +174,6 @@ namespace osu.Game.Database
     {
         Beatmaps = 1 << 0,
         Scores = 1 << 1,
-        Skins = 1 << 2,
-        All = Beatmaps | Scores | Skins
+        All = Beatmaps | Scores
     }
 }

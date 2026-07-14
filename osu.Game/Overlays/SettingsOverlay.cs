@@ -33,7 +33,6 @@ namespace osu.Game.Overlays
         {
             var sections = new List<SettingsSection>
             {
-                // This list should be kept in sync with ScreenBehaviour.
                 new GeneralSection(),
                 new InputSection(createSubPanel(new KeyBindingPanel())),
                 new UserInterfaceSection(),
