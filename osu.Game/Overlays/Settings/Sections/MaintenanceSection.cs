@@ -27,7 +27,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 new BeatmapSettings(),
                 new CollectionsSettings(),
                 new ScoreSettings(),
-                new ModPresetSettings()
             };
         }
     }
