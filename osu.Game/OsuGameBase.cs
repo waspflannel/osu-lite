@@ -339,7 +339,7 @@ namespace osu.Game
 
             RegisterImportHandler(BeatmapManager);
             RegisterImportHandler(ScoreManager);
-            RegisterImportHandler(SkinManager);
+            // osu! lite is locked to the Argon skin; user skin import is not supported.
 
             // drop track volume game-wide to leave some head-room for UI effects / samples.
             // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.

@@ -197,8 +197,6 @@ namespace osu.Game
 
         private Bindable<UserActivity> configUserActivity;
 
-        private Bindable<string> configSkin;
-
         private RealmDetachedBeatmapStore detachedBeatmapStore;
 
         private ScreenStackFooter screenStackFooter;
@@ -405,13 +403,7 @@ namespace osu.Game
 
             configUserActivity = SessionStatics.GetBindable<UserActivity>(Static.UserOnlineActivity);
 
-            configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
-
-            // Transfer skin from config to realm instance once on startup.
-            SkinManager.SetSkinFromConfiguration(configSkin.Value);
-
-            // Transfer any runtime changes back to configuration file.
-            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
+            // osu! lite is locked to the Argon skin; SkinManager defaults to it and no runtime selection is persisted.
 
             UserPlayingState.BindValueChanged(p =>
             {
@@ -552,23 +544,6 @@ namespace osu.Game
 
         public void ShowChangelogBuild(string version)
         {
-        }
-
-        /// <summary>
-        /// Present a skin select immediately.
-        /// </summary>
-        /// <param name="skin">The skin to select.</param>
-        public void PresentSkin(SkinInfo skin)
-        {
-            var databasedSkin = SkinManager.Query(s => s.ID == skin.ID);
-
-            if (databasedSkin == null)
-            {
-                Logger.Log("The requested skin could not be loaded.", LoggingTarget.Information);
-                return;
-            }
-
-            SkinManager.CurrentSkinInfo.Value = databasedSkin;
         }
 
         /// <summary>
@@ -875,9 +850,6 @@ namespace osu.Game
             GlobalCursorDisplay.ShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
-            SkinManager.PostNotification = n => Notifications.Post(n);
-            SkinManager.PresentImport = items => PresentSkin(items.First().Value);
-
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
