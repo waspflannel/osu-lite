@@ -91,11 +91,7 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Add(ReplayOverlay = new ReplayOverlay());
 
-            playbackSettings = new PlaybackSettings
-            {
-                Depth = float.MaxValue,
-                Expanded = { BindTarget = config.GetBindable<bool>(OsuSetting.ReplayPlaybackControlsExpanded) }
-            };
+            playbackSettings = new PlaybackSettings { Depth = float.MaxValue };
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);

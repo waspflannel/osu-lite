@@ -65,11 +65,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowHealthDisplayWhenCantFail => new TranslatableString(getKey(@"show_health_display_when_cant_fail"), @"Show health display even when you can't fail");
 
         /// <summary>
-        /// "Show replay settings overlay"
-        /// </summary>
-        public static LocalisableString ShowReplaySettingsOverlay => new TranslatableString(getKey(@"show_replay_settings_overlay"), @"Show replay settings overlay");
-
-        /// <summary>
         /// "Fade playfield to red when health is low"
         /// </summary>
         public static LocalisableString FadePlayfieldWhenHealthLow => new TranslatableString(getKey(@"fade_playfield_when_health_low"), @"Fade playfield to red when health is low");

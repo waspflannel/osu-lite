@@ -125,8 +125,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
-            SetDefault(OsuSetting.ReplaySettingsOverlay, true);
-            SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -322,9 +320,6 @@ namespace osu.Game.Configuration
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
-        ReplaySettingsOverlay,
-        ReplayPlaybackControlsExpanded,
-
         HideCountryFlags,
         AlwaysShowHoldForMenuButton,
         AlwaysRequireHoldingForPause,
