@@ -1013,8 +1013,10 @@ When every definition-of-done item outside the explicit CI exclusion passes, rep
 
 ## Execution log
 
-### 2026-07-15 — Phase 2 in progress
+### 2026-07-15 — Phase 2 complete
 
 - `210e22b6a6` closes arbitrary browser routing. Browser access now accepts only `ExternalBrowserDestination` and maps internally to the three locked destinations. The request-independent link parser, URL handler, warning dialog, endpoint selection, and profile-link actions were deleted. Debug and Release builds passed with zero warnings.
 - `ea85d45828` introduces the configuration-backed `LocalPlayerName` identity and removes credential and external-link-warning settings. The retained skinnable player-name component now binds to the local name rather than an API user. Debug and Release builds passed with zero warnings.
-- `Online/` and `Users/` are not yet deleted. Score/replay persistence, beatmap creator metadata, and results presentation still carry API-shaped models and are the next Phase 2 work items.
+- `bc42bc83ef` removes API/Realm score ownership. Imported replays and score presentation are local-only, while replay encoding uses the local player name.
+- `06739b68ee` changes beatmap creator metadata to text and removes avatar, flag, profile, results, and HUD user-presentation types.
+- `bbc2c40af2` deletes `Online/` and the remaining `Users/` surface, including the API provider/request stack, endpoints, API models, online beatmap metadata, report popover, and arbitrary URL helpers. Debug and Release Desktop builds passed with zero warnings. Exact source scans found no `IAPIProvider`, `APIRequest`, `OsuWebRequest`, `APIUser`, `IUser`, or `RealmUser` references; `ExternalBrowser` is the sole `OpenUrlExternally()` caller.
