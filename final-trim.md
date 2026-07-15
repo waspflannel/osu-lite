@@ -1,8 +1,8 @@
 # osu! lite final trim
 
-**Status:** binding implementation guide with post-merge unfinished-business audit  
-**Audit date:** 2026-07-15  
-**Audited tree:** repository contents matching `origin/master` at merge `23c522fa68`  
+**Status:** binding implementation guide with post-merge unfinished-business audit
+**Audit date:** 2026-07-15
+**Audited tree:** repository contents matching `origin/master` at merge `23c522fa68`
 **Purpose:** define the final product, record what the merged final trim actually completed, and remove every remaining out-of-scope path
 
 ## How to use this document
