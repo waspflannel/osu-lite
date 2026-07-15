@@ -30,7 +30,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Rulesets
@@ -293,11 +292,6 @@ namespace osu.Game.Rulesets
         /// A unique short name to reference this ruleset in online requests.
         /// </summary>
         public abstract string ShortName { get; }
-
-        /// <summary>
-        /// The playing verb to be shown in the <see cref="UserActivity.InGame"/> activities.
-        /// </summary>
-        public virtual string PlayingVerb => "Playing";
 
         /// <summary>
         /// A list of available variant ids.

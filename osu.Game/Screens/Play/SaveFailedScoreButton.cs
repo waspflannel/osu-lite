@@ -15,7 +15,6 @@ using osu.Game.Database;
 using osu.Game.Scoring;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Online;
 using osuTK;
 
 namespace osu.Game.Screens.Play
@@ -28,13 +27,13 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
-        private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
+        private readonly Bindable<ScoreSaveState> state = new Bindable<ScoreSaveState>();
 
         private readonly Func<Task<ScoreInfo>>? importFailedScore;
 
         private Live<ScoreInfo>? importedScore;
 
-        private DownloadButton button = null!;
+        private SaveScoreButton button = null!;
 
         public SaveFailedScoreButton(Func<Task<ScoreInfo>>? importFailedScore)
         {
@@ -46,7 +45,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuGame? game, Player? player)
         {
-            InternalChild = button = new DownloadButton
+            InternalChild = button = new SaveScoreButton
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { BindTarget = state },
@@ -54,19 +53,19 @@ namespace osu.Game.Screens.Play
                 {
                     switch (state.Value)
                     {
-                        case DownloadState.LocallyAvailable:
+                        case ScoreSaveState.Saved:
                             game?.PresentScore(importedScore?.Value, ScorePresentType.Gameplay);
                             break;
 
-                        case DownloadState.NotDownloaded:
-                            state.Value = DownloadState.Importing;
+                        case ScoreSaveState.NeedsSaving:
+                            state.Value = ScoreSaveState.Saving;
 
                             if (importFailedScore != null)
                             {
                                 Task.Run(importFailedScore).ContinueWith(t =>
                                 {
                                     importedScore = realm.Run<Live<ScoreInfo>?>(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.ToLive(realm));
-                                    Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
+                                    Schedule(() => state.Value = importedScore != null ? ScoreSaveState.Saved : ScoreSaveState.NeedsSaving);
                                 }).FireAndForget();
                             }
 
@@ -78,19 +77,19 @@ namespace osu.Game.Screens.Play
             if (player != null)
             {
                 importedScore = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.ToLive(realm));
-                state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
+                state.Value = importedScore != null ? ScoreSaveState.Saved : ScoreSaveState.NeedsSaving;
             }
 
             state.BindValueChanged(state =>
             {
                 switch (state.NewValue)
                 {
-                    case DownloadState.LocallyAvailable:
+                        case ScoreSaveState.Saved:
                         button.TooltipText = @"watch replay";
                         button.Enabled.Value = true;
                         break;
 
-                    case DownloadState.Importing:
+                        case ScoreSaveState.Saving:
                         button.TooltipText = @"importing score";
                         button.Enabled.Value = false;
                         break;
@@ -129,7 +128,7 @@ namespace osu.Game.Screens.Play
                     state.BindValueChanged(exportWhenReady, true);
 
                     // start the import via button
-                    if (state.Value != DownloadState.LocallyAvailable)
+                    if (state.Value != ScoreSaveState.Saved)
                         button.TriggerClick();
 
                     return true;
@@ -142,9 +141,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void exportWhenReady(ValueChangedEvent<DownloadState> state)
+        private void exportWhenReady(ValueChangedEvent<ScoreSaveState> state)
         {
-            if (state.NewValue != DownloadState.LocallyAvailable) return;
+            if (state.NewValue != ScoreSaveState.Saved) return;
 
             if (importedScore != null) scoreManager.Export(importedScore.Value);
 

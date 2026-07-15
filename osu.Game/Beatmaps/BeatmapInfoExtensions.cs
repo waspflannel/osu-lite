@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Select;
@@ -78,15 +77,5 @@ namespace osu.Game.Beatmaps
             return false;
         }
 
-        /// <summary>
-        /// Get the beatmap info page URL, or <c>null</c> if unavailable.
-        /// </summary>
-        public static string? GetOnlineURL(this IBeatmapInfo beatmapInfo, IAPIProvider api, IRulesetInfo? ruleset = null)
-        {
-            if (beatmapInfo.OnlineID <= 0 || beatmapInfo.BeatmapSet == null)
-                return null;
-
-            return $@"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
-        }
     }
 }

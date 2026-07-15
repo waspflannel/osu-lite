@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
@@ -53,8 +52,6 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
         double IBeatmapDifficultyInfo.SliderMultiplier => 0;
         double IBeatmapDifficultyInfo.SliderTickRate => 0;
-
-        public static LegacyBeatmapConversionDifficultyInfo FromAPIBeatmap(APIBeatmap apiBeatmap) => FromBeatmapInfo(apiBeatmap);
 
         public static LegacyBeatmapConversionDifficultyInfo FromBeatmap(IBeatmap beatmap) => new LegacyBeatmapConversionDifficultyInfo
         {

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
@@ -20,7 +20,7 @@ namespace osu.Game.Scoring.Legacy
     public class LegacyReplaySoloScoreInfo
     {
         [JsonProperty("mods")]
-        public APIMod[] Mods { get; set; } = Array.Empty<APIMod>();
+        public SerialisedMod[] Mods { get; set; } = Array.Empty<SerialisedMod>();
 
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; } = new Dictionary<HitResult, int>();
@@ -43,7 +43,7 @@ namespace osu.Game.Scoring.Legacy
 
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
-            Mods = score.APIMods,
+            Mods = score.SerialisedMods,
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             ClientVersion = score.ClientVersion,

@@ -14,7 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
-using osu.Game.Online;
 
 namespace osu.Game.Screens.Select
 {

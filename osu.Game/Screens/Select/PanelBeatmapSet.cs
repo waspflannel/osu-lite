@@ -22,7 +22,6 @@ using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osuTK;
@@ -44,7 +43,6 @@ namespace osu.Game.Screens.Select
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
         private Drawable chevronIcon = null!;
-        private BeatmapSetOnlineStatusPill statusPill = null!;
         private SpreadDisplay spreadDisplay = null!;
 
         [Resolved]
@@ -58,9 +56,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private OsuGame? game { get; set; }
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -132,14 +127,6 @@ namespace osu.Game.Screens.Select
                             Margin = new MarginPadding { Top = 4f },
                             Children = new Drawable[]
                             {
-                                statusPill = new BeatmapSetOnlineStatusPill
-                                {
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    TextSize = OsuFont.Style.Caption2.Size,
-                                    Margin = new MarginPadding { Right = 5f },
-                                    Animated = false,
-                                },
                                 spreadDisplay = new SpreadDisplay
                                 {
                                     Origin = Anchor.CentreLeft,
@@ -190,7 +177,6 @@ namespace osu.Game.Screens.Select
 
             titleText.Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title);
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);
-            statusPill.Status = beatmapSet.Status;
             spreadDisplay.BeatmapSet.Value = beatmapSet;
         }
 

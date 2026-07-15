@@ -37,7 +37,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
-using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -68,8 +67,6 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => true;
 
         // We show the previous screen status
-        protected override UserActivity? InitialActivity => null;
-
         protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 
         /// <summary>
@@ -302,16 +299,6 @@ namespace osu.Game.Screens.Play
                 disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
             }
 
-            switch (Beatmap.Value.BeatmapInfo.Status)
-            {
-                case BeatmapOnlineStatus.Loved:
-                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.LovedBeatmapDisclaimerTitle, PlayerLoaderStrings.LovedBeatmapDisclaimerContent));
-                    break;
-
-                case BeatmapOnlineStatus.Qualified:
-                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.QualifiedBeatmapDisclaimerTitle, PlayerLoaderStrings.QualifiedBeatmapDisclaimerContent));
-                    break;
-            }
         }
 
         protected override void LoadComplete()

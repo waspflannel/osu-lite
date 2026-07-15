@@ -18,7 +18,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
@@ -70,20 +69,6 @@ namespace osu.Game.Screens
         public virtual bool CursorVisible => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
-
-        /// <summary>
-        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered.
-        /// <para>This <see cref="Activity"/> will be automatically set to <see cref="InitialActivity"/> for this screen on entering for the first time
-        /// unless <see cref="Activity"/> is manually set before.</para>
-        /// </summary>
-        protected virtual UserActivity InitialActivity => null;
-
-        /// <summary>
-        /// The current <see cref="UserActivity"/> for this screen.
-        /// </summary>
-        protected readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
-
-        Bindable<UserActivity> IOsuScreen.Activity => Activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -179,7 +164,6 @@ namespace osu.Game.Screens
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Activity.Value ??= InitialActivity;
         }
 
         /// <summary>

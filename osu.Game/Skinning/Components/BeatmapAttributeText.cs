@@ -170,9 +170,6 @@ namespace osu.Game.Skinning.Components
                 case BeatmapAttribute.Length:
                     return ArtistStrings.TracklistLength.ToTitle();
 
-                case BeatmapAttribute.RankedStatus:
-                    return BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault;
-
                 case BeatmapAttribute.BPM:
                     return BeatmapsetsStrings.ShowStatsBpm;
 
@@ -205,9 +202,6 @@ namespace osu.Game.Skinning.Components
 
                 case BeatmapAttribute.Length:
                     return Math.Round(beatmap.Value.BeatmapInfo.Length / ModUtils.CalculateRateWithMods(mods.Value)).ToFormattedDuration();
-
-                case BeatmapAttribute.RankedStatus:
-                    return beatmap.Value.BeatmapInfo.Status.GetLocalisableDescription();
 
                 case BeatmapAttribute.BPM:
                     return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"0.##");
@@ -272,7 +266,6 @@ namespace osu.Game.Skinning.Components
         DifficultyName,
         Creator,
         Length,
-        RankedStatus,
         BPM,
         Source,
         MaxPP

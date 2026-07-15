@@ -7,7 +7,6 @@ using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -24,7 +23,6 @@ namespace osu.Game.Configuration
             SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
             SetDefault<ScoreInfo?>(Static.LastAppliedOffsetScore, null);
-            SetDefault<UserActivity?>(Static.UserOnlineActivity, null);
         }
 
         /// <summary>
@@ -71,11 +69,6 @@ namespace osu.Game.Configuration
         /// This is reset when a new challenge is up.
         /// </summary>
         DailyChallengeIntroPlayed,
-
-        /// <summary>
-        /// The activity for the current user to broadcast to other players.
-        /// </summary>
-        UserOnlineActivity,
 
     }
 }

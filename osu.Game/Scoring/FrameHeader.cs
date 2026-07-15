@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
-using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Scoring
         /// is the automatic activation of Touch Device mod when usage of touch devices is detected.
         /// </remarks>
         [Key(7)]
-        public APIMod[] Mods { get; set; }
+        public SerialisedMod[] Mods { get; set; }
 
         /// <summary>
         /// The current total score without mod multipliers active.
@@ -103,7 +103,7 @@ namespace osu.Game.Scoring
             MaxCombo = score.MaxCombo;
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
-            Mods = score.APIMods.ToArray();
+            Mods = score.SerialisedMods.ToArray();
             TotalScoreWithoutMods = score.TotalScoreWithoutMods;
             Pauses = score.Pauses.ToArray();
 
@@ -120,7 +120,7 @@ namespace osu.Game.Scoring
             Dictionary<HitResult, int> statistics,
             ScoreProcessorStatistics scoreProcessorStatistics,
             DateTimeOffset receivedTime,
-            APIMod[] mods,
+            SerialisedMod[] mods,
             long? totalScoreWithoutMods,
             int[]? pauses)
         {

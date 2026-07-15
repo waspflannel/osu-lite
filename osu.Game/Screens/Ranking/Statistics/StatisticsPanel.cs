@@ -19,7 +19,6 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Graphics.Sprites;
@@ -48,9 +47,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         private readonly Container content;
         private readonly LoadingSpinner spinner;

@@ -45,9 +45,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
-using osu.Game.Online;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -63,7 +60,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
-using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -174,8 +170,6 @@ namespace osu.Game
         private Bindable<bool> applySafeAreaConsiderations;
 
         private Bindable<float> uiScale;
-
-        private Bindable<UserActivity> configUserActivity;
 
         private RealmDetachedBeatmapStore detachedBeatmapStore;
 
@@ -363,8 +357,6 @@ namespace osu.Game
 
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
 
-            configUserActivity = SessionStatics.GetBindable<UserActivity>(Static.UserOnlineActivity);
-
             // osu! lite is locked to the Argon skin; SkinManager defaults to it and no runtime selection is persisted.
 
             UserPlayingState.BindValueChanged(p =>
@@ -380,7 +372,6 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
-            configUserActivity.BindValueChanged(_ => updateWindowTitle());
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
@@ -589,17 +580,9 @@ namespace osu.Game
 
             string newTitle;
 
-            switch (configUserActivity.Value)
-            {
-                default:
-                    newTitle = Name;
-                    break;
-
-                case UserActivity.InGame:
-                case UserActivity.WatchingReplay:
-                    newTitle = $"{Name} - {Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}";
-                    break;
-            }
+            newTitle = ScreenStack?.CurrentScreen is Player
+                ? $"{Name} - {Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(true, false)}"
+                : Name;
 
             if (newTitle != Host.Window.Title)
                 Host.Window.Title = newTitle;
@@ -1203,14 +1186,12 @@ namespace osu.Game
             if (current != null)
             {
                 OverlayActivationMode.UnbindFrom(current.OverlayActivationMode);
-                configUserActivity.UnbindFrom(current.Activity);
             }
 
             // Bind to new screen.
             if (newScreen is OsuScreen newOsuScreen)
             {
                 OverlayActivationMode.BindTo(newScreen.OverlayActivationMode);
-                configUserActivity.BindTo(newScreen.Activity);
 
                 // Handle various configuration updates based on new screen settings.
                 GlobalCursorDisplay.MenuCursor.HideCursorOnNonMouseInput = newScreen.HideMenuCursorOnNonMouseInput;
@@ -1220,6 +1201,8 @@ namespace osu.Game
                 else
                     Toolbar.Show();
             }
+
+            updateWindowTitle();
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen) => ScreenChanged((OsuScreen)lastScreen, (OsuScreen)newScreen);

@@ -99,9 +99,6 @@ namespace osu.Game.Screens.Select
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
-                case "status":
-                    return TryUpdateCriteriaSet(ref criteria.OnlineStatus, op, value);
-
                 case "creator":
                 case "author":
                 case "mapper":

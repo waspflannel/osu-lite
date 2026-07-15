@@ -27,7 +27,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using Realms;
@@ -107,7 +106,6 @@ namespace osu.Game.Screens.Select
                 {
                     GetCriteria = () => Criteria!,
                     GetLocalUserTopRanks = GetBeatmapInfoGuidToTopRankMapping,
-                    GetFavouriteBeatmapSets = GetFavouriteBeatmapSets,
                 }
             };
 
@@ -443,8 +441,6 @@ namespace osu.Game.Screens.Select
                             oldBeatmap.Hash == newBeatmap.Hash &&
                             // sanity check
                             oldBeatmap.OnlineID == newBeatmap.OnlineID &&
-                            // displayed on panel
-                            oldBeatmap.Status == newBeatmap.Status &&
                             // displayed on panel
                             oldBeatmap.DifficultyName == newBeatmap.DifficultyName &&
                             // hidden changed, needs re-filter
@@ -815,9 +811,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
         protected virtual Dictionary<Guid, ScoreRank> GetBeatmapInfoGuidToTopRankMapping(FilterCriteria criteria) => realm.Run(r =>
         {
             var topRankMapping = new Dictionary<Guid, ScoreRank>();
@@ -840,13 +833,6 @@ namespace osu.Game.Screens.Select
             return topRankMapping;
         });
 
-        /// <remarks>
-        /// Note that calling <c>.ToHashSet()</c> below has two purposes:
-        /// one being performance of contain checks in filtering code,
-        /// another being slightly better thread safety (as <see cref="ILocalUserState.FavouriteBeatmapSets"/> could be mutated during async filtering).
-        /// </remarks>
-        protected HashSet<int> GetFavouriteBeatmapSets() => api.LocalUserState.FavouriteBeatmapSets.ToHashSet();
-
         #endregion
 
         #region Drawable pooling
@@ -857,11 +843,9 @@ namespace osu.Game.Screens.Select
         private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
         private readonly DrawablePool<PanelGroupStarDifficulty> starsGroupPanelPool = new DrawablePool<PanelGroupStarDifficulty>(11);
         private readonly DrawablePool<PanelGroupRankDisplay> ranksGroupPanelPool = new DrawablePool<PanelGroupRankDisplay>(9);
-        private readonly DrawablePool<PanelGroupRankedStatus> statusGroupPanelPool = new DrawablePool<PanelGroupRankedStatus>(8);
 
         private void setupPools()
         {
-            AddInternal(statusGroupPanelPool);
             AddInternal(ranksGroupPanelPool);
             AddInternal(starsGroupPanelPool);
             AddInternal(groupPanelPool);
@@ -896,9 +880,6 @@ namespace osu.Game.Screens.Select
             if (x is RankDisplayGroupDefinition rankX && y is RankDisplayGroupDefinition rankY)
                 return rankX.Equals(rankY);
 
-            if (x is RankedStatusGroupDefinition statusX && y is RankedStatusGroupDefinition statusY)
-                return statusX.Equals(statusY);
-
             // NOTE: this branch must be AFTER all branches that compare `GroupDefinition` subtypes!
             // this is an optimisation measure. any subclass of `GroupDefinition` will pass the `is GroupDefinition` check,
             // and testing a subclass of `GroupDefinition` against any other `GroupDefinition` (or subclass thereof)
@@ -914,9 +895,6 @@ namespace osu.Game.Screens.Select
         {
             switch (item.Model)
             {
-                case RankedStatusGroupDefinition:
-                    return statusGroupPanelPool.Get();
-
                 case StarDifficultyGroupDefinition:
                     return starsGroupPanelPool.Get();
 
@@ -1194,11 +1172,6 @@ namespace osu.Game.Screens.Select
     /// Defines a grouping header for a set of carousel items grouped by achieved rank.
     /// </summary>
     public record RankDisplayGroupDefinition(ScoreRank Rank) : GroupDefinition(-(int)Rank, Rank.GetLocalisableDescription());
-
-    /// <summary>
-    /// Defines a grouping header for a set of carousel items grouped by ranked status.
-    /// </summary>
-    public record RankedStatusGroupDefinition(int Order, BeatmapOnlineStatus Status) : GroupDefinition(Order, Status.GetLocalisableDescription());
 
     /// <summary>
     /// Used to represent a portion of a <see cref="BeatmapSetInfo"/> under a <see cref="GroupDefinition"/>.

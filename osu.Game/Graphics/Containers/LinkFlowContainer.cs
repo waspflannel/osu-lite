@@ -6,10 +6,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.ListExtensions;
+using osu.Framework.Lists;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -45,7 +51,7 @@ namespace osu.Game.Graphics.Containers
                 innerPart.RecreateDrawablesFor(linkFlowContainer);
                 var drawables = innerPart.Drawables.ToList();
 
-                drawables.Add(linkFlowContainer.CreateLinkCompiler(innerPart).With(c =>
+                drawables.Add(new LinkInteraction(innerPart).With(c =>
                 {
                     c.RelativeSizeAxes = Axes.Both;
                     c.TooltipText = tooltipText;
@@ -56,16 +62,52 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart);
-
         protected override InnerFlow CreateFlow() => new LinkFlow();
+
+        private partial class LinkInteraction : OsuHoverContainer
+        {
+            private readonly SlimReadOnlyListWrapper<Drawable> parts;
+
+            public LinkInteraction(ITextPart textPart)
+            {
+                parts = textPart.Drawables.OfType<SpriteText>().Cast<Drawable>().ToList().AsSlimReadOnly();
+            }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => parts.Any(part => part.ReceivePositionalInputAt(screenSpacePos));
+
+            protected override IEnumerable<Drawable> EffectTargets => parts;
+
+            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, parts);
+
+            [Resolved(canBeNull: true)]
+            private OverlayColourProvider overlayColourProvider { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                IdleColour ??= overlayColourProvider?.Light2 ?? colours.Blue;
+            }
+
+            private partial class LinkHoverSounds : HoverClickSounds
+            {
+                private readonly SlimReadOnlyListWrapper<Drawable> parts;
+
+                public LinkHoverSounds(HoverSampleSet sampleSet, SlimReadOnlyListWrapper<Drawable> parts)
+                    : base(sampleSet)
+                {
+                    this.parts = parts;
+                }
+
+                public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => parts.Any(part => part.ReceivePositionalInputAt(screenSpacePos));
+            }
+        }
 
         private partial class LinkFlow : InnerFlow
         {
-            // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
-            // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.
+            // We want the interaction targets to always be visible no matter where they are, so RelativeSizeAxes is used.
+            // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for targets to be relative size in the flow's auto-size axes - an unsupported operation.
             // Since the compilers don't display any content and don't affect the layout, it's simplest to exclude them from the flow.
-            public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Where(c => !(c is DrawableLinkCompiler));
+            public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Where(c => !(c is LinkInteraction));
         }
     }
 }

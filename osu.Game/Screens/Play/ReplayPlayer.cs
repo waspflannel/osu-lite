@@ -22,7 +22,6 @@ using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
@@ -32,13 +31,6 @@ namespace osu.Game.Screens.Play
         public const double BASE_SEEK_AMOUNT = 1000;
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
-
-        protected override UserActivity? InitialActivity =>
-            // score may be null if LoadedBeatmapSuccessfully is false.
-            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo, localPlayerName.Value.Value);
-
-        [Resolved]
-        private LocalPlayerName localPlayerName { get; set; } = null!;
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 

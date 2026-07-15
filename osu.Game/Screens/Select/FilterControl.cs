@@ -20,7 +20,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
@@ -61,8 +60,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private readonly IBindableList<int> localUserFavouriteBeatmapSets = new BindableList<int>();
-
         [Resolved]
         private LocalPlayerName localPlayerName { get; set; } = null!;
 
@@ -77,7 +74,7 @@ namespace osu.Game.Screens.Select
         private FilterCriteria currentCriteria = null!;
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -200,7 +197,6 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            localUserFavouriteBeatmapSets.BindTo(api.LocalUserState.FavouriteBeatmapSets);
         }
 
         protected override void LoadComplete()
@@ -249,7 +245,6 @@ namespace osu.Game.Screens.Select
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
 
             localPlayerName.Value.BindValueChanged(_ => updateCriteria());
-            localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
             ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
             updateCriteria();

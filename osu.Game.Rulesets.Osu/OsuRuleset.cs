@@ -248,8 +248,6 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => SHORT_NAME;
 
-        public override string PlayingVerb => "Clicking circles";
-
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
         public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)

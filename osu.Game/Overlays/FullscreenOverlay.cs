@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -26,9 +25,6 @@ namespace osu.Game.Overlays
         public T Header { get; private set; }
 
         protected virtual Color4 BackgroundColour => ColourProvider.Background5;
-
-        [Resolved]
-        protected IAPIProvider API { get; private set; } = null!;
 
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;

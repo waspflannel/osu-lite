@@ -48,8 +48,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
-using osu.Game.Online;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
@@ -151,8 +149,6 @@ namespace osu.Game
         protected GlobalCursorDisplay GlobalCursorDisplay { get; private set; }
 
         protected MusicController MusicController { get; private set; }
-
-        protected IAPIProvider API { get; set; }
 
         protected ExternalBrowser ExternalBrowser { get; private set; }
 
@@ -287,9 +283,6 @@ namespace osu.Game
 
             CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
 
-            // osu! lite is fully offline: use a dummy API that never contacts any server.
-            dependencies.CacheAs(API ??= new DummyAPIAccess());
-
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
@@ -327,10 +320,6 @@ namespace osu.Game
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
-
-            // add api components to hierarchy.
-            if (API is Drawable apiDrawable)
-                base.Content.Add(apiDrawable);
 
             base.Content.Add(rulesetConfigCache);
 
@@ -402,8 +391,7 @@ namespace osu.Game
                     textWriter.WriteLine(@"To be very clear, the ""files/"" directory inside this directory stores all the raw pieces of your beatmaps, skins, and replays.");
                     textWriter.WriteLine(@"Importantly, it is NOT the only directory you need a backup of to avoid losing data. If you copy only the ""files/"" directory, YOU WILL LOSE DATA.");
                     textWriter.WriteLine();
-                    textWriter.WriteLine(@"For more information on how these files are organised,");
-                    textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");
+                    textWriter.WriteLine(@"For more information, consult the application logs and storage documentation.");
                 }
             }
         }

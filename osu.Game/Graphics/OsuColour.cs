@@ -144,48 +144,6 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
-        /// Retrieves a colour for the given <see cref="BeatmapOnlineStatus"/>.
-        /// A <see langword="null"/> value indicates that a "background" shade from the local <see cref="OverlayColourProvider"/>
-        /// (or another fallback colour) should be used.
-        /// </summary>
-        /// <remarks>
-        /// Sourced from web: https://github.com/ppy/osu-web/blob/007eebb1916ed5cb6a7866d82d8011b1060a945e/resources/assets/less/layout.less#L36-L50
-        /// </remarks>
-        public static Color4? ForBeatmapSetOnlineStatus(BeatmapOnlineStatus status)
-        {
-            switch (status)
-            {
-                case BeatmapOnlineStatus.None:
-                    return Color4.RosyBrown;
-
-                case BeatmapOnlineStatus.LocallyModified:
-                    return Color4.OrangeRed;
-
-                case BeatmapOnlineStatus.Ranked:
-                case BeatmapOnlineStatus.Approved:
-                    return Color4Extensions.FromHex(@"b3ff66");
-
-                case BeatmapOnlineStatus.Loved:
-                    return Color4Extensions.FromHex(@"ff66ab");
-
-                case BeatmapOnlineStatus.Qualified:
-                    return Color4Extensions.FromHex(@"66ccff");
-
-                case BeatmapOnlineStatus.Pending:
-                    return Color4Extensions.FromHex(@"ffd966");
-
-                case BeatmapOnlineStatus.WIP:
-                    return Color4Extensions.FromHex(@"ff9966");
-
-                case BeatmapOnlineStatus.Graveyard:
-                    return Color4.Black;
-
-                default:
-                    return null;
-            }
-        }
-
-        /// <summary>
         /// Retrieves the main accent colour for a <see cref="ModType"/>.
         /// </summary>
         public Color4 ForModType(ModType modType)

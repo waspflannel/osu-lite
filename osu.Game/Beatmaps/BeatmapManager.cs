@@ -21,7 +21,6 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
@@ -474,7 +473,6 @@ namespace osu.Game.Beatmaps
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
             setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
-            setInfo.Status = BeatmapOnlineStatus.LocallyModified;
         }
 
         private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, Storyboard? storyboard)
@@ -495,7 +493,6 @@ namespace osu.Game.Beatmaps
 
             // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
             beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
-            beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
 
             Realm.Write(r =>
             {

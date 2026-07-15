@@ -13,12 +13,10 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
-using osu.Game.Users;
 using osu.Game.Utils;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
@@ -26,16 +24,11 @@ namespace osu.Game.Screens.Select
 {
     public partial class SoloSongSelect : SongSelect
     {
-        protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
-
         private PlayerLoader? playerLoader;
         private IReadOnlyList<Mod>? modsAtGameplayStart;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
         private INotificationOverlay? notifications { get; set; }

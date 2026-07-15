@@ -1,5 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 
 using System.Buffers;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using MessagePack;
 using MessagePack.Formatters;
 using osu.Game.Configuration;
 
-namespace osu.Game.Online.API
+namespace osu.Game.Rulesets.Mods
 {
     public class ModSettingsDictionaryFormatter : IMessagePackFormatter<Dictionary<string, object>?>
     {
@@ -16,16 +15,13 @@ namespace osu.Game.Online.API
         {
             if (value == null) return;
 
-            var primitiveFormatter = PrimitiveObjectFormatter.Instance;
-
             writer.WriteArrayHeader(value.Count);
 
             foreach (var kvp in value)
             {
                 var stringBytes = new ReadOnlySequence<byte>(Encoding.UTF8.GetBytes(kvp.Key));
                 writer.WriteString(in stringBytes);
-
-                primitiveFormatter.Serialize(ref writer, kvp.Value.GetUnderlyingSettingValue(), options);
+                PrimitiveObjectFormatter.Instance.Serialize(ref writer, kvp.Value.GetUnderlyingSettingValue(), options);
             }
         }
 
@@ -33,13 +29,8 @@ namespace osu.Game.Online.API
         {
             var output = new Dictionary<string, object>();
 
-            int itemCount = reader.ReadArrayHeader();
-
-            for (int i = 0; i < itemCount; i++)
-            {
-                output[reader.ReadString()!] =
-                    PrimitiveObjectFormatter.Instance.Deserialize(ref reader, options)!;
-            }
+            for (int i = 0, count = reader.ReadArrayHeader(); i < count; i++)
+                output[reader.ReadString()!] = PrimitiveObjectFormatter.Instance.Deserialize(ref reader, options)!;
 
             return output;
         }

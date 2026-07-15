@@ -30,7 +30,6 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> Length;
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
-        public OptionalSet<BeatmapOnlineStatus> OnlineStatus = new OptionalSet<BeatmapOnlineStatus>();
         public OptionalRange<DateTimeOffset> LastPlayed;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
@@ -48,10 +47,6 @@ namespace osu.Game.Screens.Select
         public RulesetInfo? Ruleset;
         public IReadOnlyList<Mod>? Mods;
         public bool AllowConvertedBeatmaps;
-        public int? BeatmapSetId;
-
-        public bool? HasOnlineID;
-
         private string searchText = string.Empty;
 
         /// <summary>

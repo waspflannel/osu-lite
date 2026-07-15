@@ -7,23 +7,28 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Localisation;
-using osu.Game.Online;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class DownloadButton : GrayButton
+    public enum ScoreSaveState
+    {
+        NeedsSaving,
+        Saving,
+        Saved,
+    }
+
+    public partial class SaveScoreButton : GrayButton
     {
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
+        public readonly Bindable<ScoreSaveState> State = new Bindable<ScoreSaveState>();
 
         private SpriteIcon checkmark;
 
-        public DownloadButton()
-            : base(FontAwesome.Solid.Download)
+        public SaveScoreButton()
+            : base(FontAwesome.Solid.Save)
         {
         }
 
@@ -42,30 +47,23 @@ namespace osu.Game.Graphics.UserInterface
             State.BindValueChanged(updateState, true);
         }
 
-        private void updateState(ValueChangedEvent<DownloadState> state)
+        private void updateState(ValueChangedEvent<ScoreSaveState> state)
         {
             switch (state.NewValue)
             {
-                case DownloadState.NotDownloaded:
+                case ScoreSaveState.NeedsSaving:
                     Background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
                     Icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
-                    TooltipText = CommonStrings.Download;
+                    TooltipText = @"save score";
                     break;
 
-                case DownloadState.Downloading:
-                    Background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
-                    Icon.MoveToX(0, 500, Easing.InOutExpo);
-                    checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
-                    TooltipText = CommonStrings.Downloading;
-                    break;
-
-                case DownloadState.Importing:
+                case ScoreSaveState.Saving:
                     Background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
-                    TooltipText = CommonStrings.Importing;
+                    TooltipText = @"saving score";
                     break;
 
-                case DownloadState.LocallyAvailable:
+                case ScoreSaveState.Saved:
                     Background.FadeColour(colours.Green, 500, Easing.InOutExpo);
                     Icon.MoveToX(-8, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(new Vector2(13), 500, Easing.InOutExpo);

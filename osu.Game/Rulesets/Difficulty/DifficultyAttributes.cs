@@ -82,14 +82,5 @@ namespace osu.Game.Rulesets.Difficulty
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
         }
 
-        /// <summary>
-        /// Reads osu-web database attribute mappings into this <see cref="DifficultyAttributes"/> object.
-        /// </summary>
-        /// <param name="values">The attribute mappings.</param>
-        /// <param name="onlineInfo">The <see cref="IBeatmapOnlineInfo"/> where more information about the beatmap may be extracted from (such as AR/CS/OD/etc).</param>
-        public virtual void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
-        {
-            MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-        }
     }
 }

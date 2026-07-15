@@ -3,10 +3,8 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -38,27 +36,9 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public readonly Replay Replay;
 
-        /// <summary>
-        /// Placeholder user data to show in place of the local user when the associated mod is active.
-        /// </summary>
-        public readonly ModCreatedUser User;
-
-        public ModReplayData(Replay replay, ModCreatedUser? user = null)
+        public ModReplayData(Replay replay)
         {
             Replay = replay;
-            User = user ?? new ModCreatedUser();
         }
-    }
-
-    /// <summary>
-    /// A user which is associated with a replay that was created by a mod (ie. autoplay or cinema).
-    /// </summary>
-    public class ModCreatedUser : IUser
-    {
-        public int OnlineID => APIUser.SYSTEM_USER_ID;
-        public CountryCode CountryCode => default;
-        public bool IsBot => true;
-
-        public string Username { get; set; } = string.Empty;
     }
 }

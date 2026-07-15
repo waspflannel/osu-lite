@@ -34,16 +34,6 @@ namespace osu.Game.Beatmaps
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
-        [Ignored]
-        public BeatmapOnlineStatus Status
-        {
-            get => (BeatmapOnlineStatus)StatusInt;
-            set => StatusInt = (int)value;
-        }
-
-        [MapTo(nameof(Status))]
-        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
-
         public bool DeletePending { get; set; }
 
         public string Hash { get; set; } = string.Empty;

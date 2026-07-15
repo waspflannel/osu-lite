@@ -9,7 +9,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
-using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
@@ -83,11 +82,6 @@ namespace osu.Game.Screens
         /// </summary>
         // todo: make this work with footer.
         IBindable<bool> BackButtonVisibility { get; }
-
-        /// <summary>
-        /// The current <see cref="UserActivity"/> for this screen.
-        /// </summary>
-        Bindable<UserActivity> Activity { get; }
 
         /// <summary>
         /// The amount of parallax to be applied while this screen is displayed.

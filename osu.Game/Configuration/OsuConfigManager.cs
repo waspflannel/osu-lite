@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {

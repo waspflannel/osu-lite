@@ -1,5 +1,4 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -10,13 +9,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Online.API
+namespace osu.Game.Rulesets.Mods
 {
     [MessagePackObject]
-    public class APIMod : IEquatable<APIMod>
+    public class SerialisedMod : IEquatable<SerialisedMod>
     {
         [JsonProperty("acronym")]
         [Key(0)]
@@ -29,11 +26,11 @@ namespace osu.Game.Online.API
 
         [JsonConstructor]
         [SerializationConstructor]
-        public APIMod()
+        public SerialisedMod()
         {
         }
 
-        public APIMod(Mod mod)
+        public SerialisedMod(Mod mod)
         {
             Acronym = mod.Acronym;
 
@@ -56,56 +53,31 @@ namespace osu.Game.Online.API
                 return new UnknownMod(Acronym);
             }
 
-            if (Settings.Count > 0)
+            foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
             {
-                foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
-                {
-                    if (!Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
-                        continue;
+                if (!Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
+                    continue;
 
-                    try
-                    {
-                        resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod)!, settingValue);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log($"Failed to copy mod setting value '{settingValue}' to \"{property.Name}\": {ex.Message}");
-                    }
+                try
+                {
+                    resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod)!, settingValue);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"Failed to copy mod setting value '{settingValue}' to \"{property.Name}\": {ex.Message}");
                 }
             }
 
             return resultMod;
         }
 
-        public bool ShouldSerializeSettings() => Settings.Count > 0;
-
-        public bool Equals(APIMod? other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return Acronym == other.Acronym && Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
-        }
-
-        public override string ToString()
-        {
-            if (Settings.Count > 0)
-                return $"{Acronym} ({string.Join(',', Settings.Select(kvp => $"{kvp.Key}:{kvp.Value}"))})";
-
-            return $"{Acronym}";
-        }
+        public bool Equals(SerialisedMod? other) => other != null && Acronym == other.Acronym && Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
 
         private class ModSettingsEqualityComparer : IEqualityComparer<KeyValuePair<string, object>>
         {
             public static ModSettingsEqualityComparer Default { get; } = new ModSettingsEqualityComparer();
 
-            public bool Equals(KeyValuePair<string, object> x, KeyValuePair<string, object> y)
-            {
-                object xValue = x.Value.GetUnderlyingSettingValue();
-                object yValue = y.Value.GetUnderlyingSettingValue();
-
-                return x.Key == y.Key && EqualityComparer<object>.Default.Equals(xValue, yValue);
-            }
+            public bool Equals(KeyValuePair<string, object> x, KeyValuePair<string, object> y) => x.Key == y.Key && EqualityComparer<object>.Default.Equals(x.Value.GetUnderlyingSettingValue(), y.Value.GetUnderlyingSettingValue());
 
             public int GetHashCode(KeyValuePair<string, object> obj) => HashCode.Combine(obj.Key, obj.Value.GetUnderlyingSettingValue());
         }

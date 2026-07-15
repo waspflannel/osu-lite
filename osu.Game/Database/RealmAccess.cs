@@ -26,8 +26,6 @@ using osu.Game.Extensions;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -983,10 +981,10 @@ namespace osu.Game.Database
 
                             var legacyMods = (LegacyMods)sr.ReadInt32();
 
-                            if (!legacyMods.HasFlag(LegacyMods.ScoreV2) || score.APIMods.Any(mod => mod.Acronym == @"SV2"))
+                            if (!legacyMods.HasFlag(LegacyMods.ScoreV2) || score.SerialisedMods.Any(mod => mod.Acronym == @"SV2"))
                                 return;
 
-                            score.APIMods = score.APIMods.Append(new APIMod(new ModScoreV2())).ToArray();
+                            score.SerialisedMods = score.SerialisedMods.Append(new SerialisedMod(new ModScoreV2())).ToArray();
                             score.LegacyTotalScore = score.TotalScore = totalScore;
                         });
                     }
@@ -1199,15 +1197,6 @@ namespace osu.Game.Database
                     break;
                 }
 
-                case 48:
-                    const int qualified = (int)BeatmapOnlineStatus.Qualified;
-
-                    var beatmaps = migration.NewRealm.All<BeatmapInfo>().Where(b => b.StatusInt == qualified);
-
-                    foreach (var beatmap in beatmaps)
-                        beatmap.ResetOnlineInfo(resetOnlineId: false);
-                    break;
-
                 case 49:
                     foreach (var score in migration.NewRealm.All<ScoreInfo>().Where(s => s.LegacyOnlineID == 0))
                         score.LegacyOnlineID = -1;
@@ -1218,17 +1207,6 @@ namespace osu.Game.Database
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private string? getRulesetShortNameFromLegacyID(long rulesetId)
-        {
-            try
-            {
-                return new APIBeatmap.APIRuleset { OnlineID = (int)rulesetId }.ShortName;
-            }
-            catch
-            {
-                return null;
-            }
-        }
 #endif
 
         /// <summary>

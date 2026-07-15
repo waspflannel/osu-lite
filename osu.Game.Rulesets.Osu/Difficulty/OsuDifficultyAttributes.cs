@@ -135,30 +135,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT, ReadingDifficultNoteCount);
         }
 
-        public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
-        {
-            base.FromDatabaseAttributes(values, onlineInfo);
-
-            AimDifficulty = values[ATTRIB_ID_AIM];
-            SpeedDifficulty = values[ATTRIB_ID_SPEED];
-            ReadingDifficulty = values[ATTRIB_ID_READING];
-            StarRating = values[ATTRIB_ID_DIFFICULTY];
-            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
-            SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
-            AimDifficultStrainCount = values[ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT];
-            SpeedDifficultStrainCount = values[ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT];
-            SpeedNoteCount = values[ATTRIB_ID_SPEED_NOTE_COUNT];
-            AimDifficultSliderCount = values[ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT];
-            AimTopWeightedSliderFactor = values[ATTRIB_ID_AIM_TOP_WEIGHTED_SLIDER_FACTOR];
-            SpeedTopWeightedSliderFactor = values[ATTRIB_ID_SPEED_TOP_WEIGHTED_SLIDER_FACTOR];
-            NestedScorePerObject = values[ATTRIB_ID_NESTED_SCORE_PER_OBJECT];
-            LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
-            MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
-            ReadingDifficultNoteCount = values[ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT];
-            HitCircleCount = onlineInfo.CircleCount;
-            SliderCount = onlineInfo.SliderCount;
-            SpinnerCount = onlineInfo.SpinnerCount;
-        }
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
 

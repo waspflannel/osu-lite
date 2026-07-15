@@ -49,7 +49,6 @@ namespace osu.Game.Screens.Select
 
         private ModSettingChangeTracker? settingChangeTracker;
 
-        private BeatmapSetOnlineStatusPill statusPill = null!;
         private OsuHoverContainer titleLink = null!;
         private MarqueeContainer titleLabel = null!;
         private OsuHoverContainer artistLink = null!;
@@ -97,13 +96,6 @@ namespace osu.Game.Screens.Select
                     Spacing = new Vector2(0f, 4f),
                     Children = new Drawable[]
                     {
-                        new ShearAligningWrapper(statusPill = new BeatmapSetOnlineStatusPill
-                        {
-                            Shear = -OsuGame.SHEAR,
-                            ShowUnknownStatus = true,
-                            TextSize = OsuFont.Style.Caption1.Size,
-                            TextPadding = new MarginPadding { Horizontal = 6, Vertical = 1 },
-                        }),
                         new ShearAligningWrapper(new Container
                         {
                             Shear = -OsuGame.SHEAR,
@@ -210,7 +202,6 @@ namespace osu.Game.Screens.Select
             var metadata = working.Value.Metadata;
             var beatmapInfo = working.Value.BeatmapInfo;
 
-            statusPill.Status = beatmapInfo.Status;
 
             var titleText = new RomanisableString(metadata.TitleUnicode, metadata.Title);
             titleLabel.CreateContent = () => new OsuSpriteText

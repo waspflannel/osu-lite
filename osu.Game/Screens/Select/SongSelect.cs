@@ -37,8 +37,6 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
@@ -138,9 +136,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }

@@ -34,7 +34,6 @@ using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
-using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Graphics;
 
@@ -61,8 +60,6 @@ namespace osu.Game.Screens.Play
         public event Action OnShowingResults;
 
         protected override bool PlayExitSound => !isRestarting;
-
-        protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public override float BackgroundParallaxAmount => 0.1f;
 

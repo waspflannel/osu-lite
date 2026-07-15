@@ -69,12 +69,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             {
                 performance.Value = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
 
-                if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints())
-                {
-                    Alpha = 0.5f;
-                    TooltipText = ResultsScreenStrings.NoPPForUnrankedBeatmaps;
-                }
-                else if (hasUnrankedMods(scoreInfo))
+                if (hasUnrankedMods(scoreInfo))
                 {
                     Alpha = 0.5f;
                     TooltipText = ResultsScreenStrings.NoPPForUnrankedMods;
