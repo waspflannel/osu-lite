@@ -242,7 +242,7 @@ namespace osu.Game.Screens.Select
                 {
                     ratingAndNameContainer.FadeIn(300, Easing.OutQuint);
                     difficultyText.Text = beatmap.Value.BeatmapInfo.DifficultyName;
-                    mapperText.Text = beatmap.Value.Metadata.Author.Username;
+                    mapperText.Text = beatmap.Value.Metadata.Creator;
                 }
 
                 starRatingDisplay.Current = (Bindable<StarDifficulty>)difficultyCache.GetBindableDifficulty(beatmap.Value.BeatmapInfo, cancellationSource.Token, SongSelect.DIFFICULTY_CALCULATION_DEBOUNCE);

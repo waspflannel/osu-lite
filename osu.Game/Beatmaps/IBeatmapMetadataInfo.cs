@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
@@ -32,9 +31,9 @@ namespace osu.Game.Beatmaps
         string ArtistUnicode { get; }
 
         /// <summary>
-        /// The author of this beatmap.
+        /// The creator of this beatmap.
         /// </summary>
-        IUser Author { get; }
+        string Creator { get; }
 
         /// <summary>
         /// The source of this beatmap.
@@ -71,7 +70,7 @@ namespace osu.Game.Beatmaps
                    && TitleUnicode == other.TitleUnicode
                    && Artist == other.Artist
                    && ArtistUnicode == other.ArtistUnicode
-                   && Author.Equals(other.Author)
+                   && Creator == other.Creator
                    && Source == other.Source
                    && Tags == other.Tags
                    && PreviewTime == other.PreviewTime

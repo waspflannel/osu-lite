@@ -818,33 +818,6 @@ namespace osu.Game.Database
                     break;
                 }
 
-                case 9:
-                    // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
-                    string metadataClassName = getMappedOrOriginalName(typeof(BeatmapMetadata));
-
-                    // May be coming from a version before `RealmBeatmapMetadata` existed.
-                    if (!migration.OldRealm.Schema.TryFindObjectSchema(metadataClassName, out _))
-                        return;
-
-                    var oldMetadata = migration.OldRealm.DynamicApi.All(metadataClassName);
-                    var newMetadata = migration.NewRealm.All<BeatmapMetadata>();
-
-                    int metadataCount = newMetadata.Count();
-
-                    for (int i = 0; i < metadataCount; i++)
-                    {
-                        dynamic oldItem = oldMetadata.ElementAt(i);
-                        var newItem = newMetadata.ElementAt(i);
-
-                        string username = oldItem.Author;
-                        newItem.Author = new RealmUser
-                        {
-                            Username = username
-                        };
-                    }
-
-                    break;
-
                 case 10:
                     string rulesetSettingClassName = getMappedOrOriginalName(typeof(RealmRulesetSetting));
 

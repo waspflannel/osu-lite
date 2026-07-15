@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select
                     return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Artist), items);
 
                 case GroupMode.Author:
-                    return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Author.Username), items);
+                    return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Creator), items);
 
                 case GroupMode.Title:
                     return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Title), items);
@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Select
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
                 case GroupMode.MyMaps:
-                    return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalUserId, criteria.LocalUserUsername), items);
+                    return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalCreator), items);
 
                 case GroupMode.RankAchieved:
                 {
@@ -384,11 +384,9 @@ namespace osu.Game.Screens.Select
             return new GroupDefinition(0, source).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
+        private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, string? localCreator)
         {
-            var author = beatmap.BeatmapSet!.Metadata.Author;
-
-            if (author.OnlineID == localUserId || (author.OnlineID <= 1 && author.Username == localUserUsername))
+            if (beatmap.BeatmapSet!.Metadata.Creator == localCreator)
                 return new GroupDefinition(0, BeatmapCarouselFilterGroupingStrings.MyMaps).Yield();
 
             // discard beatmaps not owned by the user.

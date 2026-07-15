@@ -21,7 +21,6 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
@@ -62,8 +61,10 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private IBindable<APIUser> localUser = null!;
         private readonly IBindableList<int> localUserFavouriteBeatmapSets = new BindableList<int>();
+
+        [Resolved]
+        private LocalPlayerName localPlayerName { get; set; } = null!;
 
         public LocalisableString StatusText
         {
@@ -199,7 +200,6 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            localUser = api.LocalUser.GetBoundCopy();
             localUserFavouriteBeatmapSets.BindTo(api.LocalUserState.FavouriteBeatmapSets);
         }
 
@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Select
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
 
-            localUser.BindValueChanged(_ => updateCriteria());
+            localPlayerName.Value.BindValueChanged(_ => updateCriteria());
             localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
             ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
@@ -261,8 +261,6 @@ namespace osu.Game.Screens.Select
         public FilterCriteria CreateCriteria()
         {
             string query = searchTextBox.Current.Value;
-            bool isValidUser = localUser.Value.Id > 1;
-
             var criteria = new FilterCriteria
             {
                 SelectedBeatmapSet = ScopedBeatmapSet.Value,
@@ -271,8 +269,7 @@ namespace osu.Game.Screens.Select
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                LocalUserId = isValidUser ? localUser.Value.Id : null,
-                LocalUserUsername = isValidUser ? localUser.Value.Username : null,
+                LocalCreator = localPlayerName.Value.Value,
             };
 
             if (!difficultyRangeSlider.LowerBound.IsDefault)

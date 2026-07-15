@@ -356,7 +356,7 @@ namespace osu.Game.Beatmaps
                 // Matches stable implementation, because it's probably simpler than trying to do anything else.
                 // This may need to be reconsidered after we begin storing storyboards in the new editor.
                 string baseFilename = (metadata.Artist.Length > 0 ? metadata.Artist + @" - " + metadata.Title : Path.GetFileNameWithoutExtension(metadata.AudioFile))
-                                      + (metadata.Author.Username.Length > 0 ? @" (" + metadata.Author.Username + @")" : string.Empty)
+                                       + (metadata.Creator.Length > 0 ? @" (" + metadata.Creator + @")" : string.Empty)
                                       + @".osb";
                 return baseFilename.GetValidFilename();
             }

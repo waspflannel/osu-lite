@@ -21,9 +21,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Localisation;
-using osu.Game.Models;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
@@ -91,15 +89,11 @@ namespace osu.Game.Beatmaps
         /// with a single difficulty which is backed by a <see cref="BeatmapInfo"/> model
         /// and represented by the returned usable <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset, APIUser user)
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset, string creator)
         {
             var metadata = new BeatmapMetadata
             {
-                Author = new RealmUser
-                {
-                    OnlineID = user.OnlineID,
-                    Username = user.Username,
-                }
+                Creator = creator,
             };
 
             var beatmapSet = new BeatmapSetInfo
@@ -546,7 +540,7 @@ namespace osu.Game.Beatmaps
             static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
             {
                 var metadata = beatmapInfo.Metadata;
-                return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidFilename();
+                return $"{metadata.Artist} - {metadata.Title} ({metadata.Creator}) [{beatmapInfo.DifficultyName}].osu".GetValidFilename();
             }
         }
 

@@ -371,7 +371,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Creator":
-                    metadata.Author.Username = pair.Value;
+                    metadata.Creator = pair.Value;
                     break;
 
                 case @"Version":

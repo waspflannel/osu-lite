@@ -8,7 +8,6 @@ using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Extensions
 {
@@ -59,9 +58,6 @@ namespace osu.Game.Extensions
                     result = rulesetInfo.Name;
                     break;
 
-                case IUser user:
-                    result = user.Username;
-                    break;
             }
 
             // fallback in case none of the above happens to match.
