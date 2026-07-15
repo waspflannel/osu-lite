@@ -13,9 +13,9 @@ namespace osu.Game.Screens.Menu
         private Bindable<Skin> skin = null!;
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager)
+        private void load(FixedSkinProvider skinProvider)
         {
-            skin = skinManager.CurrentSkin.GetBoundCopy();
+            skin = skinProvider.CurrentSkin.GetBoundCopy();
 
             skin.BindValueChanged(_ => UpdateColour(), true);
         }

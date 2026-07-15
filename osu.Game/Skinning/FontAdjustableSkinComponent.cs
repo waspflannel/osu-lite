@@ -17,7 +17,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A skin component that contains text and allows the user to choose its font.
     /// </summary>
-    public abstract partial class FontAdjustableSkinComponent : Container, ISerialisableDrawable
+    public abstract partial class FontAdjustableSkinComponent : Container
     {
         public bool UsesFixedAnchor { get; set; }
 

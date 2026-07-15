@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public partial class LegacyHealthDisplay : HealthDisplay, ISerialisableDrawable
+    public partial class LegacyHealthDisplay : HealthDisplay
     {
         private const double epic_cutoff = 0.5;
 

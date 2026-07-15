@@ -17,7 +17,6 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Skinning;
 
 namespace osu.Game.Configuration
 {
@@ -32,7 +31,6 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             SetDefault(OsuSetting.Ruleset, string.Empty);
-            SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -192,7 +190,6 @@ namespace osu.Game.Configuration
             };
         }
 
-        public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
         public Func<GlobalAction, LocalisableString> LookupKeyBindings { private get; set; } = _ => @"unknown";
 
         IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
@@ -248,7 +245,6 @@ namespace osu.Game.Configuration
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
         ShowConvertedBeatmaps,
-        Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
         BeatmapSkins,

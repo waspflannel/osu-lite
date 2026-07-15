@@ -24,14 +24,6 @@ namespace osu.Game.Skinning
                     case Section.General:
                         switch (pair.Key)
                         {
-                            case @"Name":
-                                skin.SkinInfo.Name = pair.Value;
-                                return;
-
-                            case @"Author":
-                                skin.SkinInfo.Creator = pair.Value;
-                                return;
-
                             case @"Version":
                                 if (pair.Value == "latest")
                                 {

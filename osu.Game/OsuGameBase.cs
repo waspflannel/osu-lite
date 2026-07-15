@@ -140,7 +140,7 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager { get; private set; }
 
-        protected SkinManager SkinManager { get; private set; }
+        protected FixedSkinProvider SkinProvider { get; private set; }
 
         protected RealmRulesetStore RulesetStore { get; private set; }
 
@@ -271,8 +271,8 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
-            dependencies.CacheAs<ISkinSource>(SkinManager);
+            dependencies.Cache(SkinProvider = new FixedSkinProvider(realm, Host, Resources, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinProvider);
 
             // Initialise localisation
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
@@ -309,7 +309,6 @@ namespace osu.Game
 
             RegisterImportHandler(BeatmapManager);
             RegisterImportHandler(ScoreManager);
-            // osu! lite is locked to the Argon skin; user skin import is not supported.
 
             // drop track volume game-wide to leave some head-room for UI effects / samples.
             // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
@@ -365,9 +364,6 @@ namespace osu.Game
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
 
-            // make config aware of how to lookup skins for on-screen display purposes.
-            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
-            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
             LocalConfig.LookupKeyBindings = l => KeyBindingStore.GetBindingsStringFor(l);
         }
 

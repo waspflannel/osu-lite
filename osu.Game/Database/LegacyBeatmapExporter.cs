@@ -62,7 +62,7 @@ namespace osu.Game.Database
                 return null;
 
             using var skinStreamReader = new LineBufferedReader(skinStream);
-            var beatmapSkin = new LegacySkin(new SkinInfo(), null!)
+            var beatmapSkin = new LegacySkin("beatmap", null)
             {
                 Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
             };

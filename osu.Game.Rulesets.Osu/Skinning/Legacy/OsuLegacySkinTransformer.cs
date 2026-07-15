@@ -81,8 +81,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     combo.Scale = new Vector2(1.28f);
                                 }
 
-                                foreach (var d in container.OfType<ISerialisableDrawable>())
-                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 Children = new Drawable[]

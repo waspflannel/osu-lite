@@ -290,16 +290,13 @@ namespace osu.Game.Screens.Play
                     processDrawable(components.Components[i]);
             }
 
-            void processDrawable(ISerialisableDrawable element)
+            void processDrawable(Drawable drawable)
             {
-                // Cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
-                Drawable drawable = (Drawable)element;
-
                 // for now align some top components with the bottom-edge of the lowest top-anchored hud element.
                 if (drawable.Anchor.HasFlag(Anchor.y0))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
-                    if (element is LegacyHealthDisplay)
+                    if (drawable is LegacyHealthDisplay)
                         return;
 
                     // AABB is used here because the drawable can be flipped/rotated arbitrarily,
@@ -323,7 +320,7 @@ namespace osu.Game.Screens.Play
                 // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
                 else if (drawable.Anchor.HasFlag(Anchor.BottomRight) || (drawable.Anchor.HasFlag(Anchor.y2) && drawable.RelativeSizeAxes == Axes.X))
                 {
-                    var topLeft = element.ScreenSpaceDrawQuad.AABBFloat.TopLeft;
+                    var topLeft = drawable.ScreenSpaceDrawQuad.AABBFloat.TopLeft;
                     if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)
                         highestBottomScreenSpace = topLeft;
                 }

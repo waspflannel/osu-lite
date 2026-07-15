@@ -54,11 +54,11 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, SkinManager skinManager)
+        private void load(IBindable<WorkingBeatmap> beatmap, FixedSkinProvider skinProvider)
         {
             this.beatmap.BindTo(beatmap);
 
-            skin = skinManager.CurrentSkin.GetBoundCopy();
+            skin = skinProvider.CurrentSkin.GetBoundCopy();
 
             Children = new Drawable[]
             {

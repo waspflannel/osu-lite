@@ -400,7 +400,7 @@ namespace osu.Game.Database
                     // TODO: we may want to run this outside of the transaction.
                     Populate(item, archive, realm, cancellationToken);
 
-                    // Populate() may have adjusted file content (see SkinImporter.updateSkinIniMetadata), so regardless of whether a fast check was done earlier, let's
+                    // Populate() may have adjusted file content, so regardless of whether a fast check was done earlier, let's
                     // check for existing items a second time.
                     //
                     // If this is ever a performance issue, the fast-check hash can be compared and trigger a skip of this second check if it still matches.

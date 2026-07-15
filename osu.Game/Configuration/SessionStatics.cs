@@ -20,7 +20,6 @@ namespace osu.Game.Configuration
             SetDefault(Static.MutedAudioNotificationShownOnce, false);
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
-            SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
             SetDefault<ScoreInfo?>(Static.LastAppliedOffsetScore, null);
         }
@@ -47,12 +46,6 @@ namespace osu.Game.Configuration
         /// Used to debounce hover sounds game-wide to avoid volume saturation, especially in scrolling views with many UI controls like <see cref="SettingsOverlay"/>.
         /// </summary>
         LastHoverSoundPlaybackTime,
-
-        /// <summary>
-        /// The last playback time in milliseconds of a rank up/down sample (in <see cref="DefaultRankDisplay"/> and <see cref="LegacyRankDisplay"/>).
-        /// Used to debounce rank change sounds game-wide to avoid potential volume saturation from multiple simultaneous playback.
-        /// </summary>
-        LastRankChangeSamplePlaybackTime,
 
         /// <summary>
         /// Stores the local user's last score (can be completed or aborted).

@@ -171,7 +171,6 @@ namespace osu.Game.Database
             c.CreateMap<ScoreInfo, ScoreInfo>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
-            c.CreateMap<SkinInfo, SkinInfo>();
         }
 
         /// <summary>

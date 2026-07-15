@@ -12,8 +12,6 @@ namespace osu.Game.Skinning
     /// </summary>
     public class SkinConfiguration : IHasComboColours, IHasCustomColours
     {
-        public readonly SkinInfo SkinInfo = new SkinInfo();
-
         public const decimal LATEST_VERSION = 2.7m;
 
         /// <summary>

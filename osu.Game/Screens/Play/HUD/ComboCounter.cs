@@ -7,7 +7,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract partial class ComboCounter : RollingCounter<int>, ISerialisableDrawable
+    public abstract partial class ComboCounter : RollingCounter<int>
     {
         public bool UsesFixedAnchor { get; set; }
 

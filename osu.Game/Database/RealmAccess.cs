@@ -347,11 +347,6 @@ namespace osu.Game.Database
                         realm.Remove(beatmapSet);
                     }
 
-                    var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
-
-                    foreach (var s in pendingDeleteSkins)
-                        realm.Remove(s);
-
                     transaction.Commit();
                 }
 
@@ -888,11 +883,6 @@ namespace osu.Game.Database
                 case 21:
                     // Historically this migrated collections from external file to inside realm.
                     // The collections feature has since been removed from osu! lite (schema version 52), so this is a no-op.
-                    break;
-
-                case 25:
-                    // Remove the default skins so they can be added back by SkinManager with updated naming.
-                    migration.NewRealm.RemoveRange(migration.NewRealm.All<SkinInfo>().Where(s => s.Protected));
                     break;
 
                 case 26:
