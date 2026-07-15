@@ -1020,3 +1020,7 @@ When every definition-of-done item outside the explicit CI exclusion passes, rep
 - `bc42bc83ef` removes API/Realm score ownership. Imported replays and score presentation are local-only, while replay encoding uses the local player name.
 - `06739b68ee` changes beatmap creator metadata to text and removes avatar, flag, profile, results, and HUD user-presentation types.
 - `bbc2c40af2` deletes `Online/` and the remaining `Users/` surface, including the API provider/request stack, endpoints, API models, online beatmap metadata, report popover, and arbitrary URL helpers. Debug and Release Desktop builds passed with zero warnings. Exact source scans found no `IAPIProvider`, `APIRequest`, `OsuWebRequest`, `APIUser`, `IUser`, or `RealmUser` references; `ExternalBrowser` is the sole `OpenUrlExternally()` caller.
+
+### 2026-07-15 — Phase 3 complete
+
+- `57597934a0` replaces the Realm-backed multi-skin library with `FixedSkinProvider`, the embedded Kanna archive, beatmap-local overrides, and classic fallback. Skin selection, persistence, import/export/editing, saved layouts, non-Kanna bundled skins, mania skin branches, and their unused HUD components are deleted. Debug and Release Desktop builds passed with zero warnings; exact source scans found no legacy skin-manager, skin-importer, non-Kanna skin, or layout-serialisation type.
