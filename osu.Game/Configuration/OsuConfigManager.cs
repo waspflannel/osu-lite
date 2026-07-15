@@ -80,9 +80,6 @@ namespace osu.Game.Configuration
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
-            SetDefault(OsuSetting.MenuVoice, true);
-            SetDefault(OsuSetting.MenuMusic, true);
-            SetDefault(OsuSetting.MenuTips, true);
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
@@ -155,8 +152,6 @@ namespace osu.Game.Configuration
                 SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
             SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
-
-            SetDefault(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             SetDefault(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
 
@@ -272,9 +267,6 @@ namespace osu.Game.Configuration
         AudioOffset,
 
         VolumeInactive,
-        MenuMusic,
-        MenuVoice,
-        MenuTips,
         CursorRotation,
         MenuParallax,
         Prefer24HourTime,
@@ -309,7 +301,6 @@ namespace osu.Game.Configuration
         ScalingSizeY,
         ScalingBackgroundDim,
         UIScale,
-        IntroSequence,
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,

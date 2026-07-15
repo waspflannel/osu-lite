@@ -67,7 +67,6 @@ using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
-using IntroScreen = osu.Game.Screens.Menu.IntroScreen;
 
 namespace osu.Game
 {
@@ -169,9 +168,6 @@ namespace osu.Game
 
         [CanBeNull]
         private DevBuildBanner devBuildBanner;
-
-        [CanBeNull]
-        private IntroScreen introScreen;
 
         private Bindable<string> configRuleset;
 
@@ -1183,8 +1179,7 @@ namespace osu.Game
             if (e.Repeat)
                 return false;
 
-            // Wait until we're loaded at least to the intro before allowing various interactions.
-            if (introScreen == null) return false;
+            if (menuScreen == null) return false;
 
             switch (e.Action)
             {
@@ -1256,12 +1251,6 @@ namespace osu.Game
             if (ScreenStack.CurrentScreen is Loader)
                 return false;
 
-            if (introScreen?.DidLoadMenu == true && !(ScreenStack.CurrentScreen is IntroScreen))
-            {
-                Scheduler.Add(introScreen.MakeCurrent);
-                return true;
-            }
-
             return base.OnExiting();
         }
 
@@ -1314,11 +1303,6 @@ namespace osu.Game
 
             switch (newScreen)
             {
-                case IntroScreen intro:
-                    introScreen = intro;
-                    devBuildBanner?.Show();
-                    break;
-
                 case MainMenu menu:
                     menuScreen = menu;
                     devBuildBanner?.Show();

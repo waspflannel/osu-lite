@@ -92,8 +92,6 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
-        private MenuTipDisplay menuTipDisplay;
-        private FillFlowContainer bottomElementsFlow;
 
         private Sample reappearSampleSwoosh;
 
@@ -145,23 +143,6 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
-                new KiaiMenuFountains(),
-                bottomElementsFlow = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Spacing = new Vector2(5),
-                    Children = new Drawable[]
-                    {
-                        menuTipDisplay = new MenuTipDisplay
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        }
-                    }
-                },
                 holdToExitGameOverlay?.CreateProxy() ?? Empty()
             });
 
@@ -199,18 +180,6 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(e);
             Buttons.FadeInFromZero(500);
-
-            if (e.Last is IntroScreen && musicController.TrackLoaded)
-            {
-                var track = musicController.CurrentTrack;
-
-                // presume the track is the current beatmap's track. not sure how correct this assumption is but it has worked until now.
-                if (!track.IsRunning)
-                {
-                    Beatmap.Value.PrepareTrackForPreview(false);
-                    track.Restart();
-                }
-            }
 
             if (storage is OsuStorage osuStorage && osuStorage.Error != OsuStorageError.None)
                 dialogOverlay?.Push(new StorageErrorDialog(osuStorage, osuStorage.Error));
@@ -299,10 +268,6 @@ namespace osu.Game.Screens.Menu
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
 
-            bottomElementsFlow
-                .ScaleTo(0.9f, 1000, Easing.OutQuint)
-                .FadeOut(500, Easing.OutQuint);
-
             samplePlaybackDisabled.Value = true;
         }
 
@@ -317,13 +282,6 @@ namespace osu.Game.Screens.Menu
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
 
             musicController.EnsurePlayingSomething();
-
-            // Cycle tip on resuming
-            menuTipDisplay.ShowNextTip();
-
-            bottomElementsFlow
-                .ScaleTo(1, 1000, Easing.OutQuint)
-                .FadeIn(1000, Easing.OutQuint);
 
             samplePlaybackDisabled.Value = false;
         }
@@ -369,9 +327,6 @@ namespace osu.Game.Screens.Menu
             songTicker.Hide();
 
             this.FadeOut(3000);
-
-            bottomElementsFlow
-                .FadeOut(500, Easing.OutQuint);
 
             return base.OnExiting(e);
         }

@@ -9,13 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Utils;
 using osu.Game.Screens.Menu;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
@@ -29,31 +26,10 @@ namespace osu.Game.Screens
         private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
-        private IntroSequence introSequence;
         private LoadingSpinner spinner;
         private ScheduledDelegate spinnerShow;
 
-        protected virtual OsuScreen CreateLoadableScreen() => getIntroSequence();
-
-        private IntroScreen getIntroSequence()
-        {
-            if (introSequence == IntroSequence.Random)
-                introSequence = (IntroSequence)RNG.Next(0, (int)IntroSequence.Random);
-
-            switch (introSequence)
-            {
-                case IntroSequence.Circles:
-                    return new IntroCircles(createMainMenu);
-
-                case IntroSequence.Welcome:
-                    return new IntroWelcome(createMainMenu);
-
-                default:
-                    return new IntroTriangles(createMainMenu);
-            }
-
-            MainMenu createMainMenu() => new MainMenu();
-        }
+        protected virtual OsuScreen CreateLoadableScreen() => new MainMenu();
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
@@ -96,12 +72,6 @@ namespace osu.Game.Screens
             }
             else
                 this.Push(loadableScreen);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }
 
         /// <summary>
