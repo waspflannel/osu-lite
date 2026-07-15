@@ -758,6 +758,7 @@ namespace osu.Game.Database
             Logger.Log($"Upgrading osu-lite Realm schema from {lastSchemaVersion} to {schema_version}.");
         }
 
+#if false
         private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
         {
             Logger.Log($"Running realm migration to version {targetVersion}...");
@@ -1255,6 +1256,7 @@ namespace osu.Game.Database
                 return null;
             }
         }
+#endif
 
         /// <summary>
         /// Create a full realm backup.
