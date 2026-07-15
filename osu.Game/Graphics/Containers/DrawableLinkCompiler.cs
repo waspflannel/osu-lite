@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -9,13 +9,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Lists;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 
-namespace osu.Game.Online
+namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// An invisible drawable that brings multiple <see cref="Drawable"/> pieces together to form a consumable clickable link.
@@ -23,7 +21,7 @@ namespace osu.Game.Online
     public partial class DrawableLinkCompiler : OsuHoverContainer
     {
         /// <summary>
-        /// Each word part of a chat link (split for word-wrap support).
+        /// Each word part of a link (split for word-wrap support).
         /// </summary>
         public readonly SlimReadOnlyListWrapper<Drawable> Parts;
 

@@ -20,9 +20,9 @@ namespace osu.Game.Localisation
         public static LocalisableString NoTabletDetected => new TranslatableString(getKey(@"no_tablet_detected"), @"No tablet detected!");
 
         /// <summary>
-        /// "If your tablet is not detected, please read [this FAQ]({0}) for troubleshooting steps."
+        /// "Open troubleshooting steps if your tablet is not detected."
         /// </summary>
-        public static LocalisableString NoTabletDetectedDescription(string url) => new TranslatableString(getKey(@"no_tablet_detected_description"), @"If your tablet is not detected, please read [this FAQ]({0}) for troubleshooting steps.", url);
+        public static LocalisableString NoTabletDetectedDescription => new TranslatableString(getKey(@"no_tablet_detected_description"), @"Open troubleshooting steps if your tablet is not detected.");
 
         /// <summary>
         /// "Reset to full area"

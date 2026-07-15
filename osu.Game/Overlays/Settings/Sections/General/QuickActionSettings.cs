@@ -17,7 +17,6 @@ using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers.Zip;
-using osu.Game.Online;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override LocalisableString Header => GeneralSettingsStrings.QuickActionsHeader;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, Storage storage)
+        private void load(OsuColour colours, Storage storage, ExternalBrowser browser)
         {
             AddRange(new Drawable[]
             {
@@ -38,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Text = GeneralSettingsStrings.ReportIssue,
                     TooltipText = GeneralSettingsStrings.ReportIssueTooltip,
                     BackgroundColour = colours.YellowDarker,
-                    Action = () => game?.OpenUrlExternally(@"https://osu.ppy.sh/community/forums/topics/create?forum_id=5", LinkWarnMode.NeverWarn)
+                    Action = () => browser.Open(ExternalBrowserDestination.IssueTracker)
                 },
             });
 

@@ -97,11 +97,6 @@ namespace osu.Game
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
-        public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
-
-        public virtual EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
-
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
         /// <summary>
@@ -158,6 +153,8 @@ namespace osu.Game
         protected MusicController MusicController { get; private set; }
 
         protected IAPIProvider API { get; set; }
+
+        protected ExternalBrowser ExternalBrowser { get; private set; }
 
         protected Storage Storage { get; set; }
 
@@ -269,6 +266,7 @@ namespace osu.Game
 
             dependencies.CacheAs(LocalConfig);
             dependencies.CacheAs<IGameplaySettings>(LocalConfig);
+            dependencies.Cache(ExternalBrowser = new ExternalBrowser(Host));
 
             InitialiseFonts();
 
@@ -278,10 +276,6 @@ namespace osu.Game
 
             dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
-
-            EndpointConfiguration endpoints = CreateEndpoints();
-
-            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
             // Initialise localisation
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
@@ -487,9 +481,7 @@ namespace osu.Game
             // may be non-null for certain tests
             Storage ??= host.Storage;
 
-            LocalConfig ??= UseDevelopmentServer
-                ? new DevelopmentOsuConfigManager(Storage)
-                : new OsuConfigManager(Storage);
+            LocalConfig ??= new OsuConfigManager(Storage);
 
             host.ExceptionThrown += onExceptionThrown;
         }

@@ -22,7 +22,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 using osu.Game.Localisation;
-using osu.Game.Online;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -345,11 +344,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private partial class NoTabletMessage : CompositeDrawable
         {
-            private IBindable<string> noTabletDetectedText = new Bindable<string>();
             private LinkFlowContainer linkContainer;
 
             [Resolved]
-            private LocalisationManager localisation { get; set; }
+            private ExternalBrowser browser { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, OverlayColourProvider colourProvider)
@@ -406,23 +404,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                 };
 
-                const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
-                noTabletDetectedText = localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(url));
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                noTabletDetectedText.BindValueChanged(_ =>
-                {
-                    linkContainer.Clear();
-                    linkContainer.NewLine();
-
-                    var formattedSource = MessageFormatter.FormatText(noTabletDetectedText.Value);
-
-                    linkContainer.AddLinks(formattedSource.Text, formattedSource.Links);
-                }, true);
+                linkContainer.AddLink(TabletSettingsStrings.NoTabletDetectedDescription, () => browser.Open(ExternalBrowserDestination.TabletFaq));
             }
         }
     }

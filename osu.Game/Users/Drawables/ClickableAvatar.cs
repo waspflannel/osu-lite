@@ -24,9 +24,6 @@ namespace osu.Game.Users.Drawables
 
         private readonly bool showCardOnHover;
 
-        [Resolved]
-        private OsuGame? game { get; set; }
-
         /// <summary>
         /// A clickable avatar for the specified user, with UI sounds included.
         /// </summary>
@@ -34,9 +31,6 @@ namespace osu.Game.Users.Drawables
         /// <param name="showCardOnHover">If set to true, the <c>UserGridPanel</c> will be shown for the tooltip</param>
         public ClickableAvatar(APIUser? user = null, bool showCardOnHover = false)
         {
-            if (user?.Id != APIUser.SYSTEM_USER_ID)
-                Action = openProfile;
-
             this.showCardOnHover = showCardOnHover;
 
             TooltipContent = this.user = user ?? new GuestUser();
@@ -46,12 +40,6 @@ namespace osu.Game.Users.Drawables
         private void load()
         {
             LoadComponentAsync(new DrawableAvatar(user), Add);
-        }
-
-        private void openProfile()
-        {
-            if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
-                game?.ShowUser(user);
         }
 
         protected override bool OnClick(ClickEvent e)

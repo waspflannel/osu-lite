@@ -75,7 +75,7 @@ namespace osu.Game
     /// for initial components that are generally retrieved via DI.
     /// </summary>
     [Cached(typeof(OsuGame))]
-    public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager, ILinkHandler
+    public partial class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner, IOverlayManager
     {
 #if DEBUG
         // Different port allows running release and debug builds alongside each other.
@@ -386,127 +386,11 @@ namespace osu.Game
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
         }
 
-        private ExternalLinkOpener externalLinkOpener;
-
-        /// <summary>
-        /// Handle an arbitrary URL. Displays via in-game overlays where possible.
-        /// This can be called from a non-thread-safe non-game-loaded state.
-        /// </summary>
-        /// <param name="url">The URL to load.</param>
-        public void HandleLink(string url) => HandleLink(MessageFormatter.GetLinkDetails(url));
-
-        /// <summary>
-        /// Handle a specific <see cref="LinkDetails"/>.
-        /// This can be called from a non-thread-safe non-game-loaded state.
-        /// </summary>
-        /// <param name="link">The link to load.</param>
-        public void HandleLink(LinkDetails link) => Schedule(() =>
-        {
-            string argString = link.Argument.ToString() ?? string.Empty;
-
-            switch (link.Action)
-            {
-                case LinkAction.OpenBeatmap:
-                    // TODO: proper query params handling
-                    if (int.TryParse(argString.Contains('?') ? argString.Split('?')[0] : argString, out int beatmapId))
-                        ShowBeatmap(beatmapId);
-                    break;
-
-                case LinkAction.OpenBeatmapSet:
-                    if (int.TryParse(argString, out int setId))
-                        ShowBeatmapSet(setId);
-                    break;
-
-                case LinkAction.OpenChannel:
-                    ShowChannel(argString);
-                    break;
-
-                case LinkAction.SearchBeatmapSet:
-                    if (link.Argument is LocalisableString localisable)
-                        SearchBeatmapSet(Localisation.GetLocalisedString(localisable));
-                    else
-                        SearchBeatmapSet(argString);
-
-                    break;
-
-                case LinkAction.Spectate:
-                    waitForReady(() => Notifications, _ => Notifications.Post(new SimpleNotification
-                    {
-                        Text = NotificationsStrings.LinkTypeNotSupported,
-                        Icon = FontAwesome.Solid.LifeRing,
-                    }));
-                    break;
-
-                case LinkAction.External:
-                    OpenUrlExternally(argString);
-                    break;
-
-                case LinkAction.OpenUserProfile:
-                    ShowUser((IUser)link.Argument);
-                    break;
-
-                case LinkAction.OpenWiki:
-                    ShowWiki(argString);
-                    break;
-
-                case LinkAction.OpenChangelog:
-                    if (string.IsNullOrEmpty(argString))
-                        ShowChangelogListing();
-                    else
-                    {
-                        string[] changelogArgs = argString.Split("/");
-                        ShowChangelogBuild($"{changelogArgs[1]}-{changelogArgs[0]}");
-                    }
-
-                    break;
-
-                default:
-                    throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
-            }
-        });
-
         public void CopyToClipboard(string value) => waitForReady(() => onScreenDisplay, _ =>
         {
             dependencies.Get<Clipboard>().SetText(value);
             onScreenDisplay.Display(new CopiedToClipboardToast());
         });
-
-        public void OpenUrlExternally(string url, LinkWarnMode warnMode = LinkWarnMode.Default) => waitForReady(() => externalLinkOpener, _ => externalLinkOpener.OpenUrlExternally(url, warnMode));
-
-        // The following overlay-display methods are part of ILinkHandler.
-        // osu! lite is offline and has no online overlays, so they are intentionally no-ops.
-
-        public void ShowChannel(string channel)
-        {
-        }
-
-        public void ShowBeatmapSet(int setId)
-        {
-        }
-
-        public void ShowUser(IUser user)
-        {
-        }
-
-        public void ShowBeatmap(int beatmapId)
-        {
-        }
-
-        public void SearchBeatmapSet(string query)
-        {
-        }
-
-        public void ShowWiki(string path)
-        {
-        }
-
-        public void ShowChangelogListing()
-        {
-        }
-
-        public void ShowChangelogBuild(string version)
-        {
-        }
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -946,7 +830,6 @@ namespace osu.Game
 
             loadComponentSingleFile<BeatmapStore>(detachedBeatmapStore = new RealmDetachedBeatmapStore(), Add, true);
 
-            Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
 
             // side overlays which cancel each other.
@@ -1091,7 +974,7 @@ namespace osu.Game
                     IconColour = Colours.YellowDark,
                     Activated = () =>
                     {
-                        OpenUrlExternally("https://opentabletdriver.net/Tablets", LinkWarnMode.NeverWarn);
+                        ExternalBrowser.Open(ExternalBrowserDestination.TabletList);
                         return true;
                     }
                 }));

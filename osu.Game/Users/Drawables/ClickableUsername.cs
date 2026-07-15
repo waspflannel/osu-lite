@@ -18,14 +18,9 @@ namespace osu.Game.Users.Drawables
 
         public APIUser? TooltipContent { get; }
 
-        private readonly APIUser user;
-
-        [Resolved]
-        private OsuGame? game { get; set; }
-
         public ClickableUsername(APIUser? user)
         {
-            TooltipContent = this.user = user ?? new GuestUser();
+            TooltipContent = user ?? new GuestUser();
 
             AutoSizeAxes = Axes.Both;
 
@@ -35,14 +30,6 @@ namespace osu.Game.Users.Drawables
                 Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
             };
 
-            if (user.Id != APIUser.SYSTEM_USER_ID)
-                Action = openProfile;
-        }
-
-        private void openProfile()
-        {
-            if (user.Id > 1 || !string.IsNullOrEmpty(user.Username))
-                game?.ShowUser(user);
         }
     }
 }

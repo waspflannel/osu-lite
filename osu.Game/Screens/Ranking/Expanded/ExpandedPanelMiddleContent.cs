@@ -266,9 +266,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         internal partial class ClickableMetadata : OsuHoverContainer
         {
-            [Resolved]
-            private OsuGame? game { get; set; }
-
             public ClickableMetadata(int beatmapId, IBeatmapMetadataInfo metadata)
             {
                 AutoSizeAxes = Axes.Both;
@@ -301,8 +298,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                     }
                 };
 
-                if (beatmapId > 0)
-                    Action = () => game?.ShowBeatmap(beatmapId);
             }
         }
     }

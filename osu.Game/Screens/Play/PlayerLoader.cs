@@ -27,7 +27,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
@@ -191,7 +190,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, OsuConfigManager config, IAPIProvider api)
+        private void load(SessionStatics sessionStatics, OsuConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -301,18 +300,6 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value.Beatmap.EpilepsyWarning)
             {
                 disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
-            }
-
-            if (!string.IsNullOrEmpty(api.ScoreProcessingNoticeUrl))
-            {
-                disclaimers.Add(new PlayerLoaderDisclaimer(
-                    UsersStrings.ShowScoreProcessingTitle(UsersStrings.ShowScoreProcessingTitleLink),
-                    UsersStrings.ShowScoreProcessingMessage
-                )
-                {
-                    Action = () => (Game as OsuGame)?.OpenUrlExternally(api.ScoreProcessingNoticeUrl),
-                    IsImportant = true,
-                });
             }
 
             switch (Beatmap.Value.BeatmapInfo.Status)

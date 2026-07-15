@@ -19,7 +19,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
-using osu.Game.Online;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -229,9 +228,6 @@ namespace osu.Game.Screens.Select
                 updateDisplay();
             }
 
-            [Resolved]
-            private ILinkHandler? linkHandler { get; set; }
-
             private void updateDisplay()
             {
                 cancellationSource?.Cancel();
@@ -246,7 +242,6 @@ namespace osu.Game.Screens.Select
                 {
                     ratingAndNameContainer.FadeIn(300, Easing.OutQuint);
                     difficultyText.Text = beatmap.Value.BeatmapInfo.DifficultyName;
-                    mapperLink.Action = () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, beatmap.Value.Metadata.Author));
                     mapperText.Text = beatmap.Value.Metadata.Author.Username;
                 }
 
