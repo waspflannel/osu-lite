@@ -137,9 +137,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.IncreaseFirstObjectVisibility, true);
             SetDefault(OsuSetting.GameplayDisableWinKey, true);
 
-            SetDefault(OsuSetting.Version, string.Empty);
-
-            SetDefault(OsuSetting.ShowFirstRunSetup, true);
             SetDefault(OsuSetting.ShowMobileDisclaimer, RuntimeInfo.IsMobile);
 
             SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
@@ -243,9 +240,7 @@ namespace osu.Game.Configuration
         IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
     }
 
-    // IMPORTANT: These are used in user configuration files.
-    // The naming of these keys should not be changed once they are deployed in a release, unless migration logic is also added.
-    public enum OsuSetting
+        public enum OsuSetting
     {
         Ruleset,
         Token,
@@ -299,8 +294,6 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
-        Version,
-        ShowFirstRunSetup,
         ShowConvertedBeatmaps,
         Skin,
         ScreenshotFormat,
