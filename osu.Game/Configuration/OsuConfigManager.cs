@@ -80,9 +80,6 @@ namespace osu.Game.Configuration
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
-            SetDefault(OsuSetting.MenuVoice, true);
-            SetDefault(OsuSetting.MenuMusic, true);
-            SetDefault(OsuSetting.MenuTips, true);
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
@@ -119,14 +116,11 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
-            SetDefault(OsuSetting.StarFountains, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
-            SetDefault(OsuSetting.ReplaySettingsOverlay, true);
-            SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -137,9 +131,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.IncreaseFirstObjectVisibility, true);
             SetDefault(OsuSetting.GameplayDisableWinKey, true);
 
-            SetDefault(OsuSetting.Version, string.Empty);
-
-            SetDefault(OsuSetting.ShowFirstRunSetup, true);
             SetDefault(OsuSetting.ShowMobileDisclaimer, RuntimeInfo.IsMobile);
 
             SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
@@ -161,8 +152,6 @@ namespace osu.Game.Configuration
                 SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
             SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
-
-            SetDefault(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             SetDefault(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
 
@@ -243,9 +232,7 @@ namespace osu.Game.Configuration
         IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
     }
 
-    // IMPORTANT: These are used in user configuration files.
-    // The naming of these keys should not be changed once they are deployed in a release, unless migration logic is also added.
-    public enum OsuSetting
+        public enum OsuSetting
     {
         Ruleset,
         Token,
@@ -280,9 +267,6 @@ namespace osu.Game.Configuration
         AudioOffset,
 
         VolumeInactive,
-        MenuMusic,
-        MenuVoice,
-        MenuTips,
         CursorRotation,
         MenuParallax,
         Prefer24HourTime,
@@ -299,8 +283,6 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
-        Version,
-        ShowFirstRunSetup,
         ShowConvertedBeatmaps,
         Skin,
         ScreenshotFormat,
@@ -319,19 +301,14 @@ namespace osu.Game.Configuration
         ScalingSizeY,
         ScalingBackgroundDim,
         UIScale,
-        IntroSequence,
         UIHoldActivationDelay,
         HitLighting,
-        StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
 
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
-        ReplaySettingsOverlay,
-        ReplayPlaybackControlsExpanded,
-
         HideCountryFlags,
         AlwaysShowHoldForMenuButton,
         AlwaysRequireHoldingForPause,

@@ -33,9 +33,7 @@ namespace osu.Game.Input.Bindings
         /// It is used to decide the order of precedence, with the earlier items having higher precedence.
         /// </remarks>
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => globalKeyBindings
-                                                                       .Concat(editorKeyBindings)
-                                                                       .Concat(editorTestPlayKeyBindings)
-                                                                       .Concat(inGameKeyBindings)
+                                                                        .Concat(inGameKeyBindings)
                                                                        .Concat(replayKeyBindings)
                                                                        .Concat(songSelectKeyBindings)
                                                                        .Concat(audioControlKeyBindings)
@@ -51,9 +49,6 @@ namespace osu.Game.Input.Bindings
                 case GlobalActionCategory.General:
                     return globalKeyBindings;
 
-                case GlobalActionCategory.Editor:
-                    return editorKeyBindings;
-
                 case GlobalActionCategory.InGame:
                     return inGameKeyBindings;
 
@@ -68,9 +63,6 @@ namespace osu.Game.Input.Bindings
 
                 case GlobalActionCategory.Overlays:
                     return overlayKeyBindings;
-
-                case GlobalActionCategory.EditorTestPlay:
-                    return editorTestPlayKeyBindings;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(category), category, $"Unexpected {nameof(GlobalActionCategory)}");
@@ -113,50 +105,6 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
         };
 
-        private static IEnumerable<KeyBinding> editorKeyBindings => new[]
-        {
-            new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorComposeMode),
-            new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorDesignMode),
-            new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
-            new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
-            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.EditorCloneSelection),
-            new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
-            new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
-            new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridSpacing),
-            new KeyBinding(new[] { InputKey.Shift, InputKey.G }, GlobalAction.EditorCycleGridType),
-            new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
-            new KeyBinding(new[] { InputKey.T }, GlobalAction.EditorTapForBPM),
-            new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.EditorFlipHorizontally),
-            new KeyBinding(new[] { InputKey.Control, InputKey.J }, GlobalAction.EditorFlipVertically),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.EditorDecreaseDistanceSpacing),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.EditorIncreaseDistanceSpacing),
-            new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelDown }, GlobalAction.EditorCyclePreviousBeatSnapDivisor),
-            new KeyBinding(new[] { InputKey.Control, InputKey.MouseWheelUp }, GlobalAction.EditorCycleNextBeatSnapDivisor),
-            new KeyBinding(InputKey.None, GlobalAction.EditorToggleMoveControl),
-            new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
-            new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Left }, GlobalAction.EditorSeekToPreviousHitObject),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Right }, GlobalAction.EditorSeekToNextHitObject),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Left }, GlobalAction.EditorSeekToPreviousSamplePoint),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
-            new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.EditorAddBookmark),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.EditorRemoveClosestBookmark),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousBookmark),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextBookmark),
-            new KeyBinding(new[] { InputKey.Control, InputKey.L }, GlobalAction.EditorDiscardUnsavedChanges),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.U }, GlobalAction.EditorSubmitBeatmap),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.O }, GlobalAction.EditorEditExternally),
-        };
-
-        private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
-        {
-            new KeyBinding(new[] { InputKey.Tab }, GlobalAction.EditorTestPlayToggleAutoplay),
-            new KeyBinding(new[] { InputKey.Control, InputKey.P }, GlobalAction.EditorTestPlayToggleQuickPause),
-            new KeyBinding(new[] { InputKey.F1 }, GlobalAction.EditorTestPlayQuickExitToInitialTime),
-            new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorTestPlayQuickExitToCurrentTime),
-        };
-
         private static IEnumerable<KeyBinding> inGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
@@ -164,13 +112,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.QuickRetry),
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
-            new KeyBinding(new[] { InputKey.F3 }, GlobalAction.DecreaseScrollSpeed),
-            new KeyBinding(new[] { InputKey.F4 }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.Tab, GlobalAction.ToggleInGameLeaderboard),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
-            new KeyBinding(InputKey.Enter, GlobalAction.ToggleChatFocus),
             new KeyBinding(InputKey.F1, GlobalAction.SaveReplay),
             new KeyBinding(InputKey.F2, GlobalAction.ExportReplay),
             new KeyBinding(InputKey.Plus, GlobalAction.IncreaseOffset),
@@ -224,307 +169,157 @@ namespace osu.Game.Input.Bindings
         };
     }
 
-    /// <remarks>
-    /// IMPORTANT: New entries should always be added at the end of the enum, as key bindings are stored using the enum's numeric value and
-    /// changes in order would cause key bindings to get associated with the wrong action.
-    /// </remarks>
     public enum GlobalAction
     {
-        // Tombstoned: online chat overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        ToggleChat,
-
-        // Tombstoned: online social overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        ToggleSocial,
-
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ResetInputSettings))]
-        ResetInputSettings,
+        ResetInputSettings = 0,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleToolbar))]
-        ToggleToolbar,
+        ToggleToolbar = 1,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleSettings))]
-        ToggleSettings,
-
-        // Tombstoned: online beatmap listing overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        ToggleBeatmapListing,
+        ToggleSettings = 2,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseVolume))]
-        IncreaseVolume,
+        IncreaseVolume = 3,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseVolume))]
-        DecreaseVolume,
+        DecreaseVolume = 4,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleMute))]
-        ToggleMute,
+        ToggleMute = 5,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SkipCutscene))]
-        SkipCutscene,
+        SkipCutscene = 6,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.QuickRetry))]
-        QuickRetry,
+        QuickRetry = 7,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TakeScreenshot))]
-        TakeScreenshot,
+        TakeScreenshot = 8,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons))]
-        ToggleGameplayMouseButtons,
+        ToggleGameplayMouseButtons = 9,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Back))]
-        Back,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseScrollSpeed))]
-        IncreaseScrollSpeed,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseScrollSpeed))]
-        DecreaseScrollSpeed,
+        Back = 10,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Select))]
-        Select,
+        Select = 11,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.QuickExit))]
-        QuickExit,
+        QuickExit = 12,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicNext))]
-        MusicNext,
+        MusicNext = 13,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicPrev))]
-        MusicPrev,
+        MusicPrev = 14,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.MusicPlay))]
-        MusicPlay,
+        MusicPlay = 15,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleNowPlaying))]
-        ToggleNowPlaying,
+        ToggleNowPlaying = 16,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPrevious))]
-        SelectPrevious,
+        SelectPrevious = 17,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNext))]
-        SelectNext,
+        SelectNext = 18,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.Home))]
-        Home,
-
-        // Tombstoned: permanent notification drawer was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        ToggleNotifications,
+        Home = 19,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PauseGameplay))]
-        PauseGameplay,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSetupMode))]
-        EditorSetupMode,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorComposeMode))]
-        EditorComposeMode,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDesignMode))]
-        EditorDesignMode,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTimingMode))]
-        EditorTimingMode,
+        PauseGameplay = 20,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.HoldForHUD))]
-        HoldForHUD,
+        HoldForHUD = 21,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TogglePauseReplay))]
-        TogglePauseReplay,
+        TogglePauseReplay = 22,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleInGameInterface))]
-        ToggleInGameInterface,
-
-        // Tombstoned: mod-select overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        ToggleModSelection,
+        ToggleInGameInterface = 23,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextRandom))]
-        SelectNextRandom,
+        SelectNextRandom = 24,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousRandom))]
-        SelectPreviousRandom,
+        SelectPreviousRandom = 25,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleBeatmapOptions))]
-        ToggleBeatmapOptions,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorVerifyMode))]
-        EditorVerifyMode,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorNudgeLeft))]
-        EditorNudgeLeft,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorNudgeRight))]
-        EditorNudgeRight,
+        ToggleBeatmapOptions = 26,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PreviousVolumeMeter))]
-        PreviousVolumeMeter,
+        PreviousVolumeMeter = 27,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextVolumeMeter))]
-        NextVolumeMeter,
+        NextVolumeMeter = 28,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SeekReplayForward))]
-        SeekReplayForward,
+        SeekReplayForward = 29,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SeekReplayBackward))]
-        SeekReplayBackward,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleChatFocus))]
-        ToggleChatFocus,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridSpacing))]
-        EditorCycleGridSpacing,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
-        EditorTestGameplay,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipHorizontally))]
-        EditorFlipHorizontally,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipVertically))]
-        EditorFlipVertically,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorIncreaseDistanceSpacing))]
-        EditorIncreaseDistanceSpacing,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDecreaseDistanceSpacing))]
-        EditorDecreaseDistanceSpacing,
+        SeekReplayBackward = 30,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ActivatePreviousSet))]
-        ActivatePreviousSet,
+        ActivatePreviousSet = 31,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ActivateNextSet))]
-        ActivateNextSet,
-
-        // Tombstoned: mod-select overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        DeselectAllMods,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTapForBPM))]
-        EditorTapForBPM,
+        ActivateNextSet = 32,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleFPSCounter))]
-        ToggleFPSDisplay,
-
-        // Tombstoned: online profile overlay was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        ToggleProfile,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCloneSelection))]
-        EditorCloneSelection,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCyclePreviousBeatSnapDivisor))]
-        EditorCyclePreviousBeatSnapDivisor,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleNextBeatSnapDivisor))]
-        EditorCycleNextBeatSnapDivisor,
+        ToggleFPSDisplay = 33,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SaveReplay))]
-        SaveReplay,
+        SaveReplay = 34,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ExportReplay))]
-        ExportReplay,
+        ExportReplay = 35,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleReplaySettings))]
-        ToggleReplaySettings,
+        ToggleReplaySettings = 36,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleInGameLeaderboard))]
-        ToggleInGameLeaderboard,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleRotateControl))]
-        EditorToggleRotateControl,
+        ToggleInGameLeaderboard = 37,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.IncreaseOffset))]
-        IncreaseOffset,
+        IncreaseOffset = 38,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.DecreaseOffset))]
-        DecreaseOffset,
+        DecreaseOffset = 39,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.StepReplayForward))]
-        StepReplayForward,
+        StepReplayForward = 40,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.StepReplayBackward))]
-        StepReplayBackward,
-
-        // Tombstoned: mod-select speed-change UI was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        IncreaseModSpeed,
-
-        // Tombstoned: mod-select speed-change UI was removed. Do not reuse this ordinal (persisted in Realm keybindings).
-        DecreaseModSpeed,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleScaleControl))]
-        EditorToggleScaleControl,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayToggleAutoplay))]
-        EditorTestPlayToggleAutoplay,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayToggleQuickPause))]
-        EditorTestPlayToggleQuickPause,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayQuickExitToInitialTime))]
-        EditorTestPlayQuickExitToInitialTime,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestPlayQuickExitToCurrentTime))]
-        EditorTestPlayQuickExitToCurrentTime,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToPreviousHitObject))]
-        EditorSeekToPreviousHitObject,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextHitObject))]
-        EditorSeekToNextHitObject,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToPreviousSamplePoint))]
-        EditorSeekToPreviousSamplePoint,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextSamplePoint))]
-        EditorSeekToNextSamplePoint,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorCycleGridType))]
-        EditorCycleGridType,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorAddBookmark))]
-        EditorAddBookmark,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorRemoveClosestBookmark))]
-        EditorRemoveClosestBookmark,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToPreviousBookmark))]
-        EditorSeekToPreviousBookmark,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorSeekToNextBookmark))]
-        EditorSeekToNextBookmark,
+        StepReplayBackward = 41,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.AbsoluteScrollSongList))]
-        AbsoluteScrollSongList,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleMoveControl))]
-        EditorToggleMoveControl,
-
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDiscardUnsavedChanges))]
-        EditorDiscardUnsavedChanges,
+        AbsoluteScrollSongList = 42,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ExpandPreviousGroup))]
-        ExpandPreviousGroup,
+        ExpandPreviousGroup = 43,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ExpandNextGroup))]
-        ExpandNextGroup,
+        ExpandNextGroup = 44,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleCurrentGroup))]
-        ToggleCurrentGroup,
-
-        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SubmitBeatmap))]
-        EditorSubmitBeatmap,
-
-        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.EditExternally))]
-        EditorEditExternally,
+        ToggleCurrentGroup = 45,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.FastForwardReplay))]
-        FastForwardReplay
+        FastForwardReplay = 46
     }
 
     public enum GlobalActionCategory
     {
         General,
-        Editor,
         InGame,
         Replay,
         SongSelect,
         AudioControl,
         Overlays,
-        EditorTestPlay,
     }
 }

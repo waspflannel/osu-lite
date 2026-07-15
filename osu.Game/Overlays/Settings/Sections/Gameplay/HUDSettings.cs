@@ -27,14 +27,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 }),
                 new SettingsItemV2(new FormCheckBox
                 {
-                    Caption = GameplaySettingsStrings.ShowReplaySettingsOverlay,
-                    Current = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay),
-                })
-                {
-                    Keywords = new[] { "hide" },
-                },
-                new SettingsItemV2(new FormCheckBox
-                {
                     Caption = GameplaySettingsStrings.AlwaysShowKeyOverlay,
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay),
                 })

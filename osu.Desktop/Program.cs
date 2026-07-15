@@ -16,9 +16,9 @@ namespace osu.Desktop
     public static class Program
     {
 #if DEBUG
-        private const string base_game_name = @"osu-development";
+        private const string base_game_name = @"osu-lite-development";
 #else
-        private const string base_game_name = @"osu";
+        private const string base_game_name = @"osu-lite";
 #endif
 
         [STAThread]
@@ -47,12 +47,6 @@ namespace osu.Desktop
                     }
                 }
             }
-
-            // NVIDIA profiles are based on the executable name of a process.
-            // Lazer and stable share the same executable name.
-            // Stable sets this setting to "Off", which may not be what we want, so let's force it back to the default "Auto" on startup.
-            if (OperatingSystem.IsWindows())
-                NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
             // This is a safe default. Localised usages should specify lower values as required.
             AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(1000));
@@ -110,15 +104,6 @@ namespace osu.Desktop
 
         private static bool trySendIPCMessage(IIpcHost host, string cwd, string[] args)
         {
-            if (args.Length == 1 && args[0].StartsWith(OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
-            {
-                var osuSchemeLinkHandler = new OsuSchemeLinkIPCChannel(host);
-                if (!osuSchemeLinkHandler.HandleLinkAsync(args[0]).Wait(3000))
-                    throw new IPCTimeoutException(osuSchemeLinkHandler.GetType());
-
-                return true;
-            }
-
             if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
             {
                 var importer = new ArchiveImportIPCChannel(host);

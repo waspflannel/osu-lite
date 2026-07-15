@@ -25,11 +25,6 @@ namespace osu.Game.Localisation
         public static LocalisableString MenuCursorSize => new TranslatableString(getKey(@"menu_cursor_size"), @"Menu cursor size");
 
         /// <summary>
-        /// "Menu tips"
-        /// </summary>
-        public static LocalisableString ShowMenuTips => new TranslatableString(getKey(@"show_menu_tips"), @"Menu tips");
-
-        /// <summary>
         /// "Parallax"
         /// </summary>
         public static LocalisableString Parallax => new TranslatableString(getKey(@"parallax"), @"Parallax");
@@ -38,42 +33,6 @@ namespace osu.Game.Localisation
         /// "Hold-to-confirm activation time"
         /// </summary>
         public static LocalisableString HoldToConfirmActivationTime => new TranslatableString(getKey(@"hold_to_confirm_activation_time"), @"Hold-to-confirm activation time");
-
-        /// <summary>
-        /// "Main Menu"
-        /// </summary>
-        public static LocalisableString MainMenuHeader => new TranslatableString(getKey(@"main_menu_header"), @"Main Menu");
-
-        /// <summary>
-        /// "Interface voices"
-        /// </summary>
-        public static LocalisableString InterfaceVoices => new TranslatableString(getKey(@"interface_voices"), @"Interface voices");
-
-        /// <summary>
-        /// "osu! music theme"
-        /// </summary>
-        public static LocalisableString OsuMusicTheme => new TranslatableString(getKey(@"osu_music_theme"), @"osu! music theme");
-
-        /// <summary>
-        /// "Intro sequence"
-        /// </summary>
-        public static LocalisableString IntroSequence => new TranslatableString(getKey(@"intro_sequence"), @"Intro sequence");
-
-        /// <summary>
-        /// "Random"
-        /// </summary>
-        public static LocalisableString IntroRandom => new TranslatableString(getKey(@"intro_random"), @"Random");
-
-        /// <summary>
-        /// "Background source"
-        /// </summary>
-        public static LocalisableString BackgroundSource => new TranslatableString(getKey(@"background_source"), @"Background source");
-
-
-        /// <summary>
-        /// "Changes to this setting will only apply with an active osu!supporter tag."
-        /// </summary>
-        public static LocalisableString NotSupporterNote => new TranslatableString(getKey(@"not_supporter_note"), @"Changes to this setting will only apply with an active osu!supporter tag.");
 
         /// <summary>
         /// "Song Select"

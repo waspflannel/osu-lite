@@ -54,57 +54,7 @@ namespace osu.Game.Database
 
         private readonly SynchronizationContext? updateThreadSyncContext;
 
-        /// <summary>
-        /// Version history:
-        /// 6    ~2021-10-18   First tracked version.
-        /// 7    2021-10-18    Changed OnlineID fields to non-nullable to add indexing support.
-        /// 8    2021-10-29    Rebind scroll adjust keys to not have control modifier.
-        /// 9    2021-11-04    Converted BeatmapMetadata.Author from string to RealmUser.
-        /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
-        /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
-        /// 12   2021-11-24    Add Status to RealmBeatmapSet.
-        /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
-        /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
-        /// 15   2022-07-13    Added LastPlayed to BeatmapInfo.
-        /// 16   2022-07-15    Removed HasReplay from ScoreInfo.
-        /// 17   2022-07-16    Added CountryCode to RealmUser.
-        /// 18   2022-07-19    Added OnlineMD5Hash and LastOnlineUpdate to BeatmapInfo.
-        /// 19   2022-07-19    Added DateSubmitted and DateRanked to BeatmapSetInfo.
-        /// 20   2022-07-21    Added LastAppliedDifficultyVersion to RulesetInfo, changed default value of BeatmapInfo.StarRating to -1.
-        /// 21   2022-07-27    Migrate collections to realm (BeatmapCollection).
-        /// 22   2022-07-31    Added ModPreset.
-        /// 23   2022-08-01    Added LastLocalUpdate to BeatmapInfo.
-        /// 24   2022-08-22    Added MaximumStatistics to ScoreInfo.
-        /// 25   2022-09-18    Remove skins to add with new naming.
-        /// 26   2023-02-05    Added BeatmapHash to ScoreInfo.
-        /// 27   2023-06-06    Added EditorTimestamp to BeatmapInfo.
-        /// 28   2023-06-08    Added IsLegacyScore to ScoreInfo, parsed from replay files.
-        /// 29   2023-06-12    Run migration of old lazer scores to be best-effort in the new scoring number space. No actual realm changes.
-        /// 30   2023-06-16    Run migration of old lazer scores again. This time with more correct rounding considerations.
-        /// 31   2023-06-26    Add Version and LegacyTotalScore to ScoreInfo, set Version to 30000002 and copy TotalScore into LegacyTotalScore for legacy scores.
-        /// 32   2023-07-09    Populate legacy scores with the ScoreV2 mod (and restore TotalScore to the legacy total for such scores) using replay files.
-        /// 33   2023-08-16    Reset default chat toggle key binding to avoid conflict with newly added leaderboard toggle key binding.
-        /// 34   2023-08-21    Add BackgroundReprocessingFailed flag to ScoreInfo to track upgrade failures.
-        /// 35   2023-10-16    Clear key combinations of keybindings that are assigned to more than one action in a given settings section.
-        /// 36   2023-10-26    Add LegacyOnlineID to ScoreInfo. Move osu_scores_*_high IDs stored in OnlineID to LegacyOnlineID. Reset anomalous OnlineIDs.
-        /// 38   2023-12-10    Add EndTimeObjectCount and TotalObjectCount to BeatmapInfo.
-        /// 39   2023-12-19    Migrate any EndTimeObjectCount and TotalObjectCount values of 0 to -1 to better identify non-calculated values.
-        /// 40   2023-12-21    Add ScoreInfo.Version to keep track of which build scores were set on.
-        /// 41   2024-04-17    Add ScoreInfo.TotalScoreWithoutMods for future mod multiplier rebalances.
-        /// 42   2024-08-07    Update mania key bindings to reflect changes to ManiaAction
-        /// 43   2024-10-14    Reset keybind for toggling FPS display to avoid conflict with "convert to stream" in the editor, if not already changed by user.
-        /// 44   2024-11-22    Removed several properties from BeatmapInfo which did not need to be persisted to realm.
-        /// 45   2024-12-23    Change beat snap divisor adjust defaults to be Ctrl+Scroll instead of Ctrl+Shift+Scroll, if not already changed by user.
-        /// 46   2024-12-26    Change beat snap divisor bindings to match stable directionality ¯\_(ツ)_/¯.
-        /// 47   2025-01-21    Remove right mouse button binding for absolute scroll. Never use mouse buttons (or scroll) for global actions.
-        /// 48   2025-03-19    Clear online status for all qualified beatmaps (some were stuck in a qualified state due to local caching issues).
-        /// 49   2025-06-10    Reset the LegacyOnlineID to -1 for all scores that have it set to 0 (which is semantically the same) for consistency of handling with OnlineID.
-        /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
-        /// 51   2025-07-22    Add ScoreInfo.Pauses.
-        /// 52   2026-07-14    Remove BeatmapCollection (collections feature removed from osu! lite).
-        /// 53   2026-07-14    Remove ModPreset (mod-select feature removed from osu! lite).
-        /// </summary>
-        private const int schema_version = 53;
+        private const int schema_version = 1;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -208,12 +158,7 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
-#if DEBUG
-            applyFilenameSchemaSuffix(ref Filename);
-#endif
-
-            // `prepareFirstRealmAccess()` triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
-            using (var realm = prepareFirstRealmAccess())
+            using (var realm = getRealmInstance())
                 cleanupPendingDeletions(realm);
         }
 
@@ -796,7 +741,7 @@ namespace osu.Game.Database
         {
             // This is currently the only usage of temporary files at the osu! side.
             // If we use the temporary folder in more situations in the future, this should be moved to a higher level (helper method or OsuGameBase).
-            string tempPathLocation = Path.Combine(Path.GetTempPath(), @"lazer");
+            string tempPathLocation = Path.Combine(Path.GetTempPath(), @"osu-lite");
             if (!Directory.Exists(tempPathLocation))
                 Directory.CreateDirectory(tempPathLocation);
 
@@ -810,10 +755,10 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
-            for (ulong i = lastSchemaVersion + 1; i <= schema_version; i++)
-                applyMigrationsForVersion(migration, i);
+            Logger.Log($"Upgrading osu-lite Realm schema from {lastSchemaVersion} to {schema_version}.");
         }
 
+#if false
         private void applyMigrationsForVersion(Migration migration, ulong targetVersion)
         {
             Logger.Log($"Running realm migration to version {targetVersion}...");
@@ -1311,6 +1256,7 @@ namespace osu.Game.Database
                 return null;
             }
         }
+#endif
 
         /// <summary>
         /// Create a full realm backup.

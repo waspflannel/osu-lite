@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Menu
         private readonly Container logoHoverContainer;
         private readonly MenuLogoVisualisation visualizer;
 
-        private readonly IntroSequence intro;
-
         private Sample sampleClick;
         private SampleChannel sampleClickChannel;
 
@@ -116,10 +114,6 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
-                intro = new IntroSequence
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 logoHoverContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -345,17 +339,6 @@ namespace osu.Game.Screens.Menu
             {
                 triangles.Velocity += amplitudeAdjust * (effectPoint.KiaiMode ? 6 : 3);
             });
-        }
-
-        public void PlayIntro()
-        {
-            const double length = 3150;
-            const double fade = 200;
-
-            logoHoverContainer.FadeOut().Delay(length).FadeIn(fade);
-            intro.Show();
-            intro.Start(length);
-            intro.Delay(length + fade).FadeOut();
         }
 
         [Resolved]

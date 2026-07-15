@@ -24,7 +24,6 @@ namespace osu.Game.Overlays.Settings.Sections
             if (DebugUtils.IsDebugBuild)
             {
                 Add(new GeneralSettings());
-                Add(new BatchImportSettings());
             }
 
             Add(new MemorySettings());

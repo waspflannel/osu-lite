@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class DrawableOsuRuleset : DrawableRuleset<OsuHitObject>
     {
-        private Bindable<bool>? cursorHideEnabled;
-
         public new OsuInputManager KeyBindingInputManager => (OsuInputManager)base.KeyBindingInputManager;
 
         public new OsuPlayfield Playfield => (OsuPlayfield)base.Playfield;
@@ -37,24 +35,6 @@ namespace osu.Game.Rulesets.Osu.UI
         public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ReplayPlayer? replayPlayer)
-        {
-            if (replayPlayer != null)
-            {
-                ReplayAnalysisOverlay analysisOverlay;
-                PlayfieldAdjustmentContainer.Add(analysisOverlay = new ReplayAnalysisOverlay(replayPlayer.Score.Replay));
-                Overlays.Add(analysisOverlay.CreateProxy().With(p => p.Depth = float.NegativeInfinity));
-                replayPlayer.AddSettings(new ReplayAnalysisSettings(Config));
-
-                cursorHideEnabled = Config.GetBindable<bool>(OsuRulesetSetting.ReplayCursorHideEnabled);
-
-                // I have little faith in this working (other things touch cursor visibility) but haven't broken it yet.
-                // Let's wait for someone to report an issue before spending too much time on it.
-                cursorHideEnabled.BindValueChanged(enabled => Playfield.Cursor.FadeTo(enabled.NewValue ? 0 : 1), true);
-            }
         }
 
         public override DrawableHitObject<OsuHitObject>? CreateDrawableRepresentation(OsuHitObject h) => null;

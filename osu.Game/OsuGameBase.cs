@@ -73,17 +73,15 @@ namespace osu.Game
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
 #if DEBUG
-        public const string GAME_NAME = "osu! (development)";
+        public const string GAME_NAME = "osu!lite (development)";
 #else
-        public const string GAME_NAME = "osu!";
+        public const string GAME_NAME = "osu!lite";
 #endif
-
-        public const string OSU_PROTOCOL = "osu://";
 
         /// <summary>
         /// The filename of the main client database.
         /// </summary>
-        public const string CLIENT_DATABASE_FILENAME = @"client.realm";
+        public const string CLIENT_DATABASE_FILENAME = @"osu-lite.realm";
 
         public const int SAMPLE_CONCURRENCY = 6;
 
@@ -316,10 +314,6 @@ namespace osu.Game
             BeatmapManager.ProcessBeatmap = beatmapUpdater.Process;
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
-
-            var powerStatus = CreateBatteryInfo();
-            if (powerStatus != null)
-                dependencies.CacheAs(powerStatus);
 
             dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(hitErrorTracker = new SessionAverageHitErrorTracker());
@@ -587,8 +581,6 @@ namespace osu.Game
         protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache);
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
-
-        protected virtual BatteryInfo CreateBatteryInfo() => null;
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 

@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play.HUD
@@ -18,16 +17,14 @@ namespace osu.Game.Screens.Play.HUD
 
         private const int fade_duration = 200;
 
-        private Bindable<bool> configSettingsOverlay = null!;
+        private readonly Bindable<bool> settingsVisible = new Bindable<bool>(true);
         private Container messageContainer = null!;
         private Container content = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
-
-            configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
 
             InternalChild = content = new Container
             {
@@ -48,12 +45,12 @@ namespace osu.Game.Screens.Play.HUD
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            configSettingsOverlay.BindValueChanged(_ => updateVisibility(), true);
+            settingsVisible.BindValueChanged(_ => updateVisibility(), true);
         }
 
         private void updateVisibility()
         {
-            if (configSettingsOverlay.Value)
+            if (settingsVisible.Value)
                 content.FadeIn(fade_duration, Easing.OutQuint);
             else
                 content.FadeOut(fade_duration, Easing.OutQuint);
@@ -67,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD
             switch (e.Action)
             {
                 case GlobalAction.ToggleReplaySettings:
-                    configSettingsOverlay.Value = !configSettingsOverlay.Value;
+                    settingsVisible.Value = !settingsVisible.Value;
                     return true;
             }
 
