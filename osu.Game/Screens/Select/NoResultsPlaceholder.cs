@@ -32,9 +32,6 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private FirstRunSetupOverlay? firstRunSetupOverlay { get; set; }
-
-        [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
         protected override bool StartHidden => true;
@@ -141,9 +138,7 @@ namespace osu.Game.Screens.Select
             if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null)
             {
                 addBulletPoint();
-                textFlow.AddText("Consider running the \"");
-                textFlow.AddLink(FirstRunSetupOverlayStrings.FirstRunSetupTitle, () => firstRunSetupOverlay?.Show());
-                textFlow.AddText("\" to download or import some beatmaps!");
+                textFlow.AddText("Import local .osz beatmaps by dragging files into the window.");
             }
             else
             {

@@ -84,7 +84,7 @@ namespace osu.Game.Scoring
         /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
         /// the total score has not yet been updated to reflect the current scoring values.
         ///
-        /// See <see cref="BackgroundDataStoreProcessor"/>'s conversion logic.
+        /// Stores the score format version used when this score was created.
         /// </summary>
         /// <remarks>
         /// This may not match the version stored in the replay files.

@@ -80,9 +80,9 @@ namespace osu.Game
     {
 #if DEBUG
         // Different port allows running release and debug builds alongside each other.
-        public const string IPC_PIPE_NAME = "osu-lazer-debug";
+        public const string IPC_PIPE_NAME = "osu-lite-debug";
 #else
-        public const string IPC_PIPE_NAME = "osu-lazer";
+        public const string IPC_PIPE_NAME = "osu-lite";
 #endif
 
         /// <summary>
@@ -132,12 +132,7 @@ namespace osu.Game
         private FrameworkConfigManager frameworkConfig { get; set; }
 
         [Cached]
-        private readonly LegacyImportManager legacyImportManager = new LegacyImportManager();
-
-        [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
-
-        public virtual StableStorage GetStorageForStableInstall() => null;
 
         private float toolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
@@ -163,8 +158,6 @@ namespace osu.Game
         protected ScreenFooter ScreenFooter => screenStackFooter.Footer;
 
         protected SettingsOverlay Settings;
-
-        protected FirstRunSetupOverlay FirstRunOverlay { get; private set; }
 
         private FPSCounter fpsCounter;
 
@@ -324,13 +317,6 @@ namespace osu.Game
 
         private void onWindowDragDrop(string path)
         {
-            // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
-            if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-            {
-                HandleLink(path);
-                return;
-            }
-
             lock (dragDropFiles)
             {
                 dragDropFiles.Add(path);
@@ -949,12 +935,9 @@ namespace osu.Game
                 d.Origin = Anchor.TopRight;
             }), rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(legacyImportManager, Add);
-
             loadComponentSingleFile(screenshotManager, Add);
 
             // overlay elements
-            loadComponentSingleFile(FirstRunOverlay = new FirstRunSetupOverlay(), footerBasedOverlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new NowPlayingOverlay
@@ -965,14 +948,13 @@ namespace osu.Game
 
             loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add, true);
 
-            loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
             loadComponentSingleFile<BeatmapStore>(detachedBeatmapStore = new RealmDetachedBeatmapStore(), Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
 
             // side overlays which cancel each other.
-            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };
+            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications };
 
             foreach (var overlay in singleDisplaySideOverlays)
             {
@@ -992,69 +974,6 @@ namespace osu.Game
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
 
-            applyConfigMigrations();
-
-            // finally, update the version stored to the configuration.
-            // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
-            // debug / local compilations will reset to a non-release string.
-            LocalConfig.SetValue(OsuSetting.Version, Version);
-        }
-
-        /// <summary>
-        /// Apply any migrations to configuration.
-        /// </summary>
-        /// <remarks>
-        /// For database migrations, see <see cref="RealmAccess.applyMigrationsForVersion"/>.
-        /// </remarks>
-        private void applyConfigMigrations()
-        {
-            // arrives as 2020.123.0-lazer
-            string rawVersion = LocalConfig.Get<string>(OsuSetting.Version);
-
-            if (rawVersion.Length < 6)
-                return;
-
-            string[] pieces = rawVersion.Split('.');
-
-            // on a fresh install or when coming from a non-release build, execution will end here.
-            // we don't want to run migrations in such cases.
-            if (!int.TryParse(pieces[0], out int year)) return;
-            if (!int.TryParse(pieces[1], out int monthDay)) return;
-
-            int combined = year * 10000 + monthDay;
-
-            if (combined < 20250214)
-            {
-                // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
-                if (RuntimeInfo.IsMobile)
-                    LocalConfig.GetBindable<float>(OsuSetting.UIScale).SetDefault();
-            }
-
-            if (combined < 20260520)
-            {
-                // Pen tablet sensitivity is now separated from cursor sensitivity.
-                // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
-                var mouseHandler = Host?.AvailableInputHandlers.OfType<MouseHandler>().SingleOrDefault();
-                var penHandler = Host?.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
-
-                if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
-                    penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
-            }
-
-            if (combined < 20260521 && RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-            {
-                bool wasAlreadyUsing = Audio.UseExperimentalWasapi.Value;
-
-                // see application of FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET in FramedBeatmapClock.
-                // this basically undoes this new offset assuming that users which have been using this setting for a while
-                // already have had things tuned.
-                if (wasAlreadyUsing)
-                    LocalConfig.SetValue(OsuSetting.AudioOffset, LocalConfig.Get<double>(OsuSetting.AudioOffset) - FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET);
-
-                Audio.UseExperimentalWasapi.Value = true;
-
-                dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
-            }
         }
 
         private void handleBackButton()
@@ -1077,14 +996,7 @@ namespace osu.Game
                 {
                     string firstPath = paths.First();
 
-                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                    {
-                        HandleLink(firstPath);
-                    }
-                    else
-                    {
-                        Task.Run(() => Import(paths));
-                    }
+                    Task.Run(() => Import(paths));
                 }
             }
         }

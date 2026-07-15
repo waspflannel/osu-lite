@@ -73,17 +73,15 @@ namespace osu.Game
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles, IBeatSyncProvider
     {
 #if DEBUG
-        public const string GAME_NAME = "osu! (development)";
+        public const string GAME_NAME = "osu!lite (development)";
 #else
-        public const string GAME_NAME = "osu!";
+        public const string GAME_NAME = "osu!lite";
 #endif
-
-        public const string OSU_PROTOCOL = "osu://";
 
         /// <summary>
         /// The filename of the main client database.
         /// </summary>
-        public const string CLIENT_DATABASE_FILENAME = @"client.realm";
+        public const string CLIENT_DATABASE_FILENAME = @"osu-lite.realm";
 
         public const int SAMPLE_CONCURRENCY = 6;
 
