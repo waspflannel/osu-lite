@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -56,12 +53,5 @@ namespace osu.Game.Rulesets.Filter
         /// </returns>
         bool TryParseCustomKeywordCriteria(string key, Operator op, string value);
 
-        /// <summary>
-        /// Whether to reapply the filter as a result of the given change in applied mods.
-        /// </summary>
-        /// <param name="criteria">The current filter criteria.</param>
-        /// <param name="mods">The change in mods.</param>
-        /// <returns>Whether the filter should be re-applied.</returns>
-        bool FilterMayChangeFromMods(FilterCriteria criteria, ValueChangedEvent<IReadOnlyList<Mod>> mods);
     }
 }

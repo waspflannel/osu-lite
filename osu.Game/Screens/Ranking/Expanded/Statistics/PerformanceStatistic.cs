@@ -16,7 +16,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Localisation;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {

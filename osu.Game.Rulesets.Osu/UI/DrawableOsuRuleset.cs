@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,10 +10,8 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Configuration;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
@@ -32,8 +29,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
-            : base(ruleset, beatmap, mods)
+        public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
@@ -47,13 +44,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
-        protected override ResumeOverlay CreateResumeOverlay()
-        {
-            if (Mods.Any(m => m is OsuModAutopilot or OsuModTouchDevice))
-                return new DelayedResumeOverlay { Scale = new Vector2(0.65f) };
-
-            return new OsuResumeOverlay();
-        }
+        protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +23,6 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
 
@@ -40,14 +38,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
         public float TopPadding { get; init; }
 
         protected override bool StartHidden => true;
-
-        private ModSettingChangeTracker? settingChangeTracker;
 
         private OsuHoverContainer titleLink = null!;
         private MarqueeContainer titleLabel = null!;
@@ -169,16 +162,6 @@ namespace osu.Game.Screens.Select
             working.BindValueChanged(_ => updateDisplay());
             ruleset.BindValueChanged(_ => updateDisplay());
 
-            mods.BindValueChanged(m =>
-            {
-                settingChangeTracker?.Dispose();
-
-                updateLengthAndBpmStatistics();
-
-                settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                settingChangeTracker.SettingChanged += _ => updateLengthAndBpmStatistics();
-            });
-
             updateDisplay();
 
             statisticsFlow.AutoSizeDuration = 100;
@@ -241,14 +224,12 @@ namespace osu.Game.Screens.Select
                 // This can take time as it is a synchronous task.
                 var beatmap = working.Value.Beatmap;
 
-                double rate = ModUtils.CalculateRateWithMods(mods.Value);
+                int bpmMax = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMaximum);
+                int bpmMin = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMinimum);
+                int mostCommonBPM = FormatUtils.RoundBPM(60000 / beatmap.GetMostCommonBeatLength());
 
-                int bpmMax = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMaximum, rate);
-                int bpmMin = FormatUtils.RoundBPM(beatmap.ControlPointInfo.BPMMinimum, rate);
-                int mostCommonBPM = FormatUtils.RoundBPM(60000 / beatmap.GetMostCommonBeatLength(), rate);
-
-                double drainLength = Math.Round(beatmap.CalculateDrainLength() / rate);
-                double hitLength = Math.Round(beatmapInfo.Length / rate);
+                double drainLength = Math.Round(beatmap.CalculateDrainLength());
+                double hitLength = Math.Round(beatmapInfo.Length);
 
                 Schedule(() =>
                 {

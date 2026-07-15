@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Database;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -41,9 +40,6 @@ namespace osu.Game.Storyboards.Drawables
 
         private double? lastEventEndTime;
 
-        [Cached(typeof(IReadOnlyList<Mod>))]
-        public IReadOnlyList<Mod> Mods { get; }
-
         [Resolved]
         private GameHost host { get; set; } = null!;
 
@@ -58,11 +54,9 @@ namespace osu.Game.Storyboards.Drawables
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        public DrawableStoryboard(Storyboard storyboard, IReadOnlyList<Mod>? mods = null)
+        public DrawableStoryboard(Storyboard storyboard)
         {
             Storyboard = storyboard;
-            Mods = mods ?? Array.Empty<Mod>();
-
             Size = new Vector2(640, 480);
 
             bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).All(e => e is StoryboardVideo);

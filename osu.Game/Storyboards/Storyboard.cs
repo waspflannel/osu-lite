@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
 using osu.Game.Utils;
 using osuTK;
@@ -105,8 +104,7 @@ namespace osu.Game.Storyboards
         /// </summary>
         public Vector2 BackgroundOffset { get; set; } = Vector2.Zero;
 
-        public virtual DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
-            new DrawableStoryboard(this, mods);
+        public virtual DrawableStoryboard CreateDrawable() => new DrawableStoryboard(this);
 
         public virtual string? GetStoragePathFromStoryboardPath(string path)
         {

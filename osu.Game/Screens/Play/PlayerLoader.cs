@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                 }).WithChildren(new Drawable[]
                 {
-                    MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
+                    MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, content.LogoFacade)
                     {
                         Alpha = 0,
                         Anchor = Anchor.Centre,

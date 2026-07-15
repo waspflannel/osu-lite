@@ -54,7 +54,6 @@ using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -167,23 +166,6 @@ namespace osu.Game
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
         protected internal readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-
-        /// <summary>
-        /// The current mod selection for the local user.
-        /// </summary>
-        /// <remarks>
-        /// If a mod select overlay is present, mod instances set to this value are not guaranteed to remain as the provided instance and will be overwritten by a copy.
-        /// In such a case, changes to settings of a mod will *not* propagate after a mod is added to this collection.
-        /// As such, all settings should be finalised before adding a mod to this collection.
-        /// </remarks>
-        [Cached]
-        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        /// <summary>
-        /// Mods available for the current <see cref="Ruleset"/>.
-        /// </summary>
-        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>(new Dictionary<ModType, IReadOnlyList<Mod>>());
 
         private BeatmapDifficultyCache difficultyCache;
         private IBeatmapUpdater beatmapUpdater;

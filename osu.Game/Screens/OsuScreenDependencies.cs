@@ -3,12 +3,10 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {
@@ -17,8 +15,6 @@ namespace osu.Game.Screens
         public Bindable<WorkingBeatmap> Beatmap { get; }
 
         public Bindable<RulesetInfo> Ruleset { get; }
-
-        public Bindable<IReadOnlyList<Mod>> Mods { get; }
 
         public OsuScreenDependencies(bool requireLease, IReadOnlyDependencyContainer parent)
             : base(parent)
@@ -41,19 +37,11 @@ namespace osu.Game.Screens
                     CacheAs(Ruleset);
                 }
 
-                Mods = parent.Get<LeasedBindable<IReadOnlyList<Mod>>>()?.GetBoundCopy();
-
-                if (Mods == null)
-                {
-                    Cache(Mods = parent.Get<Bindable<IReadOnlyList<Mod>>>().BeginLease(true));
-                    CacheAs(Mods);
-                }
             }
             else
             {
                 Beatmap = (parent.Get<LeasedBindable<WorkingBeatmap>>() ?? parent.Get<Bindable<WorkingBeatmap>>()).GetBoundCopy();
                 Ruleset = (parent.Get<LeasedBindable<RulesetInfo>>() ?? parent.Get<Bindable<RulesetInfo>>()).GetBoundCopy();
-                Mods = (parent.Get<LeasedBindable<IReadOnlyList<Mod>>>() ?? parent.Get<Bindable<IReadOnlyList<Mod>>>()).GetBoundCopy();
             }
         }
     }

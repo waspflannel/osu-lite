@@ -27,7 +27,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Skinning;
@@ -937,46 +936,6 @@ namespace osu.Game.Database
                         }
                         else
                             score.TotalScoreVersion = 30000003; // `LATEST_VERSION` at time of migration
-                    }
-
-                    break;
-                }
-
-                case 32:
-                {
-                    foreach (var score in migration.NewRealm.All<ScoreInfo>())
-                    {
-                        if (!score.IsLegacyScore || !score.Ruleset.IsLegacyRuleset())
-                            continue;
-
-                        score.PopulateFromReplay(files, sr =>
-                        {
-                            sr.ReadByte(); // Ruleset.
-                            sr.ReadInt32(); // Version.
-                            sr.ReadString(); // Beatmap hash.
-                            sr.ReadString(); // Username.
-                            sr.ReadString(); // MD5Hash.
-                            sr.ReadUInt16(); // Count300.
-                            sr.ReadUInt16(); // Count100.
-                            sr.ReadUInt16(); // Count50.
-                            sr.ReadUInt16(); // CountGeki.
-                            sr.ReadUInt16(); // CountKatu.
-                            sr.ReadUInt16(); // CountMiss.
-
-                            // we should have this in LegacyTotalScore already, but if we're reading through this anyways...
-                            int totalScore = sr.ReadInt32();
-
-                            sr.ReadUInt16(); // Max combo.
-                            sr.ReadBoolean(); // Perfect.
-
-                            var legacyMods = (LegacyMods)sr.ReadInt32();
-
-                            if (!legacyMods.HasFlag(LegacyMods.ScoreV2) || score.SerialisedMods.Any(mod => mod.Acronym == @"SV2"))
-                                return;
-
-                            score.SerialisedMods = score.SerialisedMods.Append(new SerialisedMod(new ModScoreV2())).ToArray();
-                            score.LegacyTotalScore = score.TotalScore = totalScore;
-                        });
                     }
 
                     break;

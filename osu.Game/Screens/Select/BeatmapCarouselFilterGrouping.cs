@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Utils;

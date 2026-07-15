@@ -15,7 +15,6 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 
@@ -84,21 +83,15 @@ namespace osu.Game.Screens
         [Resolved]
         private MusicController musicController { get; set; }
 
-        public virtual bool? ApplyModTrackAdjustments => null;
-
         public virtual bool? AllowGlobalTrackControl => null;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; } = null!;
 
         public Bindable<RulesetInfo> Ruleset { get; private set; } = null!;
 
-        public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
-
         private OsuScreenDependencies screenDependencies;
 
         private bool? globalMusicControlStateAtSuspend;
-
-        private bool? modTrackAdjustmentStateAtSuspend;
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
@@ -123,7 +116,6 @@ namespace osu.Game.Screens
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
-            Mods = screenDependencies.Mods;
         }
 
         /// <summary>
@@ -185,10 +177,6 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(true);
 
-            // it's feasible to resume to a screen if the target screen never loaded successfully.
-            // in such a case there's no need to restore this value.
-            if (modTrackAdjustmentStateAtSuspend != null)
-                musicController.ApplyModTrackAdjustments = modTrackAdjustmentStateAtSuspend.Value;
             if (globalMusicControlStateAtSuspend != null)
                 musicController.AllowTrackControl.Value = globalMusicControlStateAtSuspend.Value;
 
@@ -199,7 +187,6 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(e);
 
-            modTrackAdjustmentStateAtSuspend = musicController.ApplyModTrackAdjustments;
             globalMusicControlStateAtSuspend = musicController.AllowTrackControl.Value;
 
             onSuspendingLogo();
@@ -208,9 +195,6 @@ namespace osu.Game.Screens
         public override void OnEntering(ScreenTransitionEvent e)
         {
             applyArrivingDefaults(false);
-
-            if (ApplyModTrackAdjustments != null)
-                musicController.ApplyModTrackAdjustments = ApplyModTrackAdjustments.Value;
 
             if (AllowGlobalTrackControl != null)
                 musicController.AllowTrackControl.Value = AllowGlobalTrackControl.Value;

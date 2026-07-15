@@ -6,7 +6,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Utils;
@@ -140,36 +139,6 @@ namespace osu.Game.Graphics
 
                 default:
                     return BlueLight;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the main accent colour for a <see cref="ModType"/>.
-        /// </summary>
-        public Color4 ForModType(ModType modType)
-        {
-            switch (modType)
-            {
-                case ModType.Automation:
-                    return Blue1;
-
-                case ModType.DifficultyIncrease:
-                    return Red1;
-
-                case ModType.DifficultyReduction:
-                    return Lime1;
-
-                case ModType.Conversion:
-                    return Purple1;
-
-                case ModType.Fun:
-                    return Pink1;
-
-                case ModType.System:
-                    return Yellow;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
             }
         }
 

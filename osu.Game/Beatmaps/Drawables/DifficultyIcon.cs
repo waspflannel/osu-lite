@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -39,8 +38,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly IRulesetInfo ruleset;
 
-        private readonly Mod[]? mods;
-
         private Drawable background = null!;
 
         private readonly Container iconContainer;
@@ -64,12 +61,10 @@ namespace osu.Game.Beatmaps.Drawables
         /// Creates a new <see cref="DifficultyIcon"/>. Will use provided beatmap's <see cref="BeatmapInfo.StarRating"/> for initial value.
         /// </summary>
         /// <param name="beatmap">The beatmap to be displayed in the tooltip, and to be used for the initial star rating value.</param>
-        /// <param name="mods">An array of mods to account for in the calculations</param>
         /// <param name="ruleset">An optional ruleset to be used for the icon display, in place of the beatmap's ruleset.</param>
-        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null, Mod[]? mods = null)
+        public DifficultyIcon(IBeatmapInfo beatmap, IRulesetInfo? ruleset = null)
         {
             this.beatmap = beatmap;
-            this.mods = mods;
             this.ruleset = ruleset ?? beatmap.Ruleset;
 
             Current.Value = new StarDifficulty(beatmap.StarRating, 0);
@@ -137,7 +132,7 @@ namespace osu.Game.Beatmaps.Drawables
             GetCustomTooltip() => new DifficultyIconTooltip();
 
         DifficultyIconTooltipContent IHasCustomTooltip<DifficultyIconTooltipContent>.
-            TooltipContent => (TooltipType != DifficultyIconTooltipType.None && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, mods, TooltipType) : null)!;
+            TooltipContent => (TooltipType != DifficultyIconTooltipType.None && beatmap != null ? new DifficultyIconTooltipContent(beatmap, Current, ruleset, TooltipType) : null)!;
     }
 
     public enum DifficultyIconTooltipType

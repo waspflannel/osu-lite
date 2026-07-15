@@ -98,12 +98,6 @@ namespace osu.Game.Screens
         IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
 
         /// <summary>
-        /// Whether mod track adjustments should be applied on entering this screen.
-        /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
-        /// </summary>
-        bool? ApplyModTrackAdjustments { get; }
-
-        /// <summary>
         /// Whether control of the global track should be allowed via the music controller / now playing overlay.
         /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
         /// </summary>

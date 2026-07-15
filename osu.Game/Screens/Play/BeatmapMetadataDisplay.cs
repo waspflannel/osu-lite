@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,7 +17,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
@@ -31,12 +29,9 @@ namespace osu.Game.Screens.Play
     public partial class BeatmapMetadataDisplay : Container
     {
         private readonly IWorkingBeatmap beatmap;
-        private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable logoFacade;
         private LoadingSpinner loading;
         private Drawable blockingLoadLayer;
-
-        public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
         public bool Loading
         {
@@ -78,13 +73,11 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public BeatmapMetadataDisplay(IWorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable logoFacade)
+        public BeatmapMetadataDisplay(IWorkingBeatmap beatmap, Drawable logoFacade)
         {
             this.beatmap = beatmap;
             this.logoFacade = logoFacade;
 
-            this.mods = new Bindable<IReadOnlyList<Mod>>();
-            this.mods.BindTo(mods);
         }
 
         private IBindable<StarDifficulty> starDifficulty;
@@ -226,13 +219,6 @@ namespace osu.Game.Screens.Play
                                     new MetadataLineInfo(metadata.Creator)
                                 }
                             }
-                        },
-                        new ModDisplay
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Margin = new MarginPadding { Top = 20 },
-                            Current = mods
                         },
                     },
                 }

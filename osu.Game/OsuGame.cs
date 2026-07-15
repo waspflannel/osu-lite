@@ -50,7 +50,6 @@ using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Toolbar;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens;
@@ -367,7 +366,6 @@ namespace osu.Game
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
-            SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
 
             applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
@@ -583,19 +581,6 @@ namespace osu.Game
 
             if (newTitle != Host.Window.Title)
                 Host.Window.Title = newTitle;
-        }
-
-        private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
-        {
-            // a lease may be taken on the mods bindable, at which point we can't really ensure valid mods.
-            if (SelectedMods.Disabled)
-                return;
-
-            if (!ModUtils.CheckValidForGameplay(mods.NewValue, out var invalid))
-            {
-                // ensure we always have a valid set of mods.
-                SelectedMods.Value = mods.NewValue.Except(invalid).ToArray();
-            }
         }
 
         #endregion

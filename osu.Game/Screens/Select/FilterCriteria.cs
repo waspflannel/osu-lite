@@ -10,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -45,7 +44,6 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
 
         public RulesetInfo? Ruleset;
-        public IReadOnlyList<Mod>? Mods;
         public bool AllowConvertedBeatmaps;
         private string searchText = string.Empty;
 

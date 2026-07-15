@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current, false);
+            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current);
 
             difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2.2) / 1125.0;
 

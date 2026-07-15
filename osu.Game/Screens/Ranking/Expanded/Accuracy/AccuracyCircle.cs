@@ -14,7 +14,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;

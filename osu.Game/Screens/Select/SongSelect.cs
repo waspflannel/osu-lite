@@ -40,7 +40,6 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
@@ -121,8 +120,6 @@ namespace osu.Game.Screens.Select
         private GridContainer mainGridContainer = null!;
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
-
-        public override bool? ApplyModTrackAdjustments => true;
 
         public override bool ShowFooter => true;
 

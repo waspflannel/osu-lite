@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -143,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             setDistances(clockRate);
         }
 
-        public double OpacityAt(double time, bool hidden)
+        public double OpacityAt(double time)
         {
             if (time > BaseObject.StartTime)
             {
@@ -155,22 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
 
-            // Equal to `OsuHitObject.TimeFadeIn` minus any adjustments from the HD mod.
             double fadeInDuration = 400 * Math.Min(1, BaseObject.TimePreempt / OsuHitObject.PREEMPT_MIN);
-
-            if (hidden)
-            {
-                // Taken from OsuModHidden.
-                double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
-                double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
-
-                return Math.Min
-                (
-                    Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0),
-                    1.0 - Math.Clamp((time - fadeOutStartTime) / fadeOutDuration, 0.0, 1.0)
-                );
-            }
-
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 

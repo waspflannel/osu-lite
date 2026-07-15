@@ -24,7 +24,6 @@ using osu.Game.Overlays;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -90,9 +89,6 @@ namespace osu.Game.Rulesets.UI
         [Cached(typeof(IBeatmap))]
         public readonly Beatmap<TObject> Beatmap;
 
-        [Cached(typeof(IReadOnlyList<Mod>))]
-        public sealed override IReadOnlyList<Mod> Mods { get; }
-
         [Resolved(CanBeNull = true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
@@ -120,8 +116,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap)
             : base(ruleset)
         {
             ArgumentNullException.ThrowIfNull(beatmap);
@@ -130,8 +125,6 @@ namespace osu.Game.Rulesets.UI
                 throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
 
             Beatmap = tBeatmap;
-            Mods = mods?.ToArray() ?? Array.Empty<Mod>();
-
             RelativeSizeAxes = Axes.Both;
 
             KeyBindingInputManager = CreateInputManager();
@@ -196,8 +189,6 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            applyRulesetMods(Mods, config);
-
             loadObjects(cancellationToken ?? CancellationToken.None);
         }
 
@@ -216,11 +207,6 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObject>())
-            {
-                foreach (var drawableHitObject in Playfield.AllHitObjects)
-                    mod.ApplyToDrawableHitObject(drawableHitObject);
-            }
         }
 
         public override void RequestResume(Action continueResume)
@@ -359,23 +345,6 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
 
-        /// <summary>
-        /// Applies the active mods to this DrawableRuleset.
-        /// </summary>
-        /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        /// <param name="config">The <see cref="OsuConfigManager"/> to apply.</param>
-        private void applyRulesetMods(IReadOnlyList<Mod> mods, OsuConfigManager config)
-        {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableToDrawableRuleset<TObject>>())
-                mod.ApplyToDrawableRuleset(this);
-
-            foreach (var mod in mods.OfType<IReadFromConfig>())
-                mod.ReadFromConfig(config);
-        }
-
         #region IProvideCursor
 
         protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
@@ -466,11 +435,6 @@ namespace osu.Game.Rulesets.UI
         /// Whether to enable frame-stable playback.
         /// </summary>
         internal abstract bool FrameStablePlayback { get; set; }
-
-        /// <summary>
-        /// The mods which are to be applied.
-        /// </summary>
-        public abstract IReadOnlyList<Mod> Mods { get; }
 
         /// <summary>~
         /// The associated ruleset.

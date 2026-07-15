@@ -21,7 +21,6 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Input;
@@ -53,9 +52,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -209,22 +205,6 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
 
             ruleset.BindValueChanged(_ => updateCriteria());
-            mods.BindValueChanged(m =>
-            {
-                // The following is a note carried from old song select and may not be a valid reason anymore:
-                // // Mods are updated once by the mod select overlay when song select is entered,
-                // // regardless of if there are any mods or any changes have taken place.
-                // // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
-                // // Todo: Investigate/fix and potentially remove this.
-                // TODO: this might be simply removable with the new song select & carousel code.
-                if (m.NewValue.SequenceEqual(m.OldValue))
-                    return;
-
-                var rulesetCriteria = currentCriteria.RulesetCriteria;
-                if (rulesetCriteria?.FilterMayChangeFromMods(currentCriteria, m) == true)
-                    updateCriteria();
-            });
-
             searchTextBox.Current.BindValueChanged(_ => updateCriteria());
 
             ScheduledDelegate? sliderDebounce = null;
@@ -263,7 +243,6 @@ namespace osu.Game.Screens.Select
                 Group = groupDropdown.Current.Value?.Value ?? GroupMode.None,
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
-                Mods = mods.Value,
                 LocalCreator = localPlayerName.Value.Value,
             };
 

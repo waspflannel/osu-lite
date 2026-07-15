@@ -22,7 +22,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK;
 
 namespace osu.Game.Screens.Select
@@ -33,9 +32,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -193,7 +189,7 @@ namespace osu.Game.Screens.Select
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateKeyCount());
-            mods.BindValueChanged(_ => updateKeyCount(), true);
+            updateKeyCount();
 
             Selected.BindValueChanged(s =>
             {

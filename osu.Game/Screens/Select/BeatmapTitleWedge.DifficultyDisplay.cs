@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +20,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
@@ -37,11 +35,6 @@ namespace osu.Game.Screens.Select
 
             [Resolved]
             private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-            [Resolved]
-            private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
-            private ModSettingChangeTracker? settingChangeTracker;
 
             [Resolved]
             private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
@@ -204,26 +197,9 @@ namespace osu.Game.Screens.Select
             {
                 base.LoadComplete();
 
-                // it is not uncommon for the beatmap and the ruleset to change in conjunction during a single update frame.
-                // in that process, it is possible for the global bindable triad (beatmap / ruleset / mods) to briefly be partially invalid in combination (e.g. mods invalid for given ruleset).
-                // `updateDisplay()` will initiate a difficulty calculation, and if it is allowed to run in that invalid intermediate state, it will loudly fail.
-                // therefore, all changes that may initiate a difficulty calculation are debounced until the next frame to ensure the global bindable state is fully consistent -
-                // and it's what you'd want to do anyway for performance reasons.
+                // Beatmap and ruleset changes can arrive in the same update frame. Defer the calculation until both are current.
                 beatmap.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
                 ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
-
-                mods.BindValueChanged(m =>
-                {
-                    settingChangeTracker?.Dispose();
-
-                    updateDifficultyStatistics();
-
-                    if (m.NewValue.Any())
-                    {
-                        settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                        settingChangeTracker.SettingChanged += _ => updateDifficultyStatistics();
-                    }
-                }, true);
 
                 updateDisplay();
             }
