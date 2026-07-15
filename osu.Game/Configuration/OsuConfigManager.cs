@@ -175,8 +175,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
             SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
 
-            // intentionally uses `DateTime?` and not `DateTimeOffset?` because the latter fails due to `DateTimeOffset` not implementing `IConvertible`
-            SetDefault(OsuSetting.LastOnlineTagsPopulation, (DateTime?)null);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -338,8 +336,6 @@ namespace osu.Game.Configuration
         AlwaysShowHoldForMenuButton,
         AlwaysRequireHoldingForPause,
         ShowMobileDisclaimer,
-
-        LastOnlineTagsPopulation,
 
         AutomaticallyAdjustBeatmapOffset,
     }

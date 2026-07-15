@@ -16,9 +16,7 @@ namespace osu.Game.Online
     {
         // IMPORTANT: this has to be defined and initialised to a non-zero value BEFORE all usages below.
         // failing to do so will cause the `Regex` constructor invocations in initialisers below to throw.
-        private static readonly TimeSpan regex_timeout = DebugUtils.IsNUnitRunning
-            ? TimeSpan.FromSeconds(1)
-            : TimeSpan.FromMilliseconds(5);
+        private static readonly TimeSpan regex_timeout = TimeSpan.FromMilliseconds(5);
 
         // [[Performance Points]] -> wiki:Performance Points (https://osu.ppy.sh/wiki/Performance_Points)
         private static readonly Regex wiki_regex = new Regex(@"\[\[(?<text>[^\]]+)\]\]", RegexOptions.None, regex_timeout);

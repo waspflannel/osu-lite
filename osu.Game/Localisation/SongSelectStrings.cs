@@ -190,16 +190,6 @@ namespace osu.Game.Localisation
         public static LocalisableString BPM => new TranslatableString(getKey(@"bpm"), @"BPM");
 
         /// <summary>
-        /// "Date Submitted"
-        /// </summary>
-        public static LocalisableString DateSubmitted => new TranslatableString(getKey(@"date_submitted"), @"Date Submitted");
-
-        /// <summary>
-        /// "Date Ranked"
-        /// </summary>
-        public static LocalisableString DateRanked => new TranslatableString(getKey(@"date_ranked"), @"Date Ranked");
-
-        /// <summary>
         /// "Date Added"
         /// </summary>
         public static LocalisableString DateAdded => new TranslatableString(getKey(@"date_added"), @"Date Added");

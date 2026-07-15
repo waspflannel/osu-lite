@@ -58,25 +58,16 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
-                              WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, RealmAccess realm, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
+                              WorkingBeatmap? defaultBeatmap = null)
             : base(storage, realm)
         {
-            if (performOnlineLookups)
-            {
-                if (api == null)
-                    throw new ArgumentNullException(nameof(api), "API must be provided if online lookups are required.");
-
-                if (difficultyCache == null)
-                    throw new ArgumentNullException(nameof(difficultyCache), "Difficulty cache must be provided if online lookups are required.");
-            }
-
             var userResources = new RealmFileStore(realm, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = (beatmapSet, scope) => ProcessBeatmap?.Invoke(beatmapSet, scope);
+            beatmapImporter.ProcessBeatmap = beatmapSet => ProcessBeatmap?.Invoke(beatmapSet);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -547,7 +538,7 @@ namespace osu.Game.Beatmaps
 
                 // do not look up metadata.
                 // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
-                ProcessBeatmap?.Invoke(liveBeatmapSet, MetadataLookupScope.None);
+                ProcessBeatmap?.Invoke(liveBeatmapSet);
             });
 
             Debug.Assert(beatmapInfo.BeatmapSet != null);
@@ -674,6 +665,5 @@ namespace osu.Game.Beatmaps
     /// Delegate type for beatmap processing callbacks.
     /// </summary>
     /// <param name="beatmapSet">The beatmap set to be processed.</param>
-    /// <param name="lookupScope">The scope to use when looking up metadata.</param>
-    public delegate void ProcessBeatmapDelegate(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope);
+    public delegate void ProcessBeatmapDelegate(BeatmapSetInfo beatmapSet);
 }

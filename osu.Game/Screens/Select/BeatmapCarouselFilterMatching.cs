@@ -85,8 +85,6 @@ namespace osu.Game.Screens.Select
             match &= !criteria.OverallDifficulty.HasFilter || criteria.OverallDifficulty.IsInRange(beatmap.Difficulty.OverallDifficulty);
             match &= !criteria.Length.HasFilter || criteria.Length.IsInRange(beatmap.Length);
             match &= !criteria.LastPlayed.HasFilter || criteria.LastPlayed.IsInRange(beatmap.LastPlayed ?? DateTimeOffset.MinValue);
-            match &= !criteria.DateRanked.HasFilter || (beatmap.BeatmapSet?.DateRanked != null && criteria.DateRanked.IsInRange(beatmap.BeatmapSet.DateRanked.Value));
-            match &= !criteria.DateSubmitted.HasFilter || (beatmap.BeatmapSet?.DateSubmitted != null && criteria.DateSubmitted.IsInRange(beatmap.BeatmapSet.DateSubmitted.Value));
             match &= !criteria.BPM.HasFilter || criteria.BPM.IsInRange(beatmap.BPM);
 
             match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(beatmap.BeatDivisor);
@@ -114,31 +112,6 @@ namespace osu.Game.Screens.Select
 
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(beatmap.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(beatmap.Metadata.Source);
-
-            if (criteria.UserTags.Any())
-            {
-                foreach (var tagFilter in criteria.UserTags)
-                {
-                    if (tagFilter.ExcludeTerm)
-                    {
-                        // if `ExcludeTerm` is true, `Matches()` will return true if a user tag *doesn't match* the excluded term.
-                        // thus, every user tag must pass this filter.
-                        foreach (string tag in beatmap.Metadata.UserTags)
-                            match &= tagFilter.Matches(tag);
-                    }
-                    else
-                    {
-                        // if `ExcludeTerm` is false, `Matches()` will return true if a user tag *matches* the expected term.
-                        // the expected behaviour is that a beatmap should be displayed if at least one of the user tags passes the filter.
-                        bool anyTagMatched = false;
-
-                        foreach (string tag in beatmap.Metadata.UserTags)
-                            anyTagMatched |= tagFilter.Matches(tag);
-
-                        match &= anyTagMatched;
-                    }
-                }
-            }
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(beatmap.StarRating);
 

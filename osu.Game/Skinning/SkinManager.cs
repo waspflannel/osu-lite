@@ -53,7 +53,7 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
-        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
+        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(CustomDefaultSkin.CreateInfo().ToLiveUnmanaged());
 
         private readonly SkinImporter skinImporter;
 
@@ -66,6 +66,8 @@ namespace osu.Game.Skinning
         private Skin trianglesSkin { get; }
 
         private Skin retroSkin { get; }
+
+        private Skin customDefaultSkin { get; }
 
         private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
         {
@@ -105,6 +107,7 @@ namespace osu.Game.Skinning
                 trianglesSkin = new TrianglesSkin(this),
                 argonSkin = new ArgonSkin(this),
                 new ArgonProSkin(this),
+                customDefaultSkin = new CustomDefaultSkin(this),
             };
 
             // Ensure the default entries are present.
@@ -122,7 +125,7 @@ namespace osu.Game.Skinning
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
             };
 
-            CurrentSkin.Value = argonSkin;
+            CurrentSkin.Value = customDefaultSkin;
             CurrentSkin.ValueChanged += skin =>
             {
                 if (!skin.NewValue.SkinInfo.Equals(CurrentSkinInfo.Value))
@@ -357,7 +360,7 @@ namespace osu.Game.Skinning
                 Guid currentUserSkin = CurrentSkinInfo.Value.ID;
 
                 if (items.Any(s => s.ID == currentUserSkin))
-                    scheduler.Add(() => CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged());
+                    scheduler.Add(() => CurrentSkinInfo.Value = CustomDefaultSkin.CreateInfo().ToLiveUnmanaged());
 
                 Delete(items.ToList(), silent);
             });

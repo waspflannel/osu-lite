@@ -104,8 +104,6 @@ namespace osu.Game
         public virtual EndpointConfiguration CreateEndpoints() =>
             UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
-        protected override OnlineStore CreateOnlineStore() => new TrustedDomainOnlineStore();
-
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
         /// <summary>
@@ -269,7 +267,6 @@ namespace osu.Game
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.Renderer, Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-            largeStore.AddTextureSource(Host.CreateTextureLoaderStore(CreateOnlineStore()));
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(LocalConfig);
@@ -307,7 +304,7 @@ namespace osu.Game
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: false));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, Audio, Resources, Host, defaultBeatmap));
             dependencies.CacheAs<IWorkingBeatmapCache>(BeatmapManager);
 
             // Add after all the above cache operations as it depends on them.
@@ -316,7 +313,7 @@ namespace osu.Game
             // TODO: OsuGame or OsuGameBase?
             dependencies.CacheAs(beatmapUpdater = CreateBeatmapUpdater());
 
-            BeatmapManager.ProcessBeatmap = (beatmapSet, scope) => beatmapUpdater.Process(beatmapSet, scope);
+            BeatmapManager.ProcessBeatmap = beatmapUpdater.Process;
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
@@ -347,10 +344,6 @@ namespace osu.Game
                 base.Content.Add(apiDrawable);
 
             base.Content.Add(rulesetConfigCache);
-
-            PreviewTrackManager previewTrackManager;
-            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
-            base.Content.Add(previewTrackManager);
 
             base.Content.Add(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
@@ -591,7 +584,7 @@ namespace osu.Game
             }
         }
 
-        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache, Storage);
+        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache);
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 

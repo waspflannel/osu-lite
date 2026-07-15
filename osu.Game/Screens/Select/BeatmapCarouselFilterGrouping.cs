@@ -183,9 +183,6 @@ namespace osu.Game.Screens.Select
                 case GroupMode.DateAdded:
                     return getGroupsBy(b => defineGroupByDate(b.BeatmapSet!.DateAdded), items);
 
-                case GroupMode.DateRanked:
-                    return getGroupsBy(b => defineGroupByRankedDate(b.BeatmapSet!.DateRanked), items);
-
                 case GroupMode.LastPlayed:
                     return getGroupsBy(b =>
                     {
@@ -300,14 +297,6 @@ namespace osu.Game.Screens.Select
             }
 
             return new GroupDefinition(151, BeatmapCarouselFilterGroupingStrings.OverMonthsAgo(5)).Yield();
-        }
-
-        private IEnumerable<GroupDefinition> defineGroupByRankedDate(DateTimeOffset? date)
-        {
-            if (date == null)
-                return new GroupDefinition(0, BeatmapCarouselFilterGroupingStrings.Unranked).Yield();
-
-            return new GroupDefinition(-date.Value.Year, $"{date.Value.Year}").Yield();
         }
 
         private IEnumerable<GroupDefinition> defineGroupByStatus(BeatmapOnlineStatus status)

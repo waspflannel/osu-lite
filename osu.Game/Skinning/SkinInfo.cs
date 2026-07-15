@@ -22,6 +22,7 @@ namespace osu.Game.Skinning
         internal static readonly Guid CLASSIC_SKIN = new Guid("81F02CD3-EEC6-4865-AC23-FAE26A386187");
         internal static readonly Guid RETRO_SKIN = new Guid("0555C76A-CC6B-4BB4-9548-DF76BA72EF25");
         internal static readonly Guid RANDOM_SKIN = new Guid("D39DFEFB-477C-4372-B1EA-2BCEA5FB8908");
+        internal static readonly Guid CUSTOM_DEFAULT_SKIN = new Guid("0F0F6BC5-E062-4C35-BD07-E740C5320CF8");
 
         [PrimaryKey]
         [JsonProperty]
