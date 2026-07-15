@@ -35,11 +35,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Caption = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = GameplaySettingsStrings.StarFountains,
-                    Current = config.GetBindable<bool>(OsuSetting.StarFountains)
-                }),
             };
         }
     }

@@ -447,7 +447,6 @@ namespace osu.Game.Screens.Play
                         BreakTracker = breakTracker,
                         Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
                     },
-                    new KiaiGameplayFountains(),
                 },
             };
 

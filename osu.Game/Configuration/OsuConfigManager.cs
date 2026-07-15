@@ -119,7 +119,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
-            SetDefault(OsuSetting.StarFountains, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -313,7 +312,6 @@ namespace osu.Game.Configuration
         IntroSequence,
         UIHoldActivationDelay,
         HitLighting,
-        StarFountains,
         MenuBackgroundSource,
         GameplayDisableWinKey,
 
