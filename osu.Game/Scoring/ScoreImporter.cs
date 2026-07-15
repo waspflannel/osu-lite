@@ -50,6 +50,11 @@ namespace osu.Game.Scoring
                     Logger.Log($@"Score '{archive.Name}' failed to import: no corresponding beatmap with the hash '{notFound.Hash}' could be found.", LoggingTarget.Database);
                     return null;
                 }
+                catch (LegacyScoreDecoder.ReplayHasModsException e)
+                {
+                    Logger.Log(e.Message, LoggingTarget.Database);
+                    return null;
+                }
                 catch (Exception e)
                 {
                     Logger.Log($@"Failed to parse headers of score '{archive.Name}': {e}.", LoggingTarget.Database);

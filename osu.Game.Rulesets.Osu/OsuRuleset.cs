@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
+        public override Score CreateAutoplayScore(IBeatmap beatmap) => OsuAutoGenerator.CreateScore(beatmap);
+
         public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new OsuHealthProcessor(drainStartTime);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);

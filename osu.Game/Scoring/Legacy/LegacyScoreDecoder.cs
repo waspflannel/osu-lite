@@ -18,7 +18,6 @@ using osu.Game.IO.Legacy;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -85,13 +84,10 @@ namespace osu.Game.Scoring.Legacy
                 /* score.Perfect = */
                 sr.ReadBoolean();
 
-                scoreInfo.Mods = currentRuleset.ConvertFromLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
+                if (sr.ReadInt32() != 0)
+                    throw new ReplayHasModsException();
 
-                // lazer replays get a really high version number.
-                if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                    scoreInfo.Mods = scoreInfo.Mods.Append(currentRuleset.CreateMod<ModClassic>()).ToArray();
-
-                currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
+                currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
@@ -127,7 +123,8 @@ namespace osu.Game.Scoring.Legacy
 
                         score.ScoreInfo.Statistics = readScore.Statistics;
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
-                        score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
+                        if (readScore.Mods.Length > 0)
+                            throw new ReplayHasModsException();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
                         decodedRank = readScore.Rank;
                         if (readScore.TotalScoreWithoutMods is long totalScoreWithoutMods)
@@ -239,7 +236,7 @@ namespace osu.Game.Scoring.Legacy
             // In osu! and osu!mania, some judgements affect combo but aren't stored to scores.
             // A special hit result is used to pad out the combo value to match, based on the max combo from the difficulty attributes.
             var calculator = rulesetInstance.CreateDifficultyCalculator(workingBeatmap);
-            var attributes = calculator.Calculate(score.Mods);
+            var attributes = calculator.Calculate();
 
             int maxComboFromStatistics = score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Select(kvp => kvp.Value).DefaultIfEmpty(0).Sum();
             if (attributes.MaxCombo > maxComboFromStatistics)
@@ -252,10 +249,7 @@ namespace osu.Game.Scoring.Legacy
             Debug.Assert(score.BeatmapInfo != null);
 
             var ruleset = score.Ruleset.CreateInstance();
-            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score.BeatmapInfo.Difficulty, score));
-            double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
-
-            score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
+            score.TotalScoreWithoutMods = score.TotalScore;
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
@@ -379,6 +373,14 @@ namespace osu.Game.Scoring.Legacy
             public BeatmapNotFoundException(string hash)
             {
                 Hash = hash;
+            }
+        }
+
+        public class ReplayHasModsException : Exception
+        {
+            public ReplayHasModsException()
+                : base("osu! lite accepts unmodded replays only.")
+            {
             }
         }
     }

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 
@@ -30,14 +29,10 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         protected Replay Replay;
         protected List<ReplayFrame> Frames => Replay.Frames;
-        private readonly IReadOnlyList<IApplicableToRate> timeAffectingMods;
-
-        protected OsuAutoGeneratorBase(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected OsuAutoGeneratorBase(IBeatmap beatmap)
             : base(beatmap)
         {
             Replay = new Replay();
-
-            timeAffectingMods = mods.OfType<IApplicableToRate>().ToList();
         }
 
         #endregion
@@ -45,8 +40,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         #region Utilities
 
         /// <summary>
-        /// Returns the real duration of time between <paramref name="startTime"/> and <paramref name="endTime"/>
-        /// after applying rate-affecting mods.
+        /// Returns the duration of time between <paramref name="startTime"/> and <paramref name="endTime"/>.
         /// </summary>
         /// <remarks>
         /// This method should only be used when <paramref name="startTime"/> and <paramref name="endTime"/> are very close.
@@ -55,30 +49,9 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// </remarks>
         /// <param name="startTime">The start time of the time delta, in original track time.</param>
         /// <param name="endTime">The end time of the time delta, in original track time.</param>
-        protected double ApplyModsToTimeDelta(double startTime, double endTime)
-        {
-            double delta = endTime - startTime;
+        protected static double GetTimeDelta(double startTime, double endTime) => endTime - startTime;
 
-            foreach (var mod in timeAffectingMods)
-                delta /= mod.ApplyToRate(startTime);
-
-            return delta;
-        }
-
-        protected double ApplyModsToRate(double time, double rate)
-        {
-            foreach (var mod in timeAffectingMods)
-                rate = mod.ApplyToRate(time, rate);
-            return rate;
-        }
-
-        /// <summary>
-        /// Calculates the interval after which the next <see cref="ReplayFrame"/> should be generated,
-        /// in milliseconds.
-        /// </summary>
-        /// <param name="time">The time of the previous frame.</param>
-        protected double GetFrameDelay(double time)
-            => ApplyModsToRate(time, 1000.0 / 60);
+        protected const double FRAME_DELAY = 1000.0 / 60;
 
         private class ReplayFrameComparer : IComparer<ReplayFrame>
         {

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -14,8 +13,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Utils;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
@@ -25,13 +22,8 @@ namespace osu.Game.Screens.Select
     public partial class SoloSongSelect : SongSelect
     {
         private PlayerLoader? playerLoader;
-        private IReadOnlyList<Mod>? modsAtGameplayStart;
-
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
-
-        [Resolved]
-        private INotificationOverlay? notifications { get; set; }
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -71,57 +63,26 @@ namespace osu.Game.Screens.Select
         {
             if (playerLoader != null) return;
 
-            modsAtGameplayStart = Mods.Value.Select(m => m.DeepClone()).ToArray();
-
-            // Ctrl+Enter should start map with autoplay enabled.
-            if (GetContainingInputManager()?.CurrentState?.Keyboard.ControlPressed == true)
-            {
-                var autoInstance = getAutoplayMod();
-
-                if (autoInstance == null)
-                {
-                    notifications?.Post(new SimpleNotification
-                    {
-                        Text = NotificationsStrings.NoAutoplayMod
-                    });
-                    return;
-                }
-
-                var mods = Mods.Value.Append(autoInstance).ToArray();
-
-                if (!ModUtils.CheckCompatibleSet(mods, out var invalid))
-                    mods = mods.Except(invalid).Append(autoInstance).ToArray();
-
-                Mods.Value = mods;
-            }
+            bool autoplay = GetContainingInputManager()?.CurrentState?.Keyboard.ControlPressed == true;
 
             sampleConfirmSelection?.Play();
 
-            this.Push(playerLoader = new PlayerLoader(createPlayer));
+            this.Push(playerLoader = new PlayerLoader(() => createPlayer(autoplay)));
 
-            Player createPlayer()
+            Player createPlayer(bool autoplay)
             {
-                Player player;
+                if (!autoplay)
+                    return new SoloPlayer();
 
-                var replayGeneratingMod = Mods.Value.OfType<ICreateReplayData>().FirstOrDefault();
-
-                if (replayGeneratingMod != null)
-                {
-                    player = new ReplayPlayer(replayGeneratingMod.CreateScoreFromReplayData);
-                }
-                else
-                {
-                    player = new SoloPlayer();
-                }
-
-                return player;
+                var replay = Ruleset.Value.CreateInstance().CreateAutoplayScore(Beatmap.Value.Beatmap);
+                return replay == null ? new SoloPlayer() : new ReplayPlayer(replay, autoplayPlayback: true);
             }
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            revertMods();
+            playerLoader = null;
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -129,18 +90,8 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(e))
                 return true;
 
-            revertMods();
-            return false;
-        }
-
-        private ModAutoplay? getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
-
-        private void revertMods()
-        {
-            if (playerLoader == null) return;
-
-            Mods.Value = modsAtGameplayStart;
             playerLoader = null;
+            return false;
         }
 
         private partial class PlayerLoader : Play.PlayerLoader

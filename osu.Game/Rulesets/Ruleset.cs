@@ -247,6 +247,11 @@ namespace osu.Game.Rulesets
         public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(this);
 
         /// <summary>
+        /// Creates an autoplay replay for this ruleset, if supported.
+        /// </summary>
+        public virtual Score? CreateAutoplayScore(IBeatmap beatmap) => null;
+
+        /// <summary>
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The health processor.</returns>
