@@ -315,10 +315,6 @@ namespace osu.Game
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
-            var powerStatus = CreateBatteryInfo();
-            if (powerStatus != null)
-                dependencies.CacheAs(powerStatus);
-
             dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(hitErrorTracker = new SessionAverageHitErrorTracker());
             dependencies.Cache(Colours = new OsuColour());
@@ -585,8 +581,6 @@ namespace osu.Game
         protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache);
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
-
-        protected virtual BatteryInfo CreateBatteryInfo() => null;
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 

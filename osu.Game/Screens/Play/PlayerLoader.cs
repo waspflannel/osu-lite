@@ -183,9 +183,6 @@ namespace osu.Game.Screens.Play
         private AudioManager audioManager { get; set; } = null!;
 
         [Resolved]
-        private BatteryInfo? batteryInfo { get; set; }
-
-        [Resolved]
         private IHighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
@@ -197,7 +194,6 @@ namespace osu.Game.Screens.Play
         private void load(SessionStatics sessionStatics, OsuConfigManager config, IAPIProvider api)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
-            batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
             showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             const float padding = 25;
@@ -365,7 +361,6 @@ namespace osu.Game.Screens.Play
             Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, Clock.CurrentTime + PlayerPushDelay, 0));
 
             showMuteWarningIfNeeded();
-            showBatteryWarningIfNeeded();
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -793,51 +788,5 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
-        #region Low battery warning
-
-        /// <summary>
-        /// This is intentionally higher than 20%, which is usually when OS level notifications
-        /// interrupt the active application to warn the user.
-        /// </summary>
-        private const double low_battery_threshold = 0.25;
-
-        private Bindable<bool> batteryWarningShownOnce = null!;
-
-        private void showBatteryWarningIfNeeded()
-        {
-            if (batteryInfo == null) return;
-
-            if (!batteryWarningShownOnce.Value)
-            {
-                if (batteryInfo.OnBattery && batteryInfo.ChargeLevel <= low_battery_threshold)
-                {
-                    notificationOverlay?.Post(new BatteryWarningNotification());
-                    batteryWarningShownOnce.Value = true;
-                }
-            }
-        }
-
-        private partial class BatteryWarningNotification : SimpleNotification
-        {
-            public BatteryWarningNotification()
-            {
-                Text = NotificationsStrings.BatteryLow;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, INotificationOverlay notificationOverlay)
-            {
-                Icon = FontAwesome.Solid.BatteryQuarter;
-                IconContent.Colour = colours.RedDark;
-
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    return true;
-                };
-            }
-        }
-
-        #endregion
     }
 }

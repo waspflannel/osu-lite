@@ -48,12 +48,6 @@ namespace osu.Desktop
                 }
             }
 
-            // NVIDIA profiles are based on the executable name of a process.
-            // Lazer and stable share the same executable name.
-            // Stable sets this setting to "Off", which may not be what we want, so let's force it back to the default "Auto" on startup.
-            if (OperatingSystem.IsWindows())
-                NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
-
             // This is a safe default. Localised usages should specify lower values as required.
             AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(1000));
 

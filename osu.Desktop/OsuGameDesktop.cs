@@ -4,7 +4,6 @@
 using System;
 using System.Reflection;
 using osu.Desktop.Performance;
-using osu.Desktop.Security;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Framework;
@@ -53,8 +52,6 @@ namespace osu.Desktop
             else if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && !IsPackageManaged && IsDeployedBuild)
                 LoadComponentAsync(new MacOSAppLocationChecker(), Add);
 
-            LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
-
             archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
         }
 
@@ -72,8 +69,6 @@ namespace osu.Desktop
 
             host.Window.Title = Name;
         }
-
-        protected override BatteryInfo CreateBatteryInfo() => FrameworkEnvironment.UseSDL3 ? new SDL3BatteryInfo() : new SDL2BatteryInfo();
 
         protected override void Dispose(bool isDisposing)
         {
