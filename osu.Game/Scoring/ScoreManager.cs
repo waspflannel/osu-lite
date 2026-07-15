@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
-using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
@@ -40,14 +39,14 @@ namespace osu.Game.Scoring
             }
         }
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api,
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm,
                             OsuConfigManager? configManager = null)
             : base(storage, realm)
         {
             this.beatmaps = beatmaps;
             this.configManager = configManager;
 
-            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm, api)
+            scoreImporter = new ScoreImporter(rulesets, beatmaps, storage, realm)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
@@ -59,15 +58,15 @@ namespace osu.Game.Scoring
         }
 
         /// <summary>
-        /// Retrieve a <see cref="Score"/> from a given <see cref="IScoreInfo"/>.
+        /// Retrieve a <see cref="Score"/> from a given <see cref="ScoreInfo"/>.
         /// </summary>
-        /// <param name="scoreInfo">The <see cref="IScoreInfo"/> to convert.</param>
+        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to convert.</param>
         /// <returns>The <see cref="Score"/>. Null if the score cannot be found in the database.</returns>
         /// <remarks>
-        /// The <see cref="IScoreInfo"/> is re-retrieved from the database to ensure all the required data
-        /// for retrieving a replay are present (may have missing properties if it was retrieved from online data).
+        /// The <see cref="ScoreInfo"/> is re-retrieved from the database to ensure all the required data
+        /// for retrieving a replay are present.
         /// </remarks>
-        public Score? GetScore(IScoreInfo scoreInfo)
+        public Score? GetScore(ScoreInfo scoreInfo)
         {
             ScoreInfo? databasedScoreInfo = getDatabasedScoreInfo(scoreInfo);
 
@@ -84,24 +83,17 @@ namespace osu.Game.Scoring
             return Realm.Run(r => r.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
         }
 
-        private ScoreInfo? getDatabasedScoreInfo(IScoreInfo originalScoreInfo)
+        private ScoreInfo? getDatabasedScoreInfo(ScoreInfo originalScoreInfo)
         {
             ScoreInfo? databasedScoreInfo = null;
 
-            if (originalScoreInfo is ScoreInfo scoreInfo)
-            {
-                if (scoreInfo.IsManaged)
-                    return scoreInfo.Detach();
+            if (originalScoreInfo.IsManaged)
+                return originalScoreInfo.Detach();
 
-                if (!string.IsNullOrEmpty(scoreInfo.Hash))
-                    databasedScoreInfo = Query(s => s.Hash == scoreInfo.Hash);
-            }
+            databasedScoreInfo = Query(s => s.ID == originalScoreInfo.ID);
 
-            if (originalScoreInfo.OnlineID > 0)
-                databasedScoreInfo ??= Query(s => s.OnlineID == originalScoreInfo.OnlineID);
-
-            if (originalScoreInfo.LegacyOnlineID > 0)
-                databasedScoreInfo ??= Query(s => s.LegacyOnlineID == originalScoreInfo.LegacyOnlineID);
+            if (databasedScoreInfo == null && !string.IsNullOrEmpty(originalScoreInfo.Hash))
+                databasedScoreInfo = Query(s => s.Hash == originalScoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -193,24 +185,18 @@ namespace osu.Game.Scoring
 
         public Task Import(ImportTask[] imports, ImportParameters parameters = default) => scoreImporter.Import(imports, parameters);
 
-        public override bool IsAvailableLocally(ScoreInfo model)
-            => Realm.Run(realm => realm.All<ScoreInfo>()
-                                       // this basically inlines `ModelExtension.MatchesOnlineID(IScoreInfo, IScoreInfo)`,
-                                       // because that method can't be used here, as realm can't translate it to its query language.
-                                       .Any(s => s.OnlineID == model.OnlineID || s.LegacyOnlineID == model.LegacyOnlineID));
-
         public IEnumerable<string> HandledExtensions => scoreImporter.HandledExtensions;
 
         public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, ImportTask[] tasks, ImportParameters parameters = default) => scoreImporter.Import(notification, tasks);
 
         /// <summary>
-        /// Export a replay from a given <see cref="IScoreInfo"/>.
+        /// Export a replay from a given <see cref="ScoreInfo"/>.
         /// </summary>
-        /// <param name="scoreInfo">The <see cref="IScoreInfo"/> to export.</param>
+        /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to export.</param>
         /// <returns>The <see cref="Task"/>. Return <see cref="Task.CompletedTask"/> if the score cannot be found in the database.</returns>
         /// <remarks>
-        /// The <see cref="IScoreInfo"/> is re-retrieved from the database to ensure all the required data
-        /// for exporting a replay are present (may have missing properties if it was retrieved from online data).
+        /// The <see cref="ScoreInfo"/> is re-retrieved from the database to ensure all the required data
+        /// for exporting a replay are present.
         /// </remarks>
         public Task Export(ScoreInfo scoreInfo)
         {

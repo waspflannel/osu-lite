@@ -35,7 +35,10 @@ namespace osu.Game.Screens.Play
 
         protected override UserActivity? InitialActivity =>
             // score may be null if LoadedBeatmapSuccessfully is false.
-            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo);
+            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo, localPlayerName.Value.Value);
+
+        [Resolved]
+        private LocalPlayerName localPlayerName { get; set; } = null!;
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
@@ -84,7 +87,7 @@ namespace osu.Game.Screens.Play
         public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => ReplayOverlay.Settings.Add(settings));
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, LocalPlayerName playerName)
         {
             if (!LoadedBeatmapSuccessfully)
                 return;
@@ -100,7 +103,7 @@ namespace osu.Game.Screens.Play
 
             OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
             message.AddText("Watching ");
-            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(playerName.Value.Value, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
             message.AddText(" play ");
             message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
             message.AddText(" on ");

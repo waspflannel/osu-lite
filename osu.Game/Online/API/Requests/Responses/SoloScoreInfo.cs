@@ -11,12 +11,11 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
     [Serializable]
-    public class SoloScoreInfo : IScoreInfo
+    public class SoloScoreInfo
     {
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
@@ -155,18 +154,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         #endregion
 
-        #region IScoreInfo
-
-        public long OnlineID => (long?)ID ?? -1;
-
-        IUser IScoreInfo.User => User!;
-        DateTimeOffset IScoreInfo.Date => EndedAt;
-        long IScoreInfo.LegacyOnlineID => (long?)LegacyScoreId ?? -1;
-        IBeatmapInfo IScoreInfo.Beatmap => Beatmap!;
-        IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
-
-        #endregion
-
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
@@ -212,10 +199,7 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             var score = new ScoreInfo
             {
-                OnlineID = OnlineID,
-                LegacyOnlineID = (long?)LegacyScoreId ?? -1,
                 IsLegacyScore = IsLegacyScore,
-                User = User ?? new APIUser { Id = UserID },
                 BeatmapInfo = new BeatmapInfo { OnlineID = BeatmapID },
                 Ruleset = new RulesetInfo { OnlineID = RulesetID },
                 Passed = Passed,
@@ -228,10 +212,8 @@ namespace osu.Game.Online.API.Requests.Responses
                 Statistics = Statistics,
                 MaximumStatistics = MaximumStatistics,
                 Date = EndedAt,
-                HasOnlineReplay = HasReplay,
                 Mods = mods,
                 PP = PP,
-                Ranked = Ranked,
             };
 
             if (beatmap is BeatmapInfo realmBeatmap)

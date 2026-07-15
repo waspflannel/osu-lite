@@ -69,18 +69,15 @@ namespace osu.Game.Users
 
         public class WatchingReplay : UserActivity
         {
-            public long ScoreID { get; set; }
-
             public string PlayerName { get; set; } = string.Empty;
 
             public int BeatmapID { get; set; }
 
             public string? BeatmapDisplayTitle { get; set; }
 
-            public WatchingReplay(ScoreInfo score)
+            public WatchingReplay(ScoreInfo score, string playerName)
             {
-                ScoreID = score.OnlineID;
-                PlayerName = score.User.Username;
+                PlayerName = playerName;
                 BeatmapID = score.BeatmapInfo?.OnlineID ?? -1;
                 BeatmapDisplayTitle = score.BeatmapInfo?.GetDisplayTitle();
             }

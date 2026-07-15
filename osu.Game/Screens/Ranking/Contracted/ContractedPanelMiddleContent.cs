@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
@@ -19,8 +20,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Users;
-using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Ranking.Contracted
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LocalPlayerName playerName)
         {
             InternalChild = new GridContainer
             {
@@ -78,12 +77,6 @@ namespace osu.Game.Screens.Ranking.Contracted
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4Extensions.FromHex("444")
                                 },
-                                new UserCoverBackground
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    User = score.User,
-                                    Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                },
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -92,26 +85,12 @@ namespace osu.Game.Screens.Ranking.Contracted
                                     Spacing = new Vector2(0, 10),
                                     Children = new Drawable[]
                                     {
-                                        new UpdateableAvatar(score.User)
+                                        new OsuSpriteText
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            Size = new Vector2(110),
-                                            Masking = true,
-                                            CornerExponent = 2.5f,
-                                            CornerRadius = 20,
-                                            EdgeEffect = new EdgeEffectParameters
-                                            {
-                                                Colour = Color4.Black.Opacity(0.15f),
-                                                Type = EdgeEffectType.Shadow,
-                                                Radius = 8,
-                                                Offset = new Vector2(0, 1),
-                                            }
-                                        },
-                                        new ClickableUsername(score.User)
-                                        {
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                                            Text = playerName.Value.Value,
                                         },
                                         new FillFlowContainer
                                         {

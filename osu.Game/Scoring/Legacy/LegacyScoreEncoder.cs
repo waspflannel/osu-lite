@@ -73,17 +73,20 @@ namespace osu.Game.Scoring.Legacy
 
         private readonly Score score;
         private readonly IBeatmap? beatmap;
+        private readonly string playerName;
 
         /// <summary>
         /// Create a new score encoder for a specific score.
         /// </summary>
         /// <param name="score">The score to be encoded.</param>
         /// <param name="beatmap">The beatmap used to convert frames for the score. May be null if the frames are already <see cref="LegacyReplayFrame"/>s.</param>
+        /// <param name="playerName">The configured local player name to write to the replay header.</param>
         /// <exception cref="ArgumentException"></exception>
-        public LegacyScoreEncoder(Score score, IBeatmap? beatmap)
+        public LegacyScoreEncoder(Score score, IBeatmap? beatmap, string playerName)
         {
             this.score = score;
             this.beatmap = beatmap;
+            this.playerName = playerName;
 
             if (beatmap == null && !score.Replay.Frames.All(f => f is LegacyReplayFrame))
                 throw new ArgumentException(@"Beatmap must be provided if frames are not already legacy frames.", nameof(beatmap));
@@ -99,8 +102,8 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
                 sw.Write(score.ScoreInfo.TotalScoreVersion);
                 sw.Write(score.ScoreInfo.BeatmapInfo!.MD5Hash);
-                sw.Write(score.ScoreInfo.User.Username);
-                sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.User.Username}-{score.ScoreInfo.Date}").ComputeMD5Hash());
+                sw.Write(playerName);
+                sw.Write(FormattableString.Invariant($"lazer-{playerName}-{score.ScoreInfo.Date}").ComputeMD5Hash());
                 sw.Write((ushort)(score.ScoreInfo.GetCount300() ?? 0));
                 sw.Write((ushort)(score.ScoreInfo.GetCount100() ?? 0));
                 sw.Write((ushort)(score.ScoreInfo.GetCount50() ?? 0));
@@ -115,7 +118,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write(getHpGraphFormatted());
                 sw.Write(score.ScoreInfo.Date.DateTime);
                 sw.WriteByteArray(createReplayData());
-                sw.Write(score.ScoreInfo.LegacyOnlineID);
+                sw.Write(-1L);
                 writeModSpecificData(score.ScoreInfo, sw);
                 sw.WriteByteArray(createScoreInfoData());
             }

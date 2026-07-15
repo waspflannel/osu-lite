@@ -42,13 +42,8 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (gameplayState != null)
-                flag.CountryCode = gameplayState.Score.ScoreInfo.User.CountryCode;
-            else
-            {
-                apiUser = api.LocalUser.GetBoundCopy();
-                apiUser.BindValueChanged(u => flag.CountryCode = u.NewValue.CountryCode, true);
-            }
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(u => flag.CountryCode = u.NewValue.CountryCode, true);
         }
 
         public bool UsesFixedAnchor { get; set; }

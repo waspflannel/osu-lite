@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
@@ -22,12 +21,6 @@ namespace osu.Game.Rulesets.Mods
                 ScoreInfo =
                 {
                     Date = DateTimeOffset.Now,
-                    User = new APIUser
-                    {
-                        Id = replayData.User.OnlineID,
-                        Username = replayData.User.Username,
-                        IsBot = replayData.User.IsBot,
-                    }
                 }
             };
         }

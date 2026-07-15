@@ -15,7 +15,6 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
@@ -67,7 +66,8 @@ namespace osu.Game.Scoring.Legacy
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException(beatmapHash);
 
-                scoreInfo.User = new APIUser { Username = sr.ReadString() };
+                // Replays are always imported as local scores.
+                sr.ReadString();
 
                 // MD5Hash
                 sr.ReadString();
@@ -105,12 +105,9 @@ namespace osu.Game.Scoring.Legacy
                 byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    scoreInfo.LegacyOnlineID = sr.ReadInt64();
+                    sr.ReadInt64();
                 else if (version >= 20121008)
-                    scoreInfo.LegacyOnlineID = sr.ReadInt32();
-
-                if (scoreInfo.LegacyOnlineID == 0)
-                    scoreInfo.LegacyOnlineID = -1;
+                    sr.ReadInt32();
 
                 byte[] compressedScoreInfo = null;
 
@@ -128,15 +125,11 @@ namespace osu.Game.Scoring.Legacy
 
                         Debug.Assert(readScore != null);
 
-                        score.ScoreInfo.OnlineID = readScore.OnlineID;
                         score.ScoreInfo.Statistics = readScore.Statistics;
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
                         score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
                         decodedRank = readScore.Rank;
-                        if (readScore.UserID > 1)
-                            score.ScoreInfo.RealmUser.OnlineID = readScore.UserID;
-
                         if (readScore.TotalScoreWithoutMods is long totalScoreWithoutMods)
                             score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
                         else

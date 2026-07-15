@@ -25,7 +25,6 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -130,7 +129,7 @@ namespace osu.Game.Screens.Play
         private ScoreManager scoreManager { get; set; }
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private LocalPlayerName localPlayerName { get; set; }
 
         [Resolved]
         private MusicController musicController { get; set; }
@@ -1226,7 +1225,6 @@ namespace osu.Game.Screens.Play
         {
             ScoreInfo = new ScoreInfo
             {
-                User = api.LocalUser.Value,
                 ClientVersion = game.Version,
             },
         };
@@ -1248,7 +1246,7 @@ namespace osu.Game.Screens.Play
             {
                 using (var stream = new MemoryStream())
                 {
-                    new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
+                    new LegacyScoreEncoder(score, GameplayState.Beatmap, localPlayerName.Value.Value).Encode(stream);
                     replayReader = new ByteArrayArchiveReader(stream.ToArray(), "replay.osr");
                 }
             }

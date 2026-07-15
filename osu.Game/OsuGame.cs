@@ -478,7 +478,7 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        public void PresentScore(IScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
+        public void PresentScore(ScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
         {
             Logger.Log($"Beginning {nameof(PresentScore)} with score {score}");
 

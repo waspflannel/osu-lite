@@ -62,13 +62,8 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (gameplayState != null)
-                avatar.User = gameplayState.Score.ScoreInfo.User;
-            else
-            {
-                apiUser = api.LocalUser.GetBoundCopy();
-                apiUser.BindValueChanged(u => avatar.User = u.NewValue, true);
-            }
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(u => avatar.User = u.NewValue, true);
         }
 
         protected override void LoadComplete()

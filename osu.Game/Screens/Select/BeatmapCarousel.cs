@@ -822,7 +822,7 @@ namespace osu.Game.Screens.Select
         {
             var topRankMapping = new Dictionary<Guid, ScoreRank>();
 
-            var allLocalScores = r.GetAllLocalScoresForUser(criteria.LocalUserId)
+            var allLocalScores = r.GetAllLocalScores()
                                   .Filter($@"{nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0", criteria.Ruleset?.ShortName)
                                   .OrderByDescending(s => s.TotalScore)
                                   .ThenBy(s => s.Date);
