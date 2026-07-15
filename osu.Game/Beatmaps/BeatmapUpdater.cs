@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Types;
@@ -19,36 +18,29 @@ namespace osu.Game.Beatmaps
 
         private readonly BeatmapDifficultyCache difficultyCache;
 
-        private readonly BeatmapUpdaterMetadataLookup metadataLookup;
-
         private const int update_queue_request_concurrency = 4;
 
-        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdaterMetadataLookup));
+        private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdater));
 
-        public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapDifficultyCache difficultyCache, Storage storage)
+        public BeatmapUpdater(IWorkingBeatmapCache workingBeatmapCache, BeatmapDifficultyCache difficultyCache)
         {
             this.workingBeatmapCache = workingBeatmapCache;
             this.difficultyCache = difficultyCache;
-
-            metadataLookup = new BeatmapUpdaterMetadataLookup(storage);
         }
 
-        public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+        public void Queue(Live<BeatmapSetInfo> beatmapSet)
         {
             Logger.Log($"Queueing change for local beatmap {beatmapSet}");
-            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, lookupScope)), CancellationToken.None, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+            Task.Factory.StartNew(() => beatmapSet.PerformRead(Process), CancellationToken.None, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
                 updateScheduler);
         }
 
-        public void Process(BeatmapSetInfo beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+        public void Process(BeatmapSetInfo beatmapSet)
         {
             beatmapSet.Realm!.Write(_ =>
             {
                 // Before we use below, we want to invalidate.
                 workingBeatmapCache.Invalidate(beatmapSet);
-
-                if (lookupScope != MetadataLookupScope.None)
-                    metadataLookup.Update(beatmapSet, lookupScope == MetadataLookupScope.OnlineFirst);
 
                 foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
                 {
@@ -68,7 +60,7 @@ namespace osu.Game.Beatmaps
             });
         }
 
-        public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
+        public void ProcessObjectCounts(BeatmapInfo beatmapInfo)
         {
             beatmapInfo.Realm!.Write(_ =>
             {
@@ -90,9 +82,6 @@ namespace osu.Game.Beatmaps
 
         public void Dispose()
         {
-            if (metadataLookup.IsNotNull())
-                metadataLookup.Dispose();
-
             if (updateScheduler.IsNotNull())
                 updateScheduler.Dispose();
         }
