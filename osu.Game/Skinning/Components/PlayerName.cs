@@ -3,13 +3,10 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Screens.Play;
+using osu.Game.Configuration;
 
 namespace osu.Game.Skinning.Components
 {
@@ -17,14 +14,6 @@ namespace osu.Game.Skinning.Components
     public partial class PlayerName : FontAdjustableSkinComponent
     {
         private readonly OsuSpriteText text;
-
-        [Resolved]
-        private GameplayState? gameplayState { get; set; }
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        private IBindable<APIUser>? apiUser;
 
         public PlayerName()
         {
@@ -41,15 +30,9 @@ namespace osu.Game.Skinning.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LocalPlayerName playerName)
         {
-            if (gameplayState != null)
-                text.Text = gameplayState.Score.ScoreInfo.User.Username;
-            else
-            {
-                apiUser = api.LocalUser.GetBoundCopy();
-                apiUser.BindValueChanged(u => text.Text = u.NewValue.Username, true);
-            }
+            playerName.Value.BindValueChanged(name => text.Text = name.NewValue, true);
         }
 
         protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);

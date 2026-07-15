@@ -266,6 +266,7 @@ namespace osu.Game
 
             dependencies.CacheAs(LocalConfig);
             dependencies.CacheAs<IGameplaySettings>(LocalConfig);
+            dependencies.Cache(new LocalPlayerName(LocalConfig));
             dependencies.Cache(ExternalBrowser = new ExternalBrowser(Host));
 
             InitialiseFonts();

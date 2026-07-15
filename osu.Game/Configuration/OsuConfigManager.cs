@@ -53,28 +53,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.SongSelectBackgroundBlur, false);
 
-            // Online settings
-            SetDefault(OsuSetting.Username, string.Empty);
-            SetDefault(OsuSetting.Token, string.Empty);
-
-            SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
-            {
-                if (enabled.NewValue)
-                    SetValue(OsuSetting.SaveUsername, true);
-                else
-                    GetBindable<string>(OsuSetting.Token).SetDefault();
-            };
-
-            SetDefault(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
-            {
-                if (!enabled.NewValue)
-                {
-                    GetBindable<string>(OsuSetting.Username).SetDefault();
-                    SetValue(OsuSetting.SavePassword, false);
-                }
-            };
-
-            SetDefault(OsuSetting.ExternalLinkWarning, true);
+            SetDefault(OsuSetting.LocalPlayerName, @"Player");
             SetDefault(OsuSetting.PreferNoVideo, false);
 
             // Audio
@@ -166,17 +145,6 @@ namespace osu.Game.Configuration
 
         }
 
-        protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
-        {
-            switch (lookup)
-            {
-                case OsuSetting.Token:
-                    return true;
-            }
-
-            return false;
-        }
-
         public override TrackedSettings CreateTrackedSettings()
         {
             return new TrackedSettings
@@ -234,8 +202,8 @@ namespace osu.Game.Configuration
 
         public enum OsuSetting
     {
+        LocalPlayerName,
         Ruleset,
-        Token,
         MenuCursorSize,
         GameplayCursorSize,
         AutoCursorSize,
@@ -272,9 +240,6 @@ namespace osu.Game.Configuration
         Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
-        Username,
-        SavePassword,
-        SaveUsername,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
         SongSelectGroupMode,
@@ -292,7 +257,6 @@ namespace osu.Game.Configuration
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
-        ExternalLinkWarning,
         PreferNoVideo,
         Scaling,
         ScalingPositionX,
