@@ -32,15 +32,11 @@ namespace osu.Game.Screens.Select
         public OptionalRange<int> BeatDivisor;
         public OptionalSet<BeatmapOnlineStatus> OnlineStatus = new OptionalSet<BeatmapOnlineStatus>();
         public OptionalRange<DateTimeOffset> LastPlayed;
-        public OptionalRange<DateTimeOffset> DateRanked;
-        public OptionalRange<DateTimeOffset> DateSubmitted;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
         public OptionalTextFilter Title;
         public OptionalTextFilter DifficultyName;
         public OptionalTextFilter Source;
-        public List<OptionalTextFilter> UserTags = [];
-
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
             IsLowerInclusive = true,
@@ -280,9 +276,7 @@ namespace osu.Game.Screens.Select
                 // Running these sorts will sort all items, including currently hidden items.
                 case SortMode.Artist:
                 case SortMode.Author:
-                case SortMode.DateSubmitted:
                 case SortMode.DateAdded:
-                case SortMode.DateRanked:
                 case SortMode.Source:
                 case SortMode.Title:
                     return false;

@@ -2,15 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
@@ -22,18 +19,12 @@ namespace osu.Game.Screens.Select
     {
         private MetadataDisplay creator = null!;
         private MetadataDisplay source = null!;
-        private MetadataDisplay userTags = null!;
         private MetadataDisplay mapperTags = null!;
-        private MetadataDisplay submitted = null!;
-        private MetadataDisplay ranked = null!;
 
         protected override bool StartHidden => true;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
         private ISongSelect? songSelect { get; set; }
@@ -92,7 +83,6 @@ namespace osu.Game.Screens.Select
                                                 {
                                                     new Dimension(),
                                                     new Dimension(),
-                                                    new Dimension(),
                                                 },
                                                 Content = new[]
                                                 {
@@ -120,24 +110,8 @@ namespace osu.Game.Screens.Select
                                                                 source = new MetadataDisplay(BeatmapsetsStrings.ShowInfoSource),
                                                             },
                                                         },
-                                                        new FillFlowContainer
-                                                        {
-                                                            RelativeSizeAxes = Axes.X,
-                                                            AutoSizeAxes = Axes.Y,
-                                                            Direction = FillDirection.Vertical,
-                                                            Spacing = new Vector2(0f, 10f),
-                                                            Children = new[]
-                                                            {
-                                                                submitted = new MetadataDisplay(SongSelectStrings.Submitted),
-                                                                ranked = new MetadataDisplay(SongSelectStrings.Ranked),
-                                                            },
-                                                        },
                                                     },
                                                 },
-                                            },
-                                            userTags = new MetadataDisplay(BeatmapsetsStrings.ShowInfoUserTags)
-                                            {
-                                                Alpha = 0,
                                             },
                                             mapperTags = new MetadataDisplay(BeatmapsetsStrings.ShowInfoMapperTags),
                                         },
@@ -173,7 +147,6 @@ namespace osu.Game.Screens.Select
         private void updateDisplay()
         {
             var metadata = beatmap.Value.Metadata;
-            var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
 
             // osu! lite is offline: mapper identity is plain local metadata, not a clickable profile link.
             creator.Data = (metadata.Author.Username, null);
@@ -188,52 +161,7 @@ namespace osu.Game.Screens.Select
             else
                 mapperTags.Tags = (Array.Empty<string>(), _ => { });
 
-            submitted.Date = beatmapSetInfo.DateSubmitted;
-            ranked.Date = beatmapSetInfo.DateRanked;
-
-            updateUserTags();
         }
 
-        private CancellationTokenSource? userTagsCancellationSource;
-
-        private void updateUserTags()
-        {
-            userTagsCancellationSource?.Cancel();
-            userTagsCancellationSource = new CancellationTokenSource();
-
-            var token = userTagsCancellationSource.Token;
-
-            realm.RunAsync(r =>
-            {
-                // need to refetch because `beatmap.Value.BeatmapInfo` is not going to have the latest tags
-                var refetchedBeatmap = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
-                return refetchedBeatmap?.Metadata.UserTags.ToArray() ?? [];
-            }, token).ContinueWith(t =>
-            {
-                string[] tags = t.GetResultSafely();
-
-                Schedule(() =>
-                {
-                    if (token.IsCancellationRequested)
-                        return;
-
-                    if (tags.Length == 0)
-                    {
-                        userTags.FadeOut(transition_duration, Easing.OutQuint);
-                        return;
-                    }
-
-                    userTags.FadeIn(transition_duration, Easing.OutQuint);
-                    userTags.Tags = (tags, tag => songSelect?.Search($@"tag=""{tag}""!"));
-                });
-            }, token);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            userTagsCancellationSource?.Cancel();
-            userTagsCancellationSource = null;
-            base.Dispose(isDisposing);
-        }
     }
 }

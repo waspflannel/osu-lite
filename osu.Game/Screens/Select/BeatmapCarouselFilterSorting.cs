@@ -82,14 +82,6 @@ namespace osu.Game.Screens.Select
                     comparison = b.BeatmapSet!.DateAdded.CompareTo(a.BeatmapSet!.DateAdded);
                     break;
 
-                case SortMode.DateRanked:
-                    comparison = Nullable.Compare(b.BeatmapSet!.DateRanked, a.BeatmapSet!.DateRanked);
-                    break;
-
-                case SortMode.DateSubmitted:
-                    comparison = Nullable.Compare(b.BeatmapSet!.DateSubmitted, a.BeatmapSet!.DateSubmitted);
-                    break;
-
                 case SortMode.LastPlayed:
                     if (aggregate)
                         comparison = compareUsingAggregateMax(b, a, static b => (b.LastPlayed ?? DateTimeOffset.MinValue).ToUnixTimeSeconds());
