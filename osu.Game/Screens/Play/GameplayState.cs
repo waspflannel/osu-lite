@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Storyboards;
@@ -28,11 +26,6 @@ namespace osu.Game.Screens.Play
         /// The ruleset used in gameplay.
         /// </summary>
         public readonly Ruleset Ruleset;
-
-        /// <summary>
-        /// The mods applied to the gameplay.
-        /// </summary>
-        public readonly IReadOnlyList<Mod> Mods;
 
         /// <summary>
         /// The gameplay score.
@@ -79,7 +72,6 @@ namespace osu.Game.Screens.Play
         public GameplayState(
             IBeatmap beatmap,
             Ruleset ruleset,
-            IReadOnlyList<Mod>? mods = null,
             Score? score = null,
             ScoreProcessor? scoreProcessor = null,
             HealthProcessor? healthProcessor = null,
@@ -96,7 +88,6 @@ namespace osu.Game.Screens.Play
                     Ruleset = ruleset.RulesetInfo
                 }
             };
-            Mods = mods ?? Array.Empty<Mod>();
             ScoreProcessor = scoreProcessor ?? ruleset.CreateScoreProcessor();
             HealthProcessor = healthProcessor ?? ruleset.CreateHealthProcessor(beatmap.HitObjects[0].StartTime);
             Storyboard = storyboard ?? new Storyboard();

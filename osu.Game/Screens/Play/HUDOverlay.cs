@@ -20,7 +20,6 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -49,7 +48,6 @@ namespace osu.Game.Screens.Play
             return child == BottomRightElements;
         }
 
-        public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
 
         [Cached]
@@ -66,7 +64,6 @@ namespace osu.Game.Screens.Play
         [CanBeNull]
         private readonly DrawableRuleset drawableRuleset;
 
-        private readonly IReadOnlyList<Mod> mods;
         private readonly PlayerConfiguration configuration;
 
         /// <summary>
@@ -107,10 +104,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
-        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, PlayerConfiguration configuration)
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, PlayerConfiguration configuration)
         {
             this.drawableRuleset = drawableRuleset;
-            this.mods = mods;
             this.configuration = configuration;
 
             RelativeSizeAxes = Axes.Both;
@@ -134,23 +130,6 @@ namespace osu.Game.Screens.Play
                 PlayfieldSkinLayer = drawableRuleset != null
                     ? new SkinnableContainer(new GlobalSkinnableContainerLookup(GlobalSkinnableContainers.Playfield, drawableRuleset.Ruleset.RulesetInfo)) { AlwaysPresent = true, }
                     : Empty(),
-                TopRightElements = new FillFlowContainer
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AlwaysPresent = true,
-                    Margin = new MarginPadding(10),
-                    Spacing = new Vector2(10),
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        // This display is potentially a duplicate of users with a local ModDisplay in their skins.
-                        // It would be very nice to remove this, but the version here has special logic with regards to replays
-                        // and initial states, so needs a bit of thought before doing so.
-                        ModDisplay = CreateModsContainer(),
-                    }
-                },
                 BottomRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
@@ -175,7 +154,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, TopRightElements };
+            hideTargets = new List<Drawable> { mainComponents };
 
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
@@ -190,8 +169,6 @@ namespace osu.Game.Screens.Play
             {
                 BindDrawableRuleset(drawableRuleset);
             }
-
-            ModDisplay.Current.Value = mods;
 
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
             configLeaderboardVisibility = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard);
@@ -223,24 +200,7 @@ namespace osu.Game.Screens.Play
             IsPlaying.BindValueChanged(_ => updateVisibility());
             configVisibilityMode.BindValueChanged(_ => updateVisibility());
 
-            replayLoaded.BindValueChanged(e =>
-            {
-                if (e.NewValue)
-                {
-                    ModDisplay.FadeIn(1000, FADE_EASING);
-                    InputCountController.Margin = new MarginPadding(10) { Bottom = 30 };
-                }
-                else
-                {
-                    ModDisplay.Delay(2000).FadeOut(200);
-                    InputCountController.Margin = new MarginPadding(10);
-                }
-
-                updateVisibility();
-            }, true);
-
-            ModDisplay.ExpansionMode = ExpansionMode.AlwaysExpanded;
-            Scheduler.AddDelayed(() => ModDisplay.ExpansionMode = ExpansionMode.ExpandOnHover, 1200);
+            replayLoaded.BindValueChanged(_ => updateVisibility(), true);
         }
 
         protected override void Update()
@@ -375,12 +335,6 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-        };
-
-        protected ModDisplay CreateModsContainer() => new ModDisplay
-        {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
         };
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

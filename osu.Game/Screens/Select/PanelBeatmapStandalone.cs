@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Select
 
             if (rulesetInstance.AvailableVariants.Count() > 1)
             {
-                int variant = rulesetInstance.GetVariantForBeatmap(beatmap, mods.Value);
+                int variant = rulesetInstance.GetVariantForBeatmap(beatmap);
                 var variantName = rulesetInstance.GetVariantName(variant);
 
                 keyCountText.Alpha = 1;

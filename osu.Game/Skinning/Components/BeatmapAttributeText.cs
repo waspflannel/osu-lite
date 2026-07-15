@@ -230,9 +230,7 @@ namespace osu.Game.Skinning.Components
 
             BeatmapDifficulty computeDifficulty()
             {
-                return ruleset.Value is RulesetInfo rulesetInfo
-                    ? rulesetInfo.CreateInstance().GetAdjustedDisplayDifficulty(beatmap.Value.BeatmapInfo, mods.Value)
-                    : new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
+                return new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
             }
         }
 

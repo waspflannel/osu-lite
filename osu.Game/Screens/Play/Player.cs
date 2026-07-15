@@ -27,7 +27,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -166,11 +165,7 @@ namespace osu.Game.Screens.Play
 
         public DimmableStoryboard DimmableStoryboard { get; private set; }
 
-        /// <summary>
-        /// Whether failing should be allowed.
-        /// By default, this checks whether all selected mods allow failing.
-        /// </summary>
-        protected virtual bool CheckModsAllowFailure() => GameplayState.Mods.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
+        protected virtual bool CheckModsAllowFailure() => true;
 
         public readonly PlayerConfiguration Configuration;
 
@@ -221,42 +216,26 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, OsuGameBase game, CancellationToken cancellationToken)
         {
-            var gameplayMods = Mods.Value.Select(m => m.DeepClone()).ToArray();
-
-            if (gameplayMods.Any(m => m is UnknownMod))
-            {
-                Logger.Log("Gameplay was started with an unknown mod applied.", level: LogLevel.Important);
-                return;
-            }
-
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
 
-            IBeatmap playableBeatmap = loadPlayableBeatmap(gameplayMods, cancellationToken);
+            IBeatmap playableBeatmap = loadPlayableBeatmap(cancellationToken);
 
             if (playableBeatmap == null)
                 return;
 
-            if (!ModUtils.CheckModsBelongToRuleset(ruleset, gameplayMods))
-            {
-                Logger.Log($@"Gameplay was started with a mod belonging to a ruleset different than '{ruleset.Description}'.", level: LogLevel.Important);
-                return;
-            }
-
             if (game != null)
                 gameActive.BindTo(game.IsActive);
 
-            DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, gameplayMods);
+            DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap);
             dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
-            ScoreProcessor.Mods.Value = gameplayMods;
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(ScoreProcessor);
 
-            HealthProcessor = gameplayMods.OfType<IApplicableHealthProcessor>().FirstOrDefault()?.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
-            HealthProcessor ??= ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
@@ -274,9 +253,7 @@ namespace osu.Game.Screens.Play
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.BeatmapHash = Beatmap.Value.BeatmapInfo.Hash;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
-            Score.ScoreInfo.Mods = gameplayMods;
-
-            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard, PlayingState));
+            dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard, PlayingState));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
             config.BindWith(OsuSetting.BeatmapSkins, rulesetSkinProvider.BeatmapSkins);
@@ -407,20 +384,6 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.HasCompleted.BindValueChanged(_ => checkScoreCompleted());
             HealthProcessor.Failed += onFail;
 
-            // Provide judgement processors to mods after they're loaded so that they're on the gameplay clock,
-            // this is required for mods that apply transforms to these processors.
-            ScoreProcessor.OnLoadComplete += _ =>
-            {
-                foreach (var mod in gameplayMods.OfType<IApplicableToScoreProcessor>())
-                    mod.ApplyToScoreProcessor(ScoreProcessor);
-            };
-
-            HealthProcessor.OnLoadComplete += _ =>
-            {
-                foreach (var mod in gameplayMods.OfType<IApplicableToHealthProcessor>())
-                    mod.ApplyToHealthProcessor(HealthProcessor);
-            };
-
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
@@ -434,7 +397,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods)
+                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard)
                     {
                         RelativeSizeAxes = Axes.Both
                     },
@@ -472,7 +435,7 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, Configuration)
                     {
                         HoldToQuit =
                         {
@@ -571,7 +534,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private IBeatmap loadPlayableBeatmap(Mod[] gameplayMods, CancellationToken cancellationToken)
+        private IBeatmap loadPlayableBeatmap(CancellationToken cancellationToken)
         {
             IBeatmap playable;
 
@@ -588,7 +551,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, gameplayMods, cancellationToken);
+                    playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, cancellationToken);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -977,9 +940,7 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            bool restartOnFail = GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail);
-            if (!restartOnFail)
-                failAnimationContainer.Start();
+            failAnimationContainer.Start();
 
             // Failures can be triggered either by a judgement, or by a mod.
             //
@@ -992,8 +953,6 @@ namespace osu.Game.Screens.Play
             {
                 ConcludeFailedScore(Score);
 
-                if (restartOnFail)
-                    Restart(true);
             });
         }
 
@@ -1135,15 +1094,6 @@ namespace osu.Game.Screens.Play
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             storyboardReplacesBackground.Value = GameplayState.Storyboard.ReplacesBackground && GameplayState.Storyboard.HasDrawable;
-
-            foreach (var mod in GameplayState.Mods.OfType<IApplicableToPlayer>())
-                mod.ApplyToPlayer(this);
-
-            foreach (var mod in GameplayState.Mods.OfType<IApplicableToHUD>())
-                mod.ApplyToHUD(HUDOverlay);
-
-            foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
-                mod.ApplyToTrack(GameplayClockContainer.AdjustmentsFromMods);
 
             updateGameplayState();
 

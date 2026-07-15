@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
@@ -117,21 +118,19 @@ namespace osu.Game.Scoring.Legacy
                 {
                     readCompressedData(compressedScoreInfo, reader =>
                     {
-                        LegacyReplaySoloScoreInfo readScore = JsonConvert.DeserializeObject<LegacyReplaySoloScoreInfo>(reader.ReadToEnd());
+                        var payload = JObject.Parse(reader.ReadToEnd());
+
+                        if (payload["mods"] is JArray { Count: > 0 })
+                            throw new ReplayHasModsException();
+
+                        LegacyReplaySoloScoreInfo readScore = payload.ToObject<LegacyReplaySoloScoreInfo>()!;
 
                         Debug.Assert(readScore != null);
 
                         score.ScoreInfo.Statistics = readScore.Statistics;
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
-                        if (readScore.Mods.Length > 0)
-                            throw new ReplayHasModsException();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
                         decodedRank = readScore.Rank;
-                        if (readScore.TotalScoreWithoutMods is long totalScoreWithoutMods)
-                            score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
-                        else
-                            PopulateTotalScoreWithoutMods(score.ScoreInfo);
-
                         score.ScoreInfo.Pauses.AddRange(readScore.Pauses);
                     });
                 }
@@ -141,8 +140,6 @@ namespace osu.Game.Scoring.Legacy
 
             if (score.ScoreInfo.IsLegacyScore)
                 score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
-
-            StandardisedScoreMigrationTools.UpdateToLatestScoring(score.ScoreInfo, workingBeatmap);
 
             if (decodedRank != null)
                 score.ScoreInfo.Rank = decodedRank.Value;
@@ -242,14 +239,6 @@ namespace osu.Game.Scoring.Legacy
             if (attributes.MaxCombo > maxComboFromStatistics)
                 score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
 #pragma warning restore CS0618
-        }
-
-        public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
-        {
-            Debug.Assert(score.BeatmapInfo != null);
-
-            var ruleset = score.Ruleset.CreateInstance();
-            score.TotalScoreWithoutMods = score.TotalScore;
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)

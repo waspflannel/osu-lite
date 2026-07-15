@@ -398,13 +398,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
         }
 
-        private ScoreRank getRank(ScoreRank rank)
-        {
-            foreach (var mod in score.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, score.Accuracy);
-
-            return rank;
-        }
+        private ScoreRank getRank(ScoreRank rank) => rank;
 
         private double inverseEasing(Easing easing, double targetValue)
         {

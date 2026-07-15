@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Utils;
@@ -69,14 +68,6 @@ namespace osu.Game.Scoring
         public long TotalScore { get; set; }
 
         /// <summary>
-        /// The total number of points awarded for the score without including mod multipliers.
-        /// </summary>
-        /// <remarks>
-        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
-        /// </remarks>
-        public long TotalScoreWithoutMods { get; set; }
-
-        /// <summary>
         /// The version of processing applied to calculate total score as stored in the database.
         /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
         /// the total score has not yet been updated to reflect the current scoring values.
@@ -112,9 +103,6 @@ namespace osu.Game.Scoring
         public DateTimeOffset Date { get; set; }
 
         public double? PP { get; set; }
-
-        [MapTo("Mods")]
-        public string ModsJson { get; set; } = string.Empty;
 
         [MapTo("Statistics")]
         public string StatisticsJson { get; set; } = string.Empty;
@@ -161,10 +149,6 @@ namespace osu.Game.Scoring
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
             clone.HitEvents = new List<HitEvent>(clone.HitEvents);
-
-            // Ensure we have fresh mods to avoid any references (ie. after gameplay).
-            clone.clearAllMods();
-            clone.ModsJson = ModsJson;
 
             return clone;
         }
@@ -222,67 +206,6 @@ namespace osu.Game.Scoring
                 return maximumStatistics ??= new Dictionary<HitResult, int>();
             }
             set => maximumStatistics = value;
-        }
-
-        private Mod[]? mods;
-
-        [Ignored]
-        public Mod[] Mods
-        {
-            get
-            {
-                if (mods != null)
-                    return mods;
-
-                return SerialisedMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
-            }
-            set
-            {
-                clearAllMods();
-                mods = value;
-                updateModsJson();
-            }
-        }
-
-        private SerialisedMod[]? serialisedMods;
-
-        [Ignored]
-        public SerialisedMod[] SerialisedMods
-        {
-            get
-            {
-                if (serialisedMods != null) return serialisedMods;
-
-                // prioritise reading from realm backing
-                if (!string.IsNullOrEmpty(ModsJson))
-                    serialisedMods = JsonConvert.DeserializeObject<SerialisedMod[]>(ModsJson);
-
-                // then check mods set via Mods property.
-                if (mods != null)
-                    serialisedMods ??= mods.Select(m => new SerialisedMod(m)).ToArray();
-
-                return serialisedMods ?? Array.Empty<SerialisedMod>();
-            }
-            set
-            {
-                clearAllMods();
-                serialisedMods = value;
-                updateModsJson();
-            }
-        }
-
-        private void clearAllMods()
-        {
-            ModsJson = string.Empty;
-            mods = null;
-            serialisedMods = null;
-        }
-
-        private void updateModsJson()
-        {
-            ModsJson = SerialisedMods.Length > 0
-                ? JsonConvert.SerializeObject(SerialisedMods)
-                : string.Empty;
         }
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()

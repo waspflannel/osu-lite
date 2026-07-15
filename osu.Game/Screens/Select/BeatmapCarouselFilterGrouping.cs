@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Select
                     if (rulesetInstance == null || rulesetInstance.AvailableVariants.Count() <= 1)
                         goto case GroupMode.None;
 
-                    return getGroupsBy(b => defineGroupByVariant(rulesetInstance, b, criteria.Mods), items);
+                    return getGroupsBy(b => defineGroupByVariant(rulesetInstance, b), items);
                 }
 
                 default:
@@ -357,9 +357,9 @@ namespace osu.Game.Screens.Select
             return new GroupDefinition(int.MaxValue, BeatmapCarouselFilterGroupingStrings.Unplayed).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByVariant(Ruleset rulesetInstance, BeatmapInfo beatmap, IReadOnlyList<Mod>? mods = null)
+        private IEnumerable<GroupDefinition> defineGroupByVariant(Ruleset rulesetInstance, BeatmapInfo beatmap)
         {
-            int variant = rulesetInstance.GetVariantForBeatmap(beatmap, mods);
+            int variant = rulesetInstance.GetVariantForBeatmap(beatmap);
             var name = rulesetInstance.GetVariantName(variant);
             return new GroupDefinition(variant, name).Yield();
         }

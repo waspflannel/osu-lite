@@ -12,7 +12,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
@@ -57,14 +56,6 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
-        /// The total number of points awarded for the score without including mod multipliers.
-        /// </summary>
-        /// <remarks>
-        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
-        /// </remarks>
-        public readonly BindableLong TotalScoreWithoutMods = new BindableLong { MinValue = 0 };
-
-        /// <summary>
         /// The current accuracy.
         /// </summary>
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
@@ -85,11 +76,6 @@ namespace osu.Game.Rulesets.Scoring
         /// The current combo.
         /// </summary>
         public readonly BindableInt Combo = new BindableInt();
-
-        /// <summary>
-        /// The current selected mods
-        /// </summary>
-        public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
         /// The current beatmap.
@@ -175,11 +161,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         private double currentBonusPortion;
 
-        /// <summary>
-        /// The total score multiplier.
-        /// </summary>
-        private double scoreMultiplier = 1;
-
         public Dictionary<HitResult, int> MaximumStatistics
         {
             get
@@ -209,27 +190,10 @@ namespace osu.Game.Rulesets.Scoring
 
             Accuracy.ValueChanged += _ => updateRank();
 
-            Mods.ValueChanged += mods =>
-            {
-                updateScoreMultiplier();
-                updateScore();
-                updateRank();
-            };
-
-            Beatmap.ValueChanged += beatmap =>
-            {
-                updateScoreMultiplier();
-            };
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
-            // NOTE: The ordering of operations here is significant.
-            // `Beatmap.Value` must be set before `base.ApplyBeatmap()` because changes to `Beatmap.Value`
-            // trigger recalculation of `scoreMultiplier`,
-            // and `base.ApplyBeatmap()` calls `SimulateAutoplay()` then `Reset(storeResults: true)`.
-            // failing to calculate the correct score multiplier *before* autoplay simulation would result in
-            // storing the incorrect value of `MaximumTotalScore`.
             Beatmap.Value = beatmap;
 
             base.ApplyBeatmap(beatmap);
@@ -397,8 +361,7 @@ namespace osu.Game.Rulesets.Scoring
             double comboProgress = maximumComboPortion > 0 ? currentComboPortion / maximumComboPortion : 1;
             double accuracyProgress = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
 
-            TotalScoreWithoutMods.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProgress, currentBonusPortion));
-            TotalScore.Value = (long)Math.Round(TotalScoreWithoutMods.Value * scoreMultiplier);
+            TotalScore.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProgress, currentBonusPortion));
         }
 
         private void updateRank()
@@ -409,19 +372,7 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                newRank = mod.AdjustRank(newRank, Accuracy.Value);
-
             rank.Value = newRank;
-        }
-
-        private void updateScoreMultiplier()
-        {
-            if (Beatmap.Value == null)
-                return;
-
-            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(Beatmap.Value.BeatmapInfo.Difficulty));
-            scoreMultiplier = calculator.CalculateFor(Mods.Value);
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
@@ -494,7 +445,6 @@ namespace osu.Game.Rulesets.Scoring
                 score.MaximumStatistics[result] = MaximumResultCounts.GetValueOrDefault(result);
 
             // Populate total score after everything else.
-            score.TotalScoreWithoutMods = TotalScoreWithoutMods.Value;
             score.TotalScore = TotalScore.Value;
         }
 

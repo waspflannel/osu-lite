@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Select
 
                 Ruleset rulesetInstance = ruleset.Value.CreateInstance();
 
-                var displayAttributes = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo, mods.Value).ToList();
+                var displayAttributes = rulesetInstance.GetBeatmapAttributesForDisplay(beatmap.Value.BeatmapInfo).ToList();
                 difficultyStatisticsDisplay.Statistics = displayAttributes.Select(a => new StatisticDifficulty.Data(a)).ToList();
             });
 

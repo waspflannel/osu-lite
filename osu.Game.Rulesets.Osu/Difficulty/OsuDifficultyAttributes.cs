@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -118,9 +117,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_READING, ReadingDifficulty);
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
 
-            if (ShouldSerializeFlashlightDifficulty())
-                yield return (ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
-
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
 
             yield return (ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT, AimDifficultStrainCount);
@@ -141,9 +137,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
         // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
         // unless the fields are also renamed.
-
-        [UsedImplicitly]
-        public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
 
         #endregion
     }

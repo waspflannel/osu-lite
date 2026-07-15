@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             var workingBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo);
 
             // Todo: The placement of this is temporary. Eventually we'll both generate the playable beatmap _and_ run through it in a background task to generate the hit events.
-            Task.Run(() => workingBeatmap.GetPlayableBeatmap(newScore.Ruleset, newScore.Mods), loadCancellation.Token).ContinueWith(task => Schedule(() =>
+            Task.Run(() => workingBeatmap.GetPlayableBeatmap(newScore.Ruleset), loadCancellation.Token).ContinueWith(task => Schedule(() =>
             {
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
                 Container<Drawable> container;

@@ -60,7 +60,7 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000014: Fix edge cases in conversion for osu! scores on selected beatmaps. Reconvert all scores.</description></item>
         /// <item><description>30000015: Fix osu! standardised score estimation algorithm violating basic invariants. Reconvert all scores.</description></item>
         /// <item><description>30000016: Fix taiko standardised score estimation algorithm not including swell tick score gain into bonus portion. Reconvert all scores.</description></item>
-        /// <item><description>30000017: Mod score multiplier rebalance. Recalculates the <see cref="ScoreInfo.TotalScore"/> of all scores with <see cref="ScoreInfo.TotalScoreWithoutMods"/> present.</description></item>
+        /// <item><description>30000017: Historical mod score multiplier rebalance.</description></item>
         /// <item><description>30000018: Further improvements to taiko standardised score estimation algorithm. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
@@ -113,7 +113,7 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write((int)(score.ScoreInfo.TotalScore));
                 sw.Write((ushort)score.ScoreInfo.MaxCombo);
                 sw.Write(score.ScoreInfo.MaxCombo == score.ScoreInfo.GetMaximumAchievableCombo());
-                sw.Write((int)score.ScoreInfo.Ruleset.CreateInstance().ConvertToLegacyMods(score.ScoreInfo.Mods));
+                sw.Write(0);
 
                 sw.Write(getHpGraphFormatted());
                 sw.Write(score.ScoreInfo.Date.DateTime);

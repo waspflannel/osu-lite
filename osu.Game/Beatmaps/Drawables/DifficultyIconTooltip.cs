@@ -121,7 +121,7 @@ namespace osu.Game.Beatmaps.Drawables
             double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
 
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
-            var beatmapAttributes = ruleset.GetBeatmapAttributesForDisplay(displayedContent.BeatmapInfo, displayedContent.Mods ?? [])
+            var beatmapAttributes = ruleset.GetBeatmapAttributesForDisplay(displayedContent.BeatmapInfo)
                                            .Select(attr => new OsuSpriteText
                                            {
                                                Font = OsuFont.Style.Caption1,

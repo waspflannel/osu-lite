@@ -166,66 +166,6 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Verifies all proposed mods are valid for a given ruleset and returns instantiated <see cref="Mod"/>s for further processing.
-        /// </summary>
-        /// <param name="ruleset">The ruleset to verify mods against.</param>
-        /// <param name="proposedMods">The proposed mods.</param>
-        /// <param name="valid">Mods instantiated from <paramref name="proposedMods"/> which were valid for the given <paramref name="ruleset"/>.</param>
-        /// <returns>Whether all <paramref name="proposedMods"/> were valid for the given <paramref name="ruleset"/>.</returns>
-        public static bool InstantiateValidModsForRuleset(Ruleset ruleset, IEnumerable<SerialisedMod> proposedMods, out List<Mod> valid)
-        {
-            valid = new List<Mod>();
-            bool proposedWereValid = true;
-
-            foreach (var serialisedMod in proposedMods)
-            {
-                var mod = serialisedMod.ToMod(ruleset);
-
-                if (mod is UnknownMod)
-                {
-                    proposedWereValid = false;
-                    continue;
-                }
-
-                valid.Add(mod);
-            }
-
-            return proposedWereValid;
-        }
-
-        /// <summary>
-        /// Verifies all mods provided belong to the given ruleset.
-        /// </summary>
-        /// <param name="ruleset">The ruleset to check the proposed mods against.</param>
-        /// <param name="proposedMods">The mods proposed for checking.</param>
-        /// <returns>Whether all <paramref name="proposedMods"/> belong to the given <paramref name="ruleset"/>.</returns>
-        public static bool CheckModsBelongToRuleset(Ruleset ruleset, IEnumerable<Mod> proposedMods)
-        {
-            var rulesetModsTypes = ruleset.AllMods.Select(m => m.GetType()).ToList();
-
-            foreach (var proposedMod in proposedMods)
-            {
-                bool found = false;
-
-                var proposedModType = proposedMod.GetType();
-
-                foreach (var rulesetModType in rulesetModsTypes)
-                {
-                    if (rulesetModType.IsAssignableFrom(proposedModType))
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                    return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Given a value of a score multiplier, returns a string version with special handling for a value near 1.00x.
         /// </summary>
         /// <param name="scoreMultiplier">The value of the score multiplier.</param>

@@ -637,43 +637,6 @@ namespace osu.Game
                 return;
             }
 
-            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
-
-            try
-            {
-                foreach (ModType type in Enum.GetValues<ModType>())
-                {
-                    dict[type] = instance.GetModsFor(type)
-                                         // Rulesets should never return null mods, but let's be defensive just in case.
-                                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                                         .Where(mod => mod != null)
-                                         .ToList();
-                }
-            }
-            catch (Exception e)
-            {
-                Rulesets.RulesetStore.LogRulesetFailure(r.NewValue, e);
-                revertRulesetChange();
-                return;
-            }
-
-            AvailableMods.Value = dict;
-
-            if (SelectedMods.Disabled)
-                return;
-
-            var convertedMods = SelectedMods.Value.Select(mod =>
-            {
-                var newMod = instance.CreateModFromAcronym(mod.Acronym);
-                newMod?.CopyCommonSettingsFrom(mod);
-                return newMod;
-            }).Where(newMod => newMod != null).ToList();
-
-            if (!ModUtils.CheckValidForGameplay(convertedMods, out var invalid))
-                invalid.ForEach(newMod => convertedMods.Remove(newMod));
-
-            SelectedMods.Value = convertedMods;
-
             void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
         }
 

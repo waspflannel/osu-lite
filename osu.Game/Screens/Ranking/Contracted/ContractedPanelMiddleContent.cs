@@ -130,15 +130,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                                     Size = new Vector2(20),
                                                     TooltipType = DifficultyIconTooltipType.Extended,
                                                     Margin = new MarginPadding { Right = 2 }
-                                                },
-                                                ..
-                                                score.Mods.AsOrdered().Select(m => new ModIcon(m)
-                                                {
-                                                    Anchor = Anchor.TopCentre,
-                                                    Origin = Anchor.TopCentre,
-                                                    Scale = new Vector2(0.3f),
-                                                    Margin = new MarginPadding { Top = -6 }
-                                                })
+                                                }
                                             ]
                                         }
                                     }

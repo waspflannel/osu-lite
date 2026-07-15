@@ -1024,3 +1024,8 @@ When every definition-of-done item outside the explicit CI exclusion passes, rep
 ### 2026-07-15 — Phase 3 complete
 
 - `57597934a0` replaces the Realm-backed multi-skin library with `FixedSkinProvider`, the embedded Kanna archive, beatmap-local overrides, and classic fallback. Skin selection, persistence, import/export/editing, saved layouts, non-Kanna bundled skins, mania skin branches, and their unused HUD components are deleted. Debug and Release Desktop builds passed with zero warnings; exact source scans found no legacy skin-manager, skin-importer, non-Kanna skin, or layout-serialisation type.
+
+### 2026-07-15 — Phase 4 core model removal
+
+- Score, replay-frame, gameplay, HUD, results, and difficulty/performance paths are unmodded-only. The score mod payload, mod-adjusted calculators, legacy score migration helper, and mod result/HUD presentation were removed. Legacy replay admission continues to reject non-zero stable masks and embedded mod entries before storage. Debug and Release Desktop builds passed with zero warnings.
+- The remaining Phase 4 work is deletion of the now-unreachable mod implementations, their supporting UI/localisation/resources, and historical Realm migration branches. It is intentionally kept as a following commit so that the core API contraction remains independently reviewable.

@@ -8,24 +8,14 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Reading : HarmonicSkill
     {
         private readonly List<DifficultyHitObject> objectList = new List<DifficultyHitObject>();
-
-        private readonly bool hasHiddenMod;
-
-        public Reading(Mod[] mods)
-            : base(mods)
-        {
-            hasHiddenMod = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
-        }
 
         private double currentStrain;
 
@@ -47,22 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
-
-            if (Mods.Any(m => m is OsuModTouchDevice))
-                difficulty = DiffUtils.Pow(difficulty, 0.89);
-
-            if (Mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = Mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                difficulty *= 1.0 - magnetisedStrength;
-            }
-
-            if (Mods.Any(m => m is OsuModRelax))
-                difficulty *= 0.4;
-
-            if (Mods.Any(m => m is OsuModAutopilot))
-                difficulty *= 0.1;
+            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current, false);
 
             difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2.2) / 1125.0;
 

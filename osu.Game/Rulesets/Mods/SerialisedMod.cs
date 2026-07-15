@@ -43,34 +43,6 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public Mod ToMod(Ruleset ruleset)
-        {
-            Mod? resultMod = ruleset.CreateModFromAcronym(Acronym);
-
-            if (resultMod == null)
-            {
-                Logger.Log($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
-                return new UnknownMod(Acronym);
-            }
-
-            foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
-            {
-                if (!Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
-                    continue;
-
-                try
-                {
-                    resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod)!, settingValue);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log($"Failed to copy mod setting value '{settingValue}' to \"{property.Name}\": {ex.Message}");
-                }
-            }
-
-            return resultMod;
-        }
-
         public bool Equals(SerialisedMod? other) => other != null && Acronym == other.Acronym && Settings.SequenceEqual(other.Settings, ModSettingsEqualityComparer.Default);
 
         private class ModSettingsEqualityComparer : IEqualityComparer<KeyValuePair<string, object>>

@@ -146,7 +146,6 @@ namespace osu.Game.Rulesets
             // if we can avoid loading the ruleset at this point (rather than erroring later in runtime) then that is preferred.
             var instance = rulesetInfo.CreateInstance();
 
-            instance.CreateAllMods();
             instance.CreateIcon();
             instance.CreateResourceStore();
 
