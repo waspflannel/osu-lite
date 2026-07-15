@@ -141,7 +141,7 @@ namespace osu.Game
 
         protected FixedSkinProvider SkinProvider { get; private set; }
 
-        protected RealmRulesetStore RulesetStore { get; private set; }
+        protected FixedRulesetStore RulesetStore { get; private set; }
 
         protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
@@ -206,8 +206,11 @@ namespace osu.Game
         /// </remarks>
         protected virtual int UnhandledExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
 
-        public OsuGameBase()
+        private readonly Func<Ruleset> createRuleset;
+
+        protected OsuGameBase(Func<Ruleset> createRuleset)
         {
+            this.createRuleset = createRuleset ?? throw new ArgumentNullException(nameof(createRuleset));
             Name = GAME_NAME;
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
@@ -232,7 +235,7 @@ namespace osu.Game
 
             dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread));
 
-            dependencies.CacheAs<RulesetStore>(RulesetStore = new RealmRulesetStore(realm, Storage));
+            dependencies.Cache(RulesetStore = new FixedRulesetStore(realm, createRuleset));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             Decoder.RegisterDependencies(RulesetStore);
@@ -343,7 +346,6 @@ namespace osu.Game
 
             dependencies.Cache(globalBindings);
 
-            Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
 
             LocalConfig.LookupKeyBindings = l => KeyBindingStore.GetBindingsStringFor(l);
@@ -593,35 +595,6 @@ namespace osu.Game
             Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
-        {
-            if (IsLoaded && !ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException("Global ruleset bindable must be changed from update thread.");
-
-            Ruleset instance = null;
-
-            if (r.NewValue?.Available == true)
-            {
-                try
-                {
-                    instance = r.NewValue.CreateInstance();
-                }
-                catch (Exception e)
-                {
-                    Rulesets.RulesetStore.LogRulesetFailure(r.NewValue, e);
-                }
-            }
-
-            if (instance == null)
-            {
-                // reject the change if the ruleset is not available.
-                revertRulesetChange();
-                return;
-            }
-
-            void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
-        }
-
         private int allowableExceptions;
 
         /// <summary>
@@ -633,7 +606,6 @@ namespace osu.Game
             if (Interlocked.Decrement(ref allowableExceptions) < 0)
             {
                 Logger.Log("Too many unhandled exceptions, crashing out.");
-                RulesetStore?.TryDisableCustomRulesetsCausing(ex);
                 return false;
             }
 
@@ -648,7 +620,6 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
 
-            RulesetStore?.Dispose();
             LocalConfig?.Dispose();
 
             beatmapUpdater?.Dispose();

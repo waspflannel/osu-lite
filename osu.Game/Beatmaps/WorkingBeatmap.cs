@@ -283,7 +283,7 @@ namespace osu.Game.Beatmaps
 
             // Check if the beatmap can be converted
             if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
-                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.ShortName}, converter: {converter}).");
 
             // Convert
             IBeatmap converted = converter.Convert(token);

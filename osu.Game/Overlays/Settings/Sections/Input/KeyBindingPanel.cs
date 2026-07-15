@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override Drawable CreateHeader() => new SettingsHeader(InputSettingsStrings.KeyBindingPanelHeader, InputSettingsStrings.KeyBindingPanelDescription);
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(RulesetStore rulesets)
+        private void load(FixedRulesetStore rulesets)
         {
             AddSection(new GlobalKeyBindingsSection());
 

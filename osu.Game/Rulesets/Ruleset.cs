@@ -15,7 +15,6 @@ using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Extensions;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
@@ -68,8 +67,6 @@ namespace osu.Game.Rulesets
                 Name = Description,
                 ShortName = ShortName,
                 OnlineID = (this as ILegacyRuleset)?.LegacyID ?? -1,
-                InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
-                Available = true,
             };
         }
 

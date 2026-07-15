@@ -25,10 +25,10 @@ namespace osu.Game.Scoring
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
-        private readonly RulesetStore rulesets;
+        private readonly IRulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
+        public ScoreImporter(IRulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
             this.rulesets = rulesets;

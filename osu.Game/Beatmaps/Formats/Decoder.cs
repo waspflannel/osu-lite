@@ -41,10 +41,10 @@ namespace osu.Game.Beatmaps.Formats
         /// <summary>
         /// Register dependencies for use with static decoder classes.
         /// </summary>
-        /// <param name="rulesets">A store containing all available rulesets (used by <see cref="LegacyBeatmapDecoder"/>).</param>
-        public static void RegisterDependencies(RulesetStore rulesets)
+        /// <param name="rulesets">The fixed local ruleset (used by <see cref="LegacyBeatmapDecoder"/>).</param>
+        public static void RegisterDependencies(IRulesetStore rulesets)
         {
-            LegacyBeatmapDecoder.RulesetStore = rulesets ?? throw new ArgumentNullException(nameof(rulesets));
+            LegacyBeatmapDecoder.Rulesets = rulesets ?? throw new System.ArgumentNullException(nameof(rulesets));
         }
 
         /// <summary>

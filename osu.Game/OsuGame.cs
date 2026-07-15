@@ -59,6 +59,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
+using osu.Game.Rulesets;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -164,8 +165,6 @@ namespace osu.Game
         [CanBeNull]
         private DevBuildBanner devBuildBanner;
 
-        private Bindable<string> configRuleset;
-
         private Bindable<bool> applySafeAreaConsiderations;
 
         private Bindable<float> uiScale;
@@ -190,7 +189,8 @@ namespace osu.Game
         private bool tabletLogNotifyOnError = true;
         private int generalLogRecentCount;
 
-        public OsuGame(string[] args = null)
+        protected OsuGame(Func<Ruleset> createRuleset, string[] args = null)
+            : base(createRuleset)
         {
             this.args = args;
 
@@ -337,24 +337,8 @@ namespace osu.Game
         {
             dependencies.CacheAs(osuLogo = new OsuLogo { Alpha = 0 });
 
-            // bind config int to database RulesetInfo
-            configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
-
-            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
-
-            try
-            {
-                Ruleset.Value = preferredRuleset ?? RulesetStore.AvailableRulesets.First();
-            }
-            catch (Exception e)
-            {
-                // on startup, a ruleset may be selected which has compatibility issues.
-                Logger.Error(e, $@"Failed to switch to preferred ruleset {preferredRuleset}.");
-                Ruleset.Value = RulesetStore.AvailableRulesets.First();
-            }
-
-            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
+            Ruleset.Value = RulesetStore.RulesetInfo;
 
             UserPlayingState.BindValueChanged(p =>
             {

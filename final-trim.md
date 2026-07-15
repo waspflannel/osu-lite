@@ -1029,3 +1029,7 @@ When every definition-of-done item outside the explicit CI exclusion passes, rep
 
 - Score, replay-frame, gameplay, HUD, results, and difficulty/performance paths are unmodded-only. The score mod payload, mod-adjusted calculators, legacy score migration helper, and mod result/HUD presentation were removed. Legacy replay admission continues to reject non-zero stable masks and embedded mod entries before storage. Debug and Release Desktop builds passed with zero warnings.
 - The selectable mod hierarchies, mod UI/tooling, score multiplier calculators, and all compiled mod-dependent gameplay, storyboard, filtering, and ruleset paths were deleted. Debug and Release Desktop builds passed with zero warnings. Mod-named icon/localisation/resource entries are retained only until the final resource/localisation sweep removes their now-unreachable payload.
+
+### 2026-07-15 — Phase 5 fixed ruleset chunk complete
+
+- Desktop now explicitly supplies the bundled osu!standard factory to `FixedRulesetStore`. Dynamic assembly discovery, external ruleset DLL loading, reflection-based ruleset construction, custom-plugin failure handling, all dynamic stores, and the toolbar selector were deleted. Ruleset metadata is seeded as the one local Realm relation needed by beatmaps and scores, while runtime construction uses the fixed factory. Persisted ruleset selection and `OsuSetting.Ruleset` are removed. Debug Desktop build passed with zero warnings.

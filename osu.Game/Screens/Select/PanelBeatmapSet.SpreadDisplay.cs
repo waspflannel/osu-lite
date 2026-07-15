@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private RulesetStore rulesets { get; set; } = null!;
+            private IRulesetStore rulesets { get; set; } = null!;
 
             private FillFlowContainer flow = null!;
             private SpriteIcon icon = null!;

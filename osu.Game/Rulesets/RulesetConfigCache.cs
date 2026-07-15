@@ -14,11 +14,11 @@ namespace osu.Game.Rulesets
     public partial class RulesetConfigCache : Component, IRulesetConfigCache
     {
         private readonly RealmAccess realm;
-        private readonly RulesetStore rulesets;
+        private readonly IRulesetStore rulesets;
 
         private readonly Dictionary<string, IRulesetConfigManager?> configCache = new Dictionary<string, IRulesetConfigManager?>();
 
-        public RulesetConfigCache(RealmAccess realm, RulesetStore rulesets)
+        public RulesetConfigCache(RealmAccess realm, IRulesetStore rulesets)
         {
             this.realm = realm;
             this.rulesets = rulesets;

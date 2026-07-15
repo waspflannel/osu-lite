@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
-using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
@@ -40,7 +39,7 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         public const int MAX_MANIA_KEY_COUNT = 18;
 
-        internal static RulesetStore? RulesetStore;
+        internal static IRulesetStore? Rulesets;
 
         private Beatmap beatmap = null!;
         private ConvertHitObjectParser parser = null!;
@@ -64,12 +63,6 @@ namespace osu.Game.Beatmaps.Formats
         public LegacyBeatmapDecoder(int version = LATEST_VERSION)
             : base(version)
         {
-            if (RulesetStore == null)
-            {
-                Logger.Log($"A {nameof(RulesetStore)} was not provided via {nameof(Decoder)}.{nameof(RegisterDependencies)}; falling back to default {nameof(AssemblyRulesetStore)}.");
-                RulesetStore = new AssemblyRulesetStore();
-            }
-
             offset = FormatVersion < 5 ? EARLY_VERSION_TIMING_OFFSET : 0;
         }
 
@@ -197,10 +190,8 @@ namespace osu.Game.Beatmaps.Formats
         internal static void ApplyLegacyDefaults(Beatmap beatmap)
         {
             beatmap.WidescreenStoryboard = false;
-            // in a perfect world this would throw if osu! ruleset couldn't be found,
-            // but unfortunately there are "legitimate" cases where it's not there (i.e. ruleset test projects),
-            // so attempt to trudge on with whatever it is that's in `BeatmapInfo` if the lookup fails.
-            beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(0) ?? beatmap.BeatmapInfo.Ruleset;
+            beatmap.BeatmapInfo.Ruleset = Rulesets?.GetRuleset(0) as RulesetInfo
+                                           ?? throw new InvalidOperationException("The bundled osu!standard ruleset has not been registered.");
         }
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line, bool isPrimaryStream)
@@ -273,7 +264,8 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Mode":
-                    beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(Parsing.ParseInt(pair.Value)) ?? throw new ArgumentException("Ruleset is not available locally.");
+                    beatmap.BeatmapInfo.Ruleset = Rulesets?.GetRuleset(Parsing.ParseInt(pair.Value)) as RulesetInfo
+                                                   ?? throw new ArgumentException("Only osu!standard beatmaps are supported.");
                     break;
 
                 case @"LetterboxInBreaks":

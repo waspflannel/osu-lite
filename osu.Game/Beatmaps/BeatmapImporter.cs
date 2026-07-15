@@ -373,7 +373,7 @@ namespace osu.Game.Beatmaps
 
                     var ruleset = realm.All<RulesetInfo>().FirstOrDefault(r => r.OnlineID == decodedInfo.Ruleset.OnlineID);
 
-                    if (ruleset?.Available != true)
+                    if (ruleset == null)
                     {
                         LogForModel(beatmapSet, $"Skipping import of {file.Filename} due to missing local ruleset {decodedInfo.Ruleset.OnlineID}.");
                         continue;

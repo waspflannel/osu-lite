@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -22,7 +21,7 @@ namespace osu.Game.Overlays.Settings
     public partial class SettingsFooter : FillFlowContainer
     {
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, RulesetStore rulesets)
+        private void load(OsuGameBase game, IRulesetStore rulesets)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -58,25 +57,14 @@ namespace osu.Game.Overlays.Settings
             };
 
             foreach (var ruleset in rulesets.AvailableRulesets)
-            {
-                try
+                modes.Add(new ConstrainedIconContainer
                 {
-                    var icon = new ConstrainedIconContainer
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Icon = ruleset.CreateInstance().CreateIcon(),
-                        Colour = Color4.Gray,
-                        Size = new Vector2(20),
-                    };
-
-                    modes.Add(icon);
-                }
-                catch (Exception e)
-                {
-                    RulesetStore.LogRulesetFailure(ruleset, e);
-                }
-            }
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Icon = ruleset.CreateInstance().CreateIcon(),
+                    Colour = Color4.Gray,
+                    Size = new Vector2(20),
+                });
         }
 
         private partial class BuildDisplay : OsuAnimatedButton, IHasContextMenu

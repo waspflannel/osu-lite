@@ -29,9 +29,6 @@ namespace osu.Game.Configuration
 
         protected override void InitialiseDefaults()
         {
-            // UI/selection defaults
-            SetDefault(OsuSetting.Ruleset, string.Empty);
-
             SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
@@ -199,7 +196,6 @@ namespace osu.Game.Configuration
         public enum OsuSetting
     {
         LocalPlayerName,
-        Ruleset,
         MenuCursorSize,
         GameplayCursorSize,
         AutoCursorSize,

@@ -39,7 +39,7 @@ namespace osu.Game.Scoring
             }
         }
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm,
+        public ScoreManager(IRulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm,
                             OsuConfigManager? configManager = null)
             : base(storage, realm)
         {
