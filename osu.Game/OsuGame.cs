@@ -752,7 +752,7 @@ namespace osu.Game
 
             loadComponentSingleFile(onScreenDisplay, Add, true);
 
-            loadComponentSingleFile(Notifications, rightFloatingOverlayContent.Add, true);
+            loadComponentSingleFile<INotificationSink>(Notifications, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(screenshotManager, Add);
 

@@ -12,6 +12,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
+    [Cached(typeof(INotificationSink))]
     public partial class NotificationSink : CompositeDrawable, INotificationSink
     {
         private FillFlowContainer<Notification> toastFlow = null!;
