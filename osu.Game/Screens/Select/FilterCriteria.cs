@@ -44,7 +44,6 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
 
         public RulesetInfo? Ruleset;
-        public bool AllowConvertedBeatmaps;
         private string searchText = string.Empty;
 
         /// <summary>

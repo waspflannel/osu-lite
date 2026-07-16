@@ -235,7 +235,6 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
-        ShowConvertedBeatmaps,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
         BeatmapSkins,

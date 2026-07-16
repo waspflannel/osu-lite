@@ -38,9 +38,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private InputManager inputManager = null!;
 
-        [Resolved]
-        private HUDOverlay? hudOverlay { get; set; }
-
         // Player settings are kept off the edge of the screen.
         //
         // In edge cases, floating point error could result in the whole control getting masked away
@@ -106,9 +103,6 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
-
-            if (hudOverlay != null)
-                button.Y = ToLocalSpace(hudOverlay.TopRightElements.ScreenSpaceDrawQuad.BottomRight).Y;
 
             // Only check expanded if already expanded.
             // This is because if we are always checking, it would bypass blocking overlays.

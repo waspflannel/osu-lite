@@ -83,7 +83,6 @@ namespace osu.Game.Screens.Play
         // They will make a best-effort attempt to get out of the way of any other skinnable components.
 
         public readonly FillFlowContainer TopLeftElements;
-        public readonly FillFlowContainer TopRightElements;
         public readonly FillFlowContainer BottomRightElements;
 
         internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
@@ -226,11 +225,6 @@ namespace osu.Game.Screens.Play
 
             if (rulesetComponents != null)
                 processDrawables(rulesetComponents);
-
-            if (lowestTopScreenSpaceRight.HasValue && DrawHeight - TopRightElements.DrawHeight > 0)
-                TopRightElements.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceRight.Value)).Y, 0, DrawHeight - TopRightElements.DrawHeight);
-            else
-                TopRightElements.Y = 0;
 
             if (lowestTopScreenSpaceLeft.HasValue && DrawHeight - TopLeftElements.DrawHeight > 0)
                 TopLeftElements.Y = Math.Clamp(ToLocalSpace(new Vector2(0, lowestTopScreenSpaceLeft.Value)).Y, 0, DrawHeight - TopLeftElements.DrawHeight);

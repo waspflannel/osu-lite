@@ -37,7 +37,6 @@ namespace osu.Game.Screens.Select
         public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
         private SongSelectSearchTextBox searchTextBox = null!;
-        private ShearedToggleButton showConvertedBeatmapsButton = null!;
         private DifficultyRangeSlider difficultyRangeSlider = null!;
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupModeDropdownItem> groupDropdown = null!;
@@ -128,8 +127,6 @@ namespace osu.Game.Screens.Select
                                     ColumnDimensions = new[]
                                     {
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute), // can probably be removed?
-                                        new Dimension(GridSizeMode.AutoSize),
                                     },
                                     Content = new[]
                                     {
@@ -139,15 +136,6 @@ namespace osu.Game.Screens.Select
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 MinRange = 0.1f,
-                                            },
-                                            Empty(),
-                                            showConvertedBeatmapsButton = new ShearedToggleButton
-                                            {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                AutoSizeAxes = Axes.X,
-                                                Text = UserInterfaceStrings.ShowConverts,
-                                                Height = 30f,
                                             },
                                         },
                                     }
@@ -219,7 +207,6 @@ namespace osu.Game.Screens.Select
             difficultyRangeSlider.LowerBound.BindValueChanged(_ => debouncedUpdateCriteria());
             difficultyRangeSlider.UpperBound.BindValueChanged(_ => debouncedUpdateCriteria());
 
-            showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
 
@@ -240,7 +227,6 @@ namespace osu.Game.Screens.Select
                 SelectedBeatmapSet = ScopedBeatmapSet.Value,
                 Sort = sortDropdown.Current.Value,
                 Group = groupDropdown.Current.Value?.Value ?? GroupMode.None,
-                AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 LocalCreator = localPlayerName.Value.Value,
             };

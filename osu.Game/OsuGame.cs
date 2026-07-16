@@ -419,10 +419,7 @@ namespace osu.Game
                 }
                 else
                 {
-                    // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps at song select.
-                    // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
-                    bool requiresRulesetSwitch = !selection.Ruleset.Equals(Ruleset.Value)
-                                                 && (selection.Ruleset.OnlineID > 0 || true);
+                    bool requiresRulesetSwitch = !selection.Ruleset.Equals(Ruleset.Value);
 
                     if (requiresRulesetSwitch)
                     {
