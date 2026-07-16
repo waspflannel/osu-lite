@@ -31,11 +31,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Caption = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
                 }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = GeneralSettingsStrings.Prefer24HourTimeDisplay,
-                    Current = config.GetBindable<bool>(OsuSetting.Prefer24HourTime)
-                }),
             };
         }
     }

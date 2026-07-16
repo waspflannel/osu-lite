@@ -138,8 +138,7 @@ namespace osu.Game.Scoring
             /// <param name="configManager">The config.</param>
             public TotalScoreBindable(ScoreInfo score, OsuConfigManager? configManager)
             {
-                configManager?.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
-                scoringMode.BindValueChanged(mode => Value = score.GetDisplayScore(mode.NewValue), true);
+                Value = score.GetDisplayScore(ScoringMode.Standardised);
             }
         }
 

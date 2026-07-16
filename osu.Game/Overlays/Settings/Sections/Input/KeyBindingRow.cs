@@ -384,30 +384,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             finalise();
         }
 
-        protected override bool OnJoystickPress(JoystickPressEvent e)
-        {
-            if (!HasFocus)
-                return false;
-
-            Debug.Assert(bindTarget != null);
-
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState), KeyCombination.FromJoystickButton(e.Button));
-            finalise();
-
-            return true;
-        }
-
-        protected override void OnJoystickRelease(JoystickReleaseEvent e)
-        {
-            if (!HasFocus)
-            {
-                base.OnJoystickRelease(e);
-                return;
-            }
-
-            finalise();
-        }
-
         protected override bool OnMidiDown(MidiDownEvent e)
         {
             if (!HasFocus)

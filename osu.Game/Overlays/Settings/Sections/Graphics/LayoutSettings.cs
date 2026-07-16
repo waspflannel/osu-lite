@@ -79,16 +79,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             window = host.Window;
 
-            scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
+            scalingMode = new Bindable<ScalingMode>(ScalingMode.Off);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
             sizeWindowed = config.GetBindable<Size>(FrameworkSetting.WindowedSize);
             windowedPositionX = config.GetBindable<double>(FrameworkSetting.WindowedPositionX);
             windowedPositionY = config.GetBindable<double>(FrameworkSetting.WindowedPositionY);
-            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
-            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
-            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
-            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
-            scalingBackgroundDim = osuConfig.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
+            scalingSizeX = new BindableFloat(1f);
+            scalingSizeY = new BindableFloat(1f);
+            scalingPositionX = new BindableFloat(0.5f);
+            scalingPositionY = new BindableFloat(0.5f);
+            scalingBackgroundDim = new BindableFloat(0.9f);
 
             windowedResolution.Value = sizeWindowed.Value;
 
@@ -151,14 +151,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     CanBeShown = { BindTarget = minimiseOnFocusLossCanBeShown },
                     Keywords = new[] { "alt-tab", "minimize", "focus", "hide" },
                 },
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = GraphicsSettingsStrings.ShrinkGameToSafeArea,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations),
-                })
-                {
-                    CanBeShown = { BindTarget = safeAreaConsiderationsCanBeShown },
-                },
                 new SettingsItemV2(new FormSliderBar<float>
                 {
                     Caption = GraphicsSettingsStrings.UIScaling,
@@ -169,72 +161,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 })
                 {
                     Keywords = new[] { "scale", "letterbox" },
-                },
-                new SettingsItemV2(new FormEnumDropdown<ScalingMode>
-                {
-                    Caption = GraphicsSettingsStrings.ScreenScaling,
-                    Current = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
-                })
-                {
-                    Keywords = new[] { "scale", "letterbox" },
-                },
-                scalingSettings = new FillFlowContainer<SettingsItemV2>
-                {
-                    Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Masking = true,
-                    Spacing = new Vector2(0, SettingsSection.ITEM_SPACING_V2),
-                    Children = new[]
-                    {
-                        new SettingsItemV2(new FormSliderBar<float>
-                        {
-                            Caption = GraphicsSettingsStrings.HorizontalPosition,
-                            Current = scalingPositionX,
-                            KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true,
-                        }.With(bindPreviewEvent))
-                        {
-                            Keywords = new[] { "screen", "scaling" },
-                        },
-                        new SettingsItemV2(new FormSliderBar<float>
-                        {
-                            Caption = GraphicsSettingsStrings.VerticalPosition,
-                            Current = scalingPositionY,
-                            KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true,
-                        }.With(bindPreviewEvent))
-                        {
-                            Keywords = new[] { "screen", "scaling" },
-                        },
-                        new SettingsItemV2(new FormSliderBar<float>
-                        {
-                            Caption = GraphicsSettingsStrings.HorizontalScale,
-                            Current = scalingSizeX,
-                            KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true,
-                        }.With(bindPreviewEvent))
-                        {
-                            Keywords = new[] { "screen", "scaling" },
-                        },
-                        new SettingsItemV2(new FormSliderBar<float>
-                        {
-                            Caption = GraphicsSettingsStrings.VerticalScale,
-                            Current = scalingSizeY,
-                            KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true,
-                        }.With(bindPreviewEvent))
-                        {
-                            Keywords = new[] { "screen", "scaling" },
-                        },
-                        new SettingsItemV2(dimSlider = new FormSliderBar<float>
-                        {
-                            Caption = GameplaySettingsStrings.BackgroundDim,
-                            Current = scalingBackgroundDim,
-                            KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true,
-                        }.With(bindPreviewEvent)),
-                    }
                 },
             };
 

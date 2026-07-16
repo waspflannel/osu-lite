@@ -79,7 +79,7 @@ namespace osu.Game.Graphics.Containers
             if (IsDangerousAction)
                 holdActivationDelay.Value = DANGEROUS_HOLD_ACTIVATION_DELAY;
             else
-                config.BindWith(OsuSetting.UIHoldActivationDelay, holdActivationDelay);
+                holdActivationDelay.Value = 200;
         }
 
         /// <summary>

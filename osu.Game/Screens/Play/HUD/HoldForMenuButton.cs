@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
 
             AutoSizeAxes = Axes.Both;
 
-            alwaysShow = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton);
+            alwaysShow = new BindableBool(false);
         }
 
         protected override void LoadComplete()
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Play.HUD
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, OsuConfigManager config)
             {
-                alwaysRequireHold = config.GetBindable<bool>(OsuSetting.AlwaysRequireHoldingForPause);
+                alwaysRequireHold = new BindableBool(true);
 
                 Size = new Vector2(60);
 

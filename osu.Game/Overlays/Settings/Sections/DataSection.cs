@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -10,16 +10,16 @@ using osu.Game.Overlays.Settings.Sections.Maintenance;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
-    public partial class MaintenanceSection : SettingsSection
+    public partial class DataSection : SettingsSection
     {
-        public override LocalisableString Header => MaintenanceSettingsStrings.MaintenanceSectionHeader;
+        public override LocalisableString Header => "Data";
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
             Icon = OsuIcon.Maintenance
         };
 
-        public MaintenanceSection()
+        public DataSection()
         {
             Children = new Drawable[]
             {

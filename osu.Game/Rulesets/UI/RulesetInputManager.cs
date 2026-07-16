@@ -229,9 +229,6 @@ namespace osu.Game.Rulesets.UI
 
                 new MouseButtonInput([], state.Mouse.Buttons).Apply(state, handler);
                 new KeyboardKeyInput([], state.Keyboard.Keys).Apply(state, handler);
-                new TouchInput(Enum.GetValues<TouchSource>().Select(s => new Touch(s, Vector2.Zero)), false).Apply(state, handler);
-                new JoystickButtonInput([], state.Joystick.Buttons).Apply(state, handler);
-                new MidiKeyInput(new MidiState(), state.Midi).Apply(state, handler);
                 new TabletPenButtonInput([], state.Tablet.PenButtons).Apply(state, handler);
                 new TabletAuxiliaryButtonInput([], state.Tablet.AuxiliaryButtons).Apply(state, handler);
 

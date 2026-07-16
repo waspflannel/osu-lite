@@ -129,28 +129,23 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(GameHost host, OsuConfigManager config, ISafeArea safeArea)
         {
-            scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
-            scalingMode.ValueChanged += _ => Scheduler.AddOnce(updateSize);
+            scalingMode = new Bindable<ScalingMode>(ScalingMode.Off);
 
-            sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
-            sizeX.ValueChanged += _ => Scheduler.AddOnce(updateSize);
+            sizeX = new BindableFloat(1f);
 
-            sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
-            sizeY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
+            sizeY = new BindableFloat(1f);
 
-            posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
-            posX.ValueChanged += _ => Scheduler.AddOnce(updateSize);
+            posX = new BindableFloat(0.5f);
 
-            posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
-            posY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
+            posY = new BindableFloat(0.5f);
 
-            applySafeAreaPadding = config.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaPadding = new BindableBool(false);
             applySafeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
 
             safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
             safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
 
-            scalingMenuBackgroundDim = config.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
+            scalingMenuBackgroundDim = new BindableFloat(0.9f);
             scalingMenuBackgroundDim.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             tabletHandler = host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
@@ -292,7 +287,7 @@ namespace osu.Game.Graphics.Containers
             {
                 if (host.Window == null) return;
 
-                bool coversWholeScreen = Size == Vector2.One && (!config.Get<bool>(OsuSetting.SafeAreaConsiderations) || safeArea.SafeAreaPadding.Value.Total == Vector2.Zero);
+                bool coversWholeScreen = Size == Vector2.One;
                 host.Window.CursorConfineRect = coversWholeScreen ? null : ToScreenSpace(DrawRectangle).AABBFloat;
             }
         }

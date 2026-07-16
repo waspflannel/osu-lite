@@ -205,14 +205,6 @@ namespace osu.Game.Screens.Menu
             return base.OnKeyDown(e);
         }
 
-        protected override bool OnJoystickPress(JoystickPressEvent e)
-        {
-            if (triggerInitialOsuLogo())
-                return true;
-
-            return base.OnJoystickPress(e);
-        }
-
         protected override bool OnMidiDown(MidiDownEvent e)
         {
             if (triggerInitialOsuLogo())

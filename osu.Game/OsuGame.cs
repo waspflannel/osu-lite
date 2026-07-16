@@ -352,7 +352,7 @@ namespace osu.Game
 
             Beatmap.BindValueChanged(beatmapChanged, true);
 
-            applySafeAreaConsiderations = LocalConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations);
+            applySafeAreaConsiderations = new BindableBool(false);
             applySafeAreaConsiderations.BindValueChanged(apply => SafeAreaContainer.SafeAreaOverrideEdges = apply.NewValue ? SafeAreaOverrideEdges : Edges.All, true);
         }
 

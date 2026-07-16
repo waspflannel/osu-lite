@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
             userCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
 
-            autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
+            autoCursorScale = new BindableBool(false);
             autoCursorScale.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();
 
             ModScaleAdjust.ValueChanged += _ => cursorScale.Value = CalculateCursorScale();

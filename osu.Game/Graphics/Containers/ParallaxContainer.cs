@@ -49,15 +49,7 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
-            parallaxEnabled.ValueChanged += delegate
-            {
-                if (!parallaxEnabled.Value)
-                {
-                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
-                    content.Scale = new Vector2(1 + Math.Abs(ParallaxAmount));
-                }
-            };
+            parallaxEnabled = new BindableBool(false);
         }
 
         protected override void LoadComplete()

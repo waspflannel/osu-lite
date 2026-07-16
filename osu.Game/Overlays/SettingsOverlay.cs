@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
                 new GameplaySection(),
                 new AudioSection(),
                 new GraphicsSection(),
-                new MaintenanceSection()
+                new DataSection()
             };
 
             return sections;

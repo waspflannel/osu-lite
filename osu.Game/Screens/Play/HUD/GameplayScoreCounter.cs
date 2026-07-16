@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play.HUD
             totalScoreBindable = scoreProcessor.TotalScore.GetBoundCopy();
             totalScoreBindable.BindValueChanged(_ => updateDisplayScore());
 
-            scoreDisplayMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+            scoreDisplayMode = new Bindable<ScoringMode>(ScoringMode.Standardised);
             scoreDisplayMode.BindValueChanged(scoreMode =>
             {
                 switch (scoreMode.NewValue)

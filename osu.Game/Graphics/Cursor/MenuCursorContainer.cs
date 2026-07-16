@@ -314,7 +314,6 @@ namespace osu.Game.Graphics.Cursor
                         return false;
 
                     case KeyDownEvent keyDown when !keyDown.Repeat:
-                    case JoystickPressEvent:
                     case MidiDownEvent:
                         lastInputWasMouseSource.Value = false;
                         return false;

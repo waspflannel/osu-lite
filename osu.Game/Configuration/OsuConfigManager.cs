@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -14,7 +13,6 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -29,109 +27,53 @@ namespace osu.Game.Configuration
 
         protected override void InitialiseDefaults()
         {
-            
+            // General
+            SetDefault(OsuSetting.LocalPlayerName, @"Player");
+
+            // Song Select
             SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
             SetDefault(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
-
             SetDefault(OsuSetting.SongSelectGroupMode, GroupMode.None);
             SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
-
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
-
-
-
             SetDefault(OsuSetting.SongSelectBackgroundBlur, false);
-
-            SetDefault(OsuSetting.LocalPlayerName, @"Player");
-            SetDefault(OsuSetting.PreferNoVideo, false);
 
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
-
-
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
-
             SetDefault(OsuSetting.AutomaticallyAdjustBeatmapOffset, false);
 
             // Input
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
-            SetDefault(OsuSetting.AutoCursorSize, false);
-
             SetDefault(OsuSetting.MouseDisableButtons, false);
             SetDefault(OsuSetting.MouseDisableWheel, false);
             SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
 
             // Graphics
             SetDefault(OsuSetting.ShowFpsDisplay, false);
+            SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
+            SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
+            SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
+            // Gameplay
             SetDefault(OsuSetting.ShowStoryboard, true);
             SetDefault(OsuSetting.BeatmapSkins, true);
             SetDefault(OsuSetting.BeatmapColours, true);
             SetDefault(OsuSetting.BeatmapHitsounds, true);
-
             SetDefault(OsuSetting.CursorRotation, true);
-
-            SetDefault(OsuSetting.MenuParallax, true);
-
-            // See https://stackoverflow.com/a/63307411 for default sourcing.
-            SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
-
-            // Gameplay
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1, 0.01f);
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
-
             SetDefault(OsuSetting.HitLighting, true);
-
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
-            SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
-
-            SetDefault(OsuSetting.FloatingComments, false);
-
-            SetDefault(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
-
-            SetDefault(OsuSetting.IncreaseFirstObjectVisibility, true);
             SetDefault(OsuSetting.GameplayDisableWinKey, true);
-
-            SetDefault(OsuSetting.ShowMobileDisclaimer, RuntimeInfo.IsMobile);
-
-            SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
-            SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
-
-            SetDefault(OsuSetting.Scaling, ScalingMode.Off);
-            SetDefault(OsuSetting.SafeAreaConsiderations, true);
-            SetDefault(OsuSetting.ScalingBackgroundDim, 0.9f, 0.5f, 1f, 0.01f);
-
-            SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f, 0.01f);
-            SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f, 0.01f);
-
-            SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f, 0.01f);
-            SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f, 0.01f);
-
-            if (RuntimeInfo.IsMobile)
-                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.1f, 0.01f);
-            else
-                SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
-
-            SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
-
-            SetDefault(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
-
-            SetDefault(OsuSetting.HideCountryFlags, false);
-
-            SetDefault(OsuSetting.LastProcessedMetadataId, -1);
-
             SetDefault(OsuSetting.ComboColourNormalisationAmount, 0.2f, 0f, 1f, 0.01f);
-
-            SetDefault(OsuSetting.AlwaysShowHoldForMenuButton, false);
-            SetDefault(OsuSetting.AlwaysRequireHoldingForPause, false);
-
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -166,19 +108,6 @@ namespace osu.Game.Configuration
                         GlobalActionKeyBindingStrings.HoldForHUD,
                         LookupKeyBindings(GlobalAction.HoldForHUD)))
                 ),
-                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, scalingMode => new SettingDescription(
-                        rawValue: scalingMode,
-                        name: GraphicsSettingsStrings.ScreenScaling,
-                        value: scalingMode.GetLocalisableDescription()
-                    )
-                ),
-                new TrackedSetting<float>(OsuSetting.UIScale, scale => new SettingDescription(
-                        rawValue: scale,
-                        name: GraphicsSettingsStrings.UIScaling,
-                        value: $"{scale:N2}x"
-                        // TODO: implement lookup for framework platform key bindings
-                    )
-                ),
             };
         }
 
@@ -188,12 +117,11 @@ namespace osu.Game.Configuration
         IBindable<float> IGameplaySettings.PositionalHitsoundsLevel => GetOriginalBindable<float>(OsuSetting.PositionalHitsoundsLevel);
     }
 
-        public enum OsuSetting
+    public enum OsuSetting
     {
         LocalPlayerName,
         MenuCursorSize,
         GameplayCursorSize,
-        AutoCursorSize,
         DimLevel,
         BlurLevel,
         LightenDuringBreaks,
@@ -202,67 +130,30 @@ namespace osu.Game.Configuration
         GameplayLeaderboard,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
-        FloatingComments,
         HUDVisibilityMode,
-
-        ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
-
-        /// <summary>
-        /// Disables mouse buttons clicks during gameplay.
-        /// </summary>
         MouseDisableButtons,
         MouseDisableWheel,
         ConfineMouseMode,
-
-        /// <summary>
-        /// Globally applied audio offset.
-        /// This is added to the audio track's current time. Higher values will cause gameplay to occur earlier, relative to the audio track.
-        /// </summary>
         AudioOffset,
-
         VolumeInactive,
         CursorRotation,
-        MenuParallax,
-        Prefer24HourTime,
-        BeatmapDetailTab,
-        BeatmapDetailModsFilter,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
         SongSelectGroupMode,
         SongSelectSortingMode,
         RandomSelectAlgorithm,
         ShowFpsDisplay,
-        ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
         BeatmapSkins,
         BeatmapColours,
         BeatmapHitsounds,
-        IncreaseFirstObjectVisibility,
-        ScoreDisplayMode,
-        PreferNoVideo,
-        Scaling,
-        ScalingPositionX,
-        ScalingPositionY,
-        ScalingSizeX,
-        ScalingSizeY,
-        ScalingBackgroundDim,
         UIScale,
-        UIHoldActivationDelay,
         HitLighting,
-        MenuBackgroundSource,
         GameplayDisableWinKey,
-
-        LastProcessedMetadataId,
-        SafeAreaConsiderations,
         ComboColourNormalisationAmount,
-        HideCountryFlags,
-        AlwaysShowHoldForMenuButton,
-        AlwaysRequireHoldingForPause,
-        ShowMobileDisclaimer,
-
         AutomaticallyAdjustBeatmapOffset,
     }
 }

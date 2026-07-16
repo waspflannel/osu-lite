@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager configManager)
         {
-            configManager.BindWith(OsuSetting.Prefer24HourTime, prefer24HourTime);
+            prefer24HourTime.Value = false;
         }
 
         protected override void LoadComplete()

@@ -100,8 +100,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
         {
-            holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
-            showMobileDisclaimer = config.GetBindable<bool>(OsuSetting.ShowMobileDisclaimer);
+            holdDelay = new BindableDouble(200);
+            new BindableBool(false);
 
             if (host.CanExit)
             {
