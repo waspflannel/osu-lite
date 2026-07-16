@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps
         public DateTimeOffset DateAdded { get; set; }
 
         [JsonIgnore]
-        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
+        public IBeatmapMetadataInfo Metadata => Beatmaps?.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 
         public IList<BeatmapInfo> Beatmaps { get; } = null!;
 
