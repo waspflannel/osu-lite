@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        public void Hide()
+        public new void Hide()
         {
         }
     }

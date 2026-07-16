@@ -48,7 +48,7 @@ namespace osu.Desktop.MacOS
             private void load(OsuColour colours)
             {
                 Icon = FontAwesome.Solid.ShieldAlt;
-                IconContent.Colour = colours.YellowDark;
+                IconColour = colours.YellowDark;
             }
         }
     }

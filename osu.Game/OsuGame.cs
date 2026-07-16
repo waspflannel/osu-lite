@@ -772,7 +772,7 @@ namespace osu.Game
             Add(new MusicKeyBindingHandler());
 
             // side overlays which cancel each other.
-            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications };
+            var singleDisplaySideOverlays = new OverlayContainer[] { Settings };
 
             foreach (var overlay in singleDisplaySideOverlays)
             {

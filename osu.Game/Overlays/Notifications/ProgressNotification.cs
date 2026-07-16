@@ -18,13 +18,15 @@ namespace osu.Game.Overlays.Notifications
 {
     public partial class ProgressNotification : Notification
     {
-        public readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource;
+        public readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         public CancellationToken CancellationToken => CancellationTokenSource.Token;
 
         public bool Ongoing => State != ProgressNotificationState.Completed && State != ProgressNotificationState.Cancelled;
 
         public Action<Notification>? CompletionTarget { get; set; }
+
+        public Func<bool>? CompletionClickAction { get; set; }
 
         private LocalisableString text;
 

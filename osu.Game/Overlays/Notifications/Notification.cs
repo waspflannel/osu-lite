@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.Notifications
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider?.Background3 ?? Framework.Graphics.Colour.Colour4.DarkGray,
+                    Colour = colourProvider?.Background3 ?? new Color4(30, 30, 30, 255),
                     Depth = float.MaxValue
                 },
             };
