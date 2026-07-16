@@ -234,8 +234,9 @@ namespace osu.Game
 
             dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread));
 
-            dependencies.Cache(RulesetStore = new FixedRulesetStore(realm, createRuleset));
+dependencies.Cache(RulesetStore = new FixedRulesetStore(realm, createRuleset));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
+            dependencies.Cache(Ruleset);
 
             Decoder.RegisterDependencies(RulesetStore);
 
