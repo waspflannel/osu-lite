@@ -20,7 +20,7 @@ namespace osu.Desktop.MacOS
     public partial class MacOSAppLocationChecker : Component
     {
         [Resolved]
-        private INotificationOverlay notification { get; set; } = null!;
+        private INotificationSink notification { get; set; } = null!;
 
         protected override void LoadComplete()
         {

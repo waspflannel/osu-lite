@@ -115,7 +115,7 @@ namespace osu.Game.Database
             if (items.Count == 0)
             {
                 if (!silent)
-                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = $"No {HumanisedModelName}s found to delete!" });
+                    PostNotification?.Invoke(new SimpleNotification { Text = $"No {HumanisedModelName}s found to delete!" });
                 return;
             }
 
@@ -157,7 +157,7 @@ namespace osu.Game.Database
             if (!items.Any())
             {
                 if (!silent)
-                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = $"No {HumanisedModelName}s found to restore!" });
+                    PostNotification?.Invoke(new SimpleNotification { Text = $"No {HumanisedModelName}s found to restore!" });
                 return;
             }
 

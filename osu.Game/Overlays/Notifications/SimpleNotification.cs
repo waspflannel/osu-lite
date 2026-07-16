@@ -1,11 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -40,59 +37,35 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        public ColourInfo IconColour
-        {
-            get => IconContent.Colour;
-            set => IconContent.Colour = value;
-        }
-
-        public override bool Read
-        {
-            get => base.Read;
-            set
-            {
-                if (value == base.Read) return;
-
-                base.Read = value;
-                Light.FadeTo(value ? 0 : 1, 100);
-            }
-        }
-
         protected TextFlowContainer TextFlow { get; }
         protected SpriteIcon IconDrawable { get; }
 
-        private readonly Box iconBackground;
-
         public SimpleNotification()
         {
-            IconContent.AddRange(new Drawable[]
+            AddInternal(new FillFlowContainer
             {
-                iconBackground = new Box
+                Direction = FillDirection.Horizontal,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(10, 0),
+                Padding = new MarginPadding(10),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                IconDrawable = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Icon = icon,
-                    Size = new Vector2(16),
+                    IconDrawable = new SpriteIcon
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Icon = icon,
+                        Size = new Vector2(16),
+                    },
+                    TextFlow = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Text = text
+                    },
                 }
             });
-
-            Content.Add(TextFlow = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
-            {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Text = text
-            });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
-        {
-            Light.Colour = colours.Green;
-            iconBackground.Colour = colourProvider.Background5;
         }
     }
 }

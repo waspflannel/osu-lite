@@ -209,7 +209,7 @@ namespace osu.Game.Beatmaps
                         beatmap.UserSettings.Offset = 0;
                 }
 
-                PostNotification?.Invoke(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.AllOffsetsReset });
+                PostNotification?.Invoke(new SimpleNotification { Text = MaintenanceSettingsStrings.AllOffsetsReset });
             });
         }
 
@@ -264,7 +264,7 @@ namespace osu.Game.Beatmaps
             if (items.Count == 0)
             {
                 if (!silent)
-                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.NoVideosFoundToDelete });
+                    PostNotification?.Invoke(new SimpleNotification { Text = MaintenanceSettingsStrings.NoVideosFoundToDelete });
                 return;
             }
 

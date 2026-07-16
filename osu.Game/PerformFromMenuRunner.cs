@@ -26,7 +26,7 @@ namespace osu.Game
         private readonly Func<IScreen> getCurrentScreen;
 
         [Resolved]
-        private INotificationOverlay notifications { get; set; }
+        private INotificationSink notifications { get; set; }
 
         [Resolved]
         private IDialogOverlay dialogOverlay { get; set; }

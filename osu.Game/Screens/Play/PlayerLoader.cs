@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
         private IDisposable? highPerformanceSession;
 
         [Resolved]
-        private INotificationOverlay? notificationOverlay { get; set; }
+        private INotificationSink? notificationSink { get; set; }
 
         [Resolved]
         private VolumeOverlay? volumeOverlay { get; set; }
@@ -725,7 +725,7 @@ namespace osu.Game.Screens.Play
                 // Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
                 if (volumeOverlay?.IsMuted.Value == true || Precision.AlmostBigger(volume_requirement, aggregateVolumeTrack))
                 {
-                    notificationOverlay?.Post(new MutedNotification());
+                    notificationSink?.Post(new MutedNotification());
                     muteWarningShownOnce.Value = true;
                 }
             }
@@ -739,7 +739,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
+            private void load(OsuColour colours, AudioManager audioManager, INotificationSink notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
                 IconContent.Colour = colours.RedDark;
