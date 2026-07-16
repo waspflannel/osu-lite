@@ -19,11 +19,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString OsuReplay => new TranslatableString(getKey(@"osu_replay"), @"osu! Replay");
 
-        /// <summary>
-        /// "osu!"
-        /// </summary>
-        public static LocalisableString OsuProtocol => new TranslatableString(getKey(@"osu_protocol"), @"osu!");
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
