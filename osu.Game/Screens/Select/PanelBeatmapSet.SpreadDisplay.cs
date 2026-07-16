@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Select
                 if (songSelect != null)
                     scopedBeatmapSet.BindTo(songSelect.ScopedBeatmapSet);
 
-                configManager.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmaps);
+                // converted beatmaps are not applicable — only osu!standard
             }
 
             protected override void LoadComplete()
