@@ -52,7 +52,9 @@ namespace osu.Game.Database
         private readonly SynchronizationContext? updateThreadSyncContext;
 
         // Version 2 removes retired online metadata and introduces the local creator field.
-        private const int schema_version = 2;
+        // Version 3 removes OnlineID / OnlineMD5Hash / LastLocalUpdate / LastOnlineUpdate / EditorTimestamp from Beatmap,
+        //            OnlineID from BeatmapSet and Ruleset.
+        private const int schema_version = 3;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
