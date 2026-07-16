@@ -144,7 +144,6 @@ namespace osu.Game.Screens.Select
 
 
         private Bindable<bool> configBackgroundBlur = null!;
-        private Bindable<bool> showConvertedBeatmaps = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -294,7 +293,6 @@ namespace osu.Game.Screens.Select
                 updateBackgroundDim();
             });
 
-            showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
@@ -581,7 +579,7 @@ namespace osu.Game.Screens.Select
 
         private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
         {
-            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value))
+            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, true))
                 return false;
 
             if (beatmap.Hidden)
@@ -1037,7 +1035,7 @@ namespace osu.Game.Screens.Select
             // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps.
             // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
             bool requiresRulesetSwitch = !beatmapInfo.Ruleset.Equals(Ruleset.Value)
-                                         && (beatmapInfo.Ruleset.OnlineID > 0 || !showConvertedBeatmaps.Value);
+                                         && (beatmapInfo.Ruleset.OnlineID > 0 || true);
 
             if (requiresRulesetSwitch)
             {
