@@ -2,6 +2,8 @@
 
 A local-first, cross-platform osu!standard desktop player.
 
+> **Current status:** `final-trim` is a working merge checkpoint. Major offline, fixed-skin, fixed-ruleset, mod, editor/export, intro, and stable-import removals are in place. Notification drawer replacement, exact settings/input cleanup, dependency cleanup, and the resource repack are still in progress. See [final-trim.md](final-trim.md) for the binding scope and current checkpoint.
+
 ## Supported platforms
 
 - Windows 10+
@@ -35,8 +37,8 @@ osu! lite is a trimmed build of the osu! game client that focuses on being a loc
 - Unmodded solo play and Ctrl+Enter autoplay
 - Local score history and in-game leaderboard
 - Difficulty and performance calculation
-- Keyboard, mouse, and tablet/pen input
-- Six-section settings (General, Input, Gameplay, Audio, Graphics, Data)
+- Keyboard, mouse, tablet/pen input, with remaining joystick/mobile residue scheduled for removal
+- Six-section settings (General, Input, Gameplay, Audio, Graphics, Maintenance); the final Data allowlist is still in progress
 - One bundled Kanna user skin with beatmap-local overrides
 - Localisation for retained UI
 
@@ -47,13 +49,12 @@ osu! lite is a trimmed build of the osu! game client that focuses on being a loc
 - Dynamic rulesets (only osu!standard)
 - Beatmap editor or external editing
 - Beatmap export
-- Notification drawer (transient toasts only)
 - Replay analysis
-- Joystick/gamepad input
 - Startup intro sequences
-- Mobile platforms (Android/iOS)
 - Stable osu! data migration
 - Mod-bearing replay import
+
+The notification drawer, joystick/gamepad paths, mobile/touch residue, and resource repack are not yet complete removals; they remain documented work in [final-trim.md](final-trim.md).
 
 ## External browser destinations
 

@@ -1,6 +1,6 @@
 # osu! lite final trim
 
-**Status:** binding implementation guide with post-merge unfinished-business audit
+**Status:** in progress; merge checkpoint after phases 2–5 and portions of phases 6, 7, and 9
 **Audit date:** 2026-07-15
 **Audited tree:** repository contents matching `origin/master` at merge `23c522fa68`
 **Purpose:** define the final product, record what the merged final trim actually completed, and remove every remaining out-of-scope path
@@ -22,9 +22,9 @@ The following are not acceptable reasons to leave an item behind:
 
 When a removed feature is intertwined with retained code, remove its fields, branches, constructor parameters, interfaces, enum members, persistence columns, localisation, resources, and call sites from the retained code. A compile error caused by deletion is a work item, not a reason to restore the old abstraction.
 
-## Current baseline
+## 2026-07-15 Audit Baseline
 
-The merged final-trim pass made another substantial reduction. The following values describe the post-merge source, not the pre-final-trim baseline used when this guide was first written.
+The merged final-trim pass made another substantial reduction. The following values describe the post-merge source, not the pre-final-trim baseline used when this guide was first written. They are retained as the comparison point for the current checkpoint below.
 
 | Measurement | Current value |
 |---|---:|
@@ -44,11 +44,46 @@ The merged final-trim pass made another substantial reduction. The following val
 
 The final-trim merge removed about 5.6% of the remaining files and 6.1% of the remaining physical C# lines. Across all trimming passes, the repository has removed 3,428 tracked C# files and 422,603 physical C# lines from the original baseline.
 
-The remaining source reduction is estimated at **20,000–35,000 physical C# lines**, or about **12–21% of the current tree**. The midpoint is roughly **27,000 lines / 16.5%**, leaving approximately **128,500–143,500 physical C# lines**. This is an estimate, not a quota: the product boundary decides completion.
+At audit time, the remaining source reduction was estimated at **20,000–35,000 physical C# lines**, or about **12–21% of the then-current tree**. The current checkpoint has surpassed that numerical range, confirming that it was never a completion quota: the product boundary decides completion.
+
+## 2026-07-16 Merge Checkpoint
+
+The `final-trim` branch is being merged as a working checkpoint, not as completion of this guide. The product builds cleanly, but manual gameplay/import smoke testing must continue after the merge before further broad deletions.
+
+| Measurement | Current checkpoint |
+|---|---:|
+| Tracked C# files | 1,106 |
+| Physical C# lines | 108,821 |
+| Reduction from audit baseline | 289 files / 54,723 lines |
+| Direct package references in `osu.Game` | 10 |
+| Release output directory | 581.90 MiB |
+| `osu.Game.Resources.dll` | 125.29 MiB |
+| Release build | succeeds with 0 errors / 0 warnings |
+| Debug build | succeeds with 0 errors / 0 warnings when built outside Visual Studio's locked output directory |
+
+Completed product boundaries at this checkpoint:
+
+- the API/request stack and user model directories are gone, with browser access constrained to the three approved destinations;
+- Kanna is the fixed user skin, with beatmap-local overrides and classic fallback;
+- selectable mods, replay analysis, startup intros, stable import, external editing, beatmap export, dynamic ruleset loading, and `osu://` association are gone;
+- runtime ruleset registration is fixed to osu!standard;
+- legacy editor/export and updater paths are removed;
+- the settings surface has six sections, while its final allowlist cleanup is still pending;
+- repository documentation and issue forms now describe osu! lite.
+
+The remaining material work is:
+
+1. remove online-ID-shaped beatmap/ruleset persistence and narrow beatmap/import management to local install/reinstall operations;
+2. replace the notification drawer with the required small operation-status sink;
+3. reduce settings to the exact allowlists, rename/narrow Maintenance to Data, and remove joystick/touch/mobile residue;
+4. delete remaining mod/localisation/dead-code/member residue;
+5. remove AutoMapper, Humanizer, and Microsoft.Toolkit.HighPerformance with their callers;
+6. replace `ppy.osu.Game.Resources` with the embedded allowlisted payload and trim Kanna; this remains the largest and highest-risk phase;
+7. remove stale local-resource scripts and lazer project metadata, then record final evidence here.
 
 ## Unfinished business
 
-This section is the authoritative post-merge remainder. Items elsewhere in this guide that are already absent are historical record; the items below still exist in the audited tree and are required for the product defined here. **CI configuration, CI workflow repair, and CI matrix coverage are explicitly out of scope and do not block completion.** Builds and smoke tests may be run manually.
+This is the authoritative post-merge audit remainder, not a statement of the current branch. The merge checkpoint above records which broad items have since landed; the detailed ledger below remains binding for the portions that are still incomplete. **CI configuration, CI workflow repair, and CI matrix coverage are explicitly out of scope and do not block completion.** Builds and smoke tests may be run manually.
 
 ### 1. Finish the offline/local identity boundary
 
@@ -1033,3 +1068,12 @@ When every definition-of-done item outside the explicit CI exclusion passes, rep
 ### 2026-07-15 — Phase 5 fixed ruleset chunk complete
 
 - Desktop now explicitly supplies the bundled osu!standard factory to `FixedRulesetStore`. Dynamic assembly discovery, external ruleset DLL loading, reflection-based ruleset construction, custom-plugin failure handling, all dynamic stores, and the toolbar selector were deleted. Ruleset metadata is seeded as the one local Realm relation needed by beatmaps and scores, while runtime construction uses the fixed factory. Persisted ruleset selection and `OsuSetting.Ruleset` are removed. Debug Desktop build passed with zero warnings.
+
+### 2026-07-16 — Working merge checkpoint
+
+- `fce2c1c39c` removes editor/export paths, including `IBeatmapUpdater`, `BeatmapUpdater`, legacy beatmap/storyboard encoders and exporter, external editing, create-difficulty, and BeatmapManager save APIs. Normal local archive import remains.
+- `ffd443d11c`, `31e479d1cd`, and `e405010782` remove Debug/User Interface/Mods/Joystick settings surfaces, toolbar clocks, and Star Fountains. The settings section is not yet at the final allowlist: Maintenance still needs to become the narrow Data section, and configuration/input residue remains.
+- `a35d8140e1` removes the `osu://` association. `b0808164ef`, `ad901f7843`, and `aec1f20898` remove stale repository debris and rewrite public documentation. `UseLocalResources` remains until the resource package is removed.
+- `23142f4980` and `e2e2acb785` fix runtime regressions found during manual smoke testing: legacy-null metadata no longer crashes storyboard filename generation; removed mod-display layout code no longer dereferences an uninitialised HUD container; and the conversion UI/filter path is fully removed rather than partially disabled.
+- Debug and Release builds pass with zero warnings. Debug output must be built outside Visual Studio's active `bin` directory while an existing debug session holds its DLLs open.
+- The old trim documents were deleted before final evidence was captured. This guide is now the sole trim record and must be updated through final completion.

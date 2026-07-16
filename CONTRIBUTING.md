@@ -13,7 +13,8 @@ Please open an issue at https://github.com/waspflannel/osu-lite/issues/new/choos
 2. Create a topic branch from `master`.
 3. Make your changes, keeping commits focused and descriptive.
 4. Build with `dotnet build osu.Desktop -c Debug` and verify zero errors and warnings.
-5. Open a pull request against `master`.
+5. Run a manual smoke check for the path you changed. At minimum, launch with a fresh profile; import a valid local `.osz` when changing beatmap, storage, skin, or gameplay code.
+6. Open a pull request against `master`.
 
 ## Code conventions
 
@@ -21,6 +22,7 @@ Please open an issue at https://github.com/waspflannel/osu-lite/issues/new/choos
 - Keep the scope narrow — this is a focused local desktop player.
 - Do not reintroduce online/API/mod/editor/skin-selection functionality.
 - Remove unused code rather than commenting it out.
+- Check [final-trim.md](final-trim.md) before changing a retained boundary; it records the still-binding product contract and known incomplete trim clusters.
 
 ## Scope
 
