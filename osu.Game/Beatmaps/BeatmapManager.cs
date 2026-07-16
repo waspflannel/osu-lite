@@ -41,10 +41,6 @@ namespace osu.Game.Beatmaps
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
 
-        private readonly LegacyBeatmapExporter legacyBeatmapExporter;
-
-        public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
-
         public override bool PauseImports
         {
             get => base.PauseImports;
@@ -64,15 +60,9 @@ namespace osu.Game.Beatmaps
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapImporter = CreateBeatmapImporter(storage, realm);
-            beatmapImporter.ProcessBeatmap = beatmapSet => ProcessBeatmap?.Invoke(beatmapSet);
             beatmapImporter.PostNotification = obj => PostNotification?.Invoke(obj);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
-
-            legacyBeatmapExporter = new LegacyBeatmapExporter(storage)
-            {
-                PostNotification = obj => PostNotification?.Invoke(obj)
-            };
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
@@ -115,96 +105,6 @@ namespace osu.Game.Beatmaps
             return imported.PerformRead(s => GetWorkingBeatmap(s.Beatmaps.First()));
         }
 
-        /// <summary>
-        /// Add a new difficulty to the provided <paramref name="targetBeatmapSet"/> based on the provided <paramref name="referenceWorkingBeatmap"/>.
-        /// The new difficulty will be backed by a <see cref="BeatmapInfo"/> model
-        /// and represented by the returned <see cref="WorkingBeatmap"/>.
-        /// </summary>
-        /// <remarks>
-        /// Contrary to <see cref="CopyExistingDifficulty"/>, this method does not preserve hitobjects and beatmap-level settings from <paramref name="referenceWorkingBeatmap"/>.
-        /// The created beatmap will have zero hitobjects and will have default settings (including difficulty settings), but will preserve metadata and existing timing points.
-        /// </remarks>
-        /// <param name="targetBeatmapSet">The <see cref="BeatmapSetInfo"/> to add the new difficulty to.</param>
-        /// <param name="referenceWorkingBeatmap">The <see cref="WorkingBeatmap"/> to use as a baseline reference when creating the new difficulty.</param>
-        /// <param name="rulesetInfo">The ruleset with which the new difficulty should be created.</param>
-        public virtual WorkingBeatmap CreateNewDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap, RulesetInfo rulesetInfo)
-        {
-            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceWorkingBeatmap.Metadata.DeepClone())
-            {
-                DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
-            };
-            var newBeatmap = new Beatmap
-            {
-                BeatmapInfo = newBeatmapInfo,
-                Bookmarks = referenceWorkingBeatmap.Beatmap.Bookmarks.ToArray()
-            };
-
-            foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
-                newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
-
-            foreach (var effectPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.EffectPoints)
-            {
-                var clonedEffectPoint = (EffectControlPoint)effectPoint.DeepClone();
-
-                if (!rulesetInfo.Equals(referenceWorkingBeatmap.BeatmapInfo.Ruleset))
-                    clonedEffectPoint.ScrollSpeedBindable.SetDefault();
-
-                newBeatmap.ControlPointInfo.Add(clonedEffectPoint.Time, clonedEffectPoint);
-            }
-
-            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
-        }
-
-        /// <summary>
-        /// Add a copy of the provided <paramref name="referenceWorkingBeatmap"/> to the provided <paramref name="targetBeatmapSet"/>.
-        /// The new difficulty will be backed by a <see cref="BeatmapInfo"/> model
-        /// and represented by the returned <see cref="WorkingBeatmap"/>.
-        /// </summary>
-        /// <remarks>
-        /// Contrary to <see cref="CreateNewDifficulty"/>, this method creates a nearly-exact copy of <paramref name="referenceWorkingBeatmap"/>
-        /// (with the exception of a few key properties that cannot be copied under any circumstance, like difficulty name, beatmap hash, or online status).
-        /// </remarks>
-        /// <param name="targetBeatmapSet">The <see cref="BeatmapSetInfo"/> to add the copy to.</param>
-        /// <param name="referenceWorkingBeatmap">The <see cref="WorkingBeatmap"/> to be copied.</param>
-        public virtual WorkingBeatmap CopyExistingDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap)
-        {
-            var newBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(referenceWorkingBeatmap.BeatmapInfo.Ruleset).Clone();
-            BeatmapInfo newBeatmapInfo;
-
-            newBeatmap.BeatmapInfo = newBeatmapInfo = referenceWorkingBeatmap.BeatmapInfo.Clone();
-            // assign a new ID to the clone.
-            newBeatmapInfo.ID = Guid.NewGuid();
-            // add "(copy)" suffix to difficulty name, and additionally ensure that it doesn't conflict with any other potentially pre-existing copies.
-            newBeatmapInfo.DifficultyName = NamingUtils.GetNextBestName(
-                targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName),
-                $"{newBeatmapInfo.DifficultyName} (copy)");
-            // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
-            newBeatmapInfo.Hash = string.Empty;
-            // clear online properties.
-            newBeatmapInfo.ResetOnlineInfo();
-
-            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
-        }
-
-        private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin)
-        {
-            // populate circular beatmap set info <-> beatmap info references manually.
-            // several places like `Save()` or `GetWorkingBeatmap()`
-            // rely on them being freely traversable in both directions for correct operation.
-            targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
-            newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
-
-            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, new Storyboard());
-
-            workingBeatmapCache.Invalidate(targetBeatmapSet);
-            return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
-        }
-
-        /// <summary>
-        /// Hide a beatmap difficulty.
-        /// Will fail if all difficulties are about to be hidden.
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
         public bool Hide(BeatmapInfo beatmapInfo)
         {
             return Realm.Run(r =>
@@ -327,16 +227,6 @@ namespace osu.Game.Beatmaps
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
-
-        /// <summary>
-        /// Saves an existing <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
-        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
-        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        /// <param name="storyboard">The storyboard content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null, Storyboard? storyboard = null) =>
-            save(beatmapInfo, beatmapContent, beatmapSkin, storyboard);
 
         public void DeleteAllVideos()
         {
@@ -463,82 +353,9 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
-        public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
-            beatmapImporter.BeginExternalEditing(model);
-
-        public Task ExportLegacy(BeatmapSetInfo beatmapSet) => legacyBeatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
-
-        public Task ExportLegacy(BeatmapInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
-
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
             setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
-        }
-
-        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, Storyboard? storyboard)
-        {
-            var setInfo = beatmapInfo.BeatmapSet;
-            Debug.Assert(setInfo != null);
-
-            // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
-            // This should hopefully be temporary, assuming said clone is eventually removed.
-
-            // Warning: The directionality here is important. Changes have to be copied *from* beatmapContent (which comes from editor and is being saved)
-            // *to* the beatmapInfo (which is a database model and needs to receive values without the taiko slider velocity multiplier for correct operation).
-            // CopyTo() will undo such adjustments, while CopyFrom() will not.
-            beatmapContent.Difficulty.CopyTo(beatmapInfo.Difficulty);
-
-            // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
-            beatmapContent.BeatmapInfo = beatmapInfo;
-
-            // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
-            beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
-
-            Realm.Write(r =>
-            {
-                using var stream = new MemoryStream();
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin, storyboard).Encode(sw);
-
-                stream.Seek(0, SeekOrigin.Begin);
-
-                // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
-                var existingFileInfo = beatmapInfo.Path != null ? setInfo.GetFile(beatmapInfo.Path) : null;
-                string targetFilename = createBeatmapFilenameFromMetadata(beatmapInfo);
-
-                // ensure that two difficulties from the set don't point at the same beatmap file.
-                if (setInfo.Beatmaps.Any(b => b.ID != beatmapInfo.ID && string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
-                    throw new InvalidOperationException($"{setInfo.GetDisplayString()} already has a difficulty with the name of '{beatmapInfo.DifficultyName}'.");
-
-                if (existingFileInfo != null)
-                    DeleteFile(setInfo, existingFileInfo);
-
-                beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
-                beatmapInfo.Hash = stream.ComputeSHA2Hash();
-
-                AddFile(setInfo, stream, createBeatmapFilenameFromMetadata(beatmapInfo));
-
-                updateHashAndMarkDirty(setInfo);
-
-                var liveBeatmapSet = r.Find<BeatmapSetInfo>(setInfo.ID)!;
-
-                setInfo.CopyChangesToRealm(liveBeatmapSet);
-
-                liveBeatmapSet.Beatmaps.Single(b => b.ID == beatmapInfo.ID)
-                              .UpdateLocalScores(r);
-
-                // do not look up metadata.
-                // this is a locally-modified set now, so looking up metadata is busy work at best and harmful at worst.
-                ProcessBeatmap?.Invoke(liveBeatmapSet);
-            });
-
-            Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-            static string createBeatmapFilenameFromMetadata(BeatmapInfo beatmapInfo)
-            {
-                var metadata = beatmapInfo.Metadata;
-                return $"{metadata.Artist} - {metadata.Title} ({metadata.Creator}) [{beatmapInfo.DifficultyName}].osu".GetValidFilename();
-            }
         }
 
         public void MarkPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>

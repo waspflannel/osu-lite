@@ -29,10 +29,7 @@ namespace osu.Game.Configuration
 
         protected override void InitialiseDefaults()
         {
-            SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
-            SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
-
-            SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
+            
             SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
             SetDefault(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
 

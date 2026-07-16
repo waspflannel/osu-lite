@@ -168,7 +168,6 @@ namespace osu.Game
         protected internal readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private BeatmapDifficultyCache difficultyCache;
-        private IBeatmapUpdater beatmapUpdater;
 
         private RulesetConfigCache rulesetConfigCache;
 
@@ -281,12 +280,7 @@ namespace osu.Game
             // Add after all the above cache operations as it depends on them.
             base.Content.Add(difficultyCache);
 
-            // TODO: OsuGame or OsuGameBase?
-            dependencies.CacheAs(beatmapUpdater = CreateBeatmapUpdater());
-
-            BeatmapManager.ProcessBeatmap = beatmapUpdater.Process;
-
-            dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
+dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
             dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(hitErrorTracker = new SessionAverageHitErrorTracker());
@@ -539,8 +533,6 @@ namespace osu.Game
             }
         }
 
-        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache);
-
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
@@ -614,9 +606,7 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
 
-            LocalConfig?.Dispose();
-
-            beatmapUpdater?.Dispose();
+LocalConfig?.Dispose();
 
             realm?.Dispose();
 

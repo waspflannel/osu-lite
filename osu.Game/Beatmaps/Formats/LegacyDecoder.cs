@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps.Formats
         /// The .osu format (beatmap) version.
         ///
         /// osu!stable's versions end at <see cref="LATEST_VERSION"/>.
-        /// osu!lazer's versions starts at <see cref="LegacyBeatmapEncoder.FIRST_LAZER_VERSION"/>.
+        /// osu!lazer's versions start at 128.
         /// </summary>
         protected readonly int FormatVersion;
 

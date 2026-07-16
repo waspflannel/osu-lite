@@ -206,7 +206,6 @@ namespace osu.Game.Scoring
         }
 
         public Task<Live<ScoreInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, ScoreInfo original) => scoreImporter.ImportAsUpdate(notification, task, original);
-        public Task<ExternalEditOperation<ScoreInfo>> BeginExternalEditing(ScoreInfo model) => scoreImporter.BeginExternalEditing(model);
 
         public Live<ScoreInfo>? Import(ScoreInfo item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) =>
             scoreImporter.ImportModel(item, archive, parameters, cancellationToken);
