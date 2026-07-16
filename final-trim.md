@@ -83,15 +83,13 @@ The remaining material work is:
 
 > **Trim 1 completed 2026-07-16** ([`trim-1-online-persistence`](https://github.com/waspflannel/osu-lite/tree/trim-1-online-persistence)):
 > Deleted `IHasOnlineID<T>`, `BeatmapSetHypeStatus`, `BeatmapSetNominationStatus`, `BeatmapSetNominationStatusRequiredMeta`.
-> Removed `OnlineID` from `BeatmapInfo`, `BeatmapSetInfo`, `RulesetInfo`, `IRulesetInfo`, `IBeatmapInfo`, `IBeatmapSetInfo`.
-> Removed `OnlineMD5Hash`, `LastOnlineUpdate`, `LastLocalUpdate`, `EditorTimestamp`, `MatchesOnlineVersion`, `ResetOnlineInfo`.
-> Removed `AllBeatmapsUpToDate`, `MatchesOnlineID`, `IsLegacyRuleset`, `ForOnlineId`.
-> Rewrote `BeatmapImporter` to remove all online-ID-based import/dedup/update logic.
-> Removed `ImportAsUpdate` from `IModelImporter`, `RealmArchiveModelImporter`, `BeatmapManager`, `ScoreManager`.
-> Removed `CreateNew` and `QueryOnlineBeatmapId` from `BeatmapManager`.
-> Replaced `OnlineID`-based score legacy logic with hardcoded osu!standard (0) constants.
-> Parsed and discarded `BeatmapID`/`BeatmapSetID` in `LegacyBeatmapDecoder`.
-> Cleaned up `BeatmapCarousel`, `PanelBeatmapSet`, `SpreadDisplay`, `DifficultyIcon`, `RealmDetachedBeatmapStore`, `OsuGame`, `WorkingBeatmap`, `FlatWorkingBeatmap`.
+> Removed `OnlineID` from all beatmap/ruleset models, removed online-ID-based import logic, removed `ImportAsUpdate`, `CreateNew`.
+>
+> **Trim 2 completed 2026-07-16** ([`trim-2-notification-sink`](https://github.com/waspflannel/osu-lite/tree/trim-2-notification-sink)):
+> Deleted `NotificationOverlay`, `NotificationOverlayToastTray`, `NotificationSection`, `ProgressCompletionNotification`, `IHasCompletionTarget`, `INotificationOverlay`.
+> Stripped `Notification`, `SimpleNotification`, `SimpleErrorNotification`, `ProgressNotification` to bare essentials.
+> Created `INotificationSink` + `NotificationSink` with minimal bottom-right toast tray and ongoing-operation tracking.
+> Updated all consumers (`OsuGame`, `ConfirmExitDialog`, `ScreenshotManager`, `HUDOverlay`, `PlayerLoader`, etc.).
 
 ## Unfinished business
 
