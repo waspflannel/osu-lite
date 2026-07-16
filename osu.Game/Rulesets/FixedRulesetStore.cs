@@ -42,14 +42,13 @@ namespace osu.Game.Rulesets
                 else
                 {
                     storedRuleset.Name = ruleset.RulesetInfo.Name;
-                    storedRuleset.OnlineID = ruleset.RulesetInfo.OnlineID;
                 }
 
                 RulesetInfo = storedRuleset.Clone();
             });
         }
 
-        public RulesetInfo? GetRuleset(int id) => id == RulesetInfo.OnlineID ? RulesetInfo : null;
+        public RulesetInfo? GetRuleset(int id) => RulesetInfo;
 
         public RulesetInfo? GetRuleset(string shortName) => string.Equals(shortName, RulesetInfo.ShortName, StringComparison.Ordinal) ? RulesetInfo : null;
 

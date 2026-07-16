@@ -47,7 +47,6 @@ namespace osu.Game.Beatmaps
             ID = Guid.NewGuid();
             Ruleset = ruleset ?? new RulesetInfo
             {
-                OnlineID = 0,
                 ShortName = @"osu",
                 Name = @"null placeholder ruleset"
             };
@@ -66,9 +65,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public RealmNamedFileUsage? File => BeatmapSet?.Files.FirstOrDefault(f => f.File.Hash == Hash);
 
-        [Indexed]
-        public int OnlineID { get; set; } = -1;
-
         public double Length { get; set; }
 
         public double BPM { get; set; }
@@ -84,24 +80,6 @@ namespace osu.Game.Beatmaps
         [Indexed]
         public string MD5Hash { get; set; } = string.Empty;
 
-        public string OnlineMD5Hash { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The last time of a local modification (via the editor).
-        /// </summary>
-        public DateTimeOffset? LastLocalUpdate { get; set; }
-
-        /// <summary>
-        /// The last time online metadata was applied to this beatmap.
-        /// </summary>
-        public DateTimeOffset? LastOnlineUpdate { get; set; }
-
-        /// <summary>
-        /// Whether this beatmap matches the online version, based on fetched online metadata.
-        /// Will return <c>true</c> if no online metadata is available.
-        /// </summary>
-        public bool MatchesOnlineVersion => LastOnlineUpdate == null || MD5Hash == OnlineMD5Hash;
-
         [JsonIgnore]
         public bool Hidden { get; set; }
 
@@ -110,27 +88,11 @@ namespace osu.Game.Beatmaps
         public int TotalObjectCount { get; set; } = -1;
 
         /// <summary>
-        /// Reset any fetched online linking information (and history).
-        /// </summary>
-        public void ResetOnlineInfo(bool resetOnlineId = true)
-        {
-            if (resetOnlineId)
-                OnlineID = -1;
-            LastOnlineUpdate = null;
-            OnlineMD5Hash = string.Empty;
-        }
-
-        /// <summary>
         /// The time at which this beatmap was last played by the local user.
         /// </summary>
         public DateTimeOffset? LastPlayed { get; set; }
 
         public int BeatDivisor { get; set; } = 4;
-
-        /// <summary>
-        /// The time in milliseconds when last exiting the editor with this beatmap loaded.
-        /// </summary>
-        public double? EditorTimestamp { get; set; }
 
         public bool Equals(BeatmapInfo? other)
         {

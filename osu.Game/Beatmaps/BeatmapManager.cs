@@ -74,36 +74,9 @@ namespace osu.Game.Beatmaps
         protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm);
 
         /// <summary>
-        /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
-        /// with a single difficulty which is backed by a <see cref="BeatmapInfo"/> model
-        /// and represented by the returned usable <see cref="WorkingBeatmap"/>.
+        /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public WorkingBeatmap CreateNew(RulesetInfo ruleset, string creator)
-        {
-            var metadata = new BeatmapMetadata
-            {
-                Creator = creator,
-            };
-
-            var beatmapSet = new BeatmapSetInfo
-            {
-                DateAdded = DateTimeOffset.UtcNow,
-                Beatmaps =
-                {
-                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata)
-                }
-            };
-
-            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-                b.BeatmapSet = beatmapSet;
-
-            var imported = beatmapImporter.ImportModel(beatmapSet);
-
-            if (imported == null)
-                throw new InvalidOperationException("Failed to import new beatmap");
-
-            return imported.PerformRead(s => GetWorkingBeatmap(s.Beatmaps.First()));
-        }
+        public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
 
         public bool Hide(BeatmapInfo beatmapInfo)
         {
@@ -215,19 +188,6 @@ namespace osu.Game.Beatmaps
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s for a specific online ID.
         /// </summary>
         /// <returns>A matching local beatmap info if existing and in a valid state.</returns>
-        public BeatmapInfo? QueryOnlineBeatmapId(int id) => Realm.Run(r =>
-            r.All<BeatmapInfo>()
-             .ForOnlineId(id)
-             // See https://github.com/ppy/osu/issues/36234 for why this isn't a SingleOrDefault().
-             .FirstOrDefault()
-             ?.Detach()
-        );
-
-        /// <summary>
-        /// A default representation of a WorkingBeatmap to use when no beatmap is available.
-        /// </summary>
-        public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
-
         public void DeleteAllVideos()
         {
             Realm.Write(r =>
@@ -350,9 +310,6 @@ namespace osu.Game.Beatmaps
             Realm.Run(r => Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
-        public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
-            beatmapImporter.ImportAsUpdate(notification, importTask, original);
-
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
             setInfo.Hash = beatmapImporter.ComputeHash(setInfo);
@@ -451,7 +408,7 @@ namespace osu.Game.Beatmaps
         {
             return Realm.Run(r => r.All<BeatmapInfo>()
                                    .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
-                                   .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", model.OnlineID)
+                                   .Filter($@"{nameof(BeatmapInfo.MD5Hash)} == $0", model.MD5Hash)
                                    .Any());
         }
 

@@ -107,10 +107,5 @@ namespace osu.Game.Database
 
         public static IQueryable<BeatmapInfo> NotDeleted(this IQueryable<BeatmapInfo> beatmaps) =>
             beatmaps.Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false");
-
-        public static IQueryable<BeatmapInfo> ForOnlineId(this IQueryable<BeatmapInfo> beatmaps, int id) =>
-            beatmaps
-                .NotDeleted()
-                .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", id);
     }
 }

@@ -66,7 +66,6 @@ namespace osu.Game.Rulesets
             {
                 Name = Description,
                 ShortName = ShortName,
-                OnlineID = (this as ILegacyRuleset)?.LegacyID ?? -1,
             };
         }
 

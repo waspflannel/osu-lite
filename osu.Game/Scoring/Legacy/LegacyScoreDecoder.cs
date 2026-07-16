@@ -261,8 +261,9 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
-                // In mania, mouseX encodes the pressed keys in the lower 20 bits
-                int mouseXParseLimit = currentRuleset.RulesetInfo.OnlineID == 3 ? (1 << 20) - 1 : Parsing.MAX_COORDINATE_VALUE;
+                // In mania, mouseX encodes the pressed keys in the lower 20 bits.
+                // osu! lite only supports osu!standard, so use standard coordinate range.
+                int mouseXParseLimit = Parsing.MAX_COORDINATE_VALUE;
 
                 // the legacy replay format as defined by stable expects frame delta times
                 // ('delta time' here meaning the amount of time between consecutive frames)

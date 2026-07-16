@@ -1186,7 +1186,7 @@ namespace osu.Game.Screens.Play
 
             ByteArrayArchiveReader replayReader = null;
 
-            if (score.ScoreInfo.Ruleset.IsLegacyRuleset())
+            if (score.ScoreInfo.Ruleset.ShortName.Equals(@"osu", StringComparison.Ordinal))
             {
                 using (var stream = new MemoryStream())
                 {

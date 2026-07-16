@@ -249,10 +249,7 @@ namespace osu.Game.Screens.Select
                         int previousIndex = Items.IndexOf(beatmap);
                         Debug.Assert(previousIndex >= 0);
 
-                        // we're intentionally being lenient with there being two difficulties with equal online ID or difficulty name.
-                        // this can be the case when the user modifies the beatmap using the editor's "external edit" feature.
                         BeatmapInfo? matchingNewBeatmap =
-                            newSetBeatmaps.FirstOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
                             newSetBeatmaps.FirstOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
 
                         // The matching beatmap may have been deleted or invalidated in some way since this event was fired.
@@ -435,12 +432,8 @@ namespace osu.Game.Screens.Select
                         // - Background user tag population runs and causes a realm update.
                         //   We don't display user tags so want to ignore this.
                         bool equalForDisplayPurposes =
-                            // covers import-as-update flows, such as updating the beatmap with the latest online versions, or external editing inside editor
                             oldBeatmap.ID == newBeatmap.ID &&
-                            // covers metadata changes
                             oldBeatmap.Hash == newBeatmap.Hash &&
-                            // sanity check
-                            oldBeatmap.OnlineID == newBeatmap.OnlineID &&
                             // displayed on panel
                             oldBeatmap.DifficultyName == newBeatmap.DifficultyName &&
                             // hidden changed, needs re-filter

@@ -22,9 +22,6 @@ namespace osu.Game.Beatmaps
         [PrimaryKey]
         public Guid ID { get; set; }
 
-        [Indexed]
-        public int OnlineID { get; set; } = -1;
-
         public DateTimeOffset DateAdded { get; set; }
 
         [JsonIgnore]
@@ -83,7 +80,5 @@ namespace osu.Game.Beatmaps
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
 
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
-
-        public bool AllBeatmapsUpToDate => Beatmaps.All(b => b.MatchesOnlineVersion);
     }
 }

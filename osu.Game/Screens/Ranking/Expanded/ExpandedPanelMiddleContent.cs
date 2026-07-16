@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new ClickableMetadata(beatmap.OnlineID, metadata),
+                            new ClickableMetadata(0, metadata),
                             new Container
                             {
                                 Anchor = Anchor.TopCentre,

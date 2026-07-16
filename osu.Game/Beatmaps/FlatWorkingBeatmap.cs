@@ -24,8 +24,6 @@ namespace osu.Game.Beatmaps
         public FlatWorkingBeatmap(string file, int? beatmapId = null)
             : this(readFromFile(file))
         {
-            if (beatmapId.HasValue)
-                beatmap.BeatmapInfo.OnlineID = beatmapId.Value;
         }
 
         public FlatWorkingBeatmap(IBeatmap beatmap)

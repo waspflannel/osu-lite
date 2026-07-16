@@ -239,12 +239,7 @@ namespace osu.Game.Beatmaps
                     b.BeatmapInfo.ID = BeatmapInfo.ID;
                     b.BeatmapInfo.UserSettings = BeatmapInfo.UserSettings;
                     b.BeatmapInfo.BeatmapSet = BeatmapInfo.BeatmapSet;
-                    b.BeatmapInfo.OnlineID = BeatmapInfo.OnlineID;
-                    b.BeatmapInfo.OnlineMD5Hash = BeatmapInfo.OnlineMD5Hash;
-                    b.BeatmapInfo.LastLocalUpdate = BeatmapInfo.LastLocalUpdate;
-                    b.BeatmapInfo.LastOnlineUpdate = BeatmapInfo.LastOnlineUpdate;
                     b.BeatmapInfo.LastPlayed = BeatmapInfo.LastPlayed;
-                    b.BeatmapInfo.EditorTimestamp = BeatmapInfo.EditorTimestamp;
                     b.BeatmapInfo.StarRating = BeatmapInfo.StarRating; // this could be recomputed in the decoding process but it's a bit annoying to do.
 
                     return b;

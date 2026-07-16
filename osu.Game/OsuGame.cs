@@ -380,11 +380,8 @@ namespace osu.Game
             Logger.Log($"Beginning {nameof(PresentBeatmap)} with beatmap {beatmap}");
             Live<BeatmapSetInfo> databasedSet = null;
 
-            if (beatmap.OnlineID > 0)
-                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID && !s.DeletePending);
-
             if (beatmap is BeatmapSetInfo localBeatmap)
-                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash && !s.DeletePending);
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash && !s.DeletePending);
 
             if (databasedSet == null)
             {

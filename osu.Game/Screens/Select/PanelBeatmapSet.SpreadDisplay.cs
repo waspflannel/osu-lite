@@ -133,12 +133,12 @@ namespace osu.Game.Screens.Select
                 bool showVisible = VisibleBeatmaps.Value == null || VisibleBeatmaps.Value?.Count <= max_difficulties_before_collapsing;
                 bool showHidden = beatmaps.Count <= max_difficulties_before_collapsing;
 
-                var beatmapsByRuleset = beatmaps.GroupBy(beatmap => beatmap.Ruleset.OnlineID).OrderBy(group => group.Key);
+                var beatmapsByRuleset = beatmaps.GroupBy(beatmap => beatmap.Ruleset.ShortName).OrderBy(group => group.Key);
 
                 foreach (var rulesetGrouping in beatmapsByRuleset)
                 {
-                    int rulesetId = rulesetGrouping.Key;
-                    var rulesetIcon = rulesets.GetRuleset(rulesetId)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
+                    string rulesetShortName = rulesetGrouping.Key;
+                    var rulesetIcon = rulesets.GetRuleset(rulesetShortName)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
                     flow.Add(rulesetIcon.With(i =>
                     {
                         i.Size = new Vector2(14);

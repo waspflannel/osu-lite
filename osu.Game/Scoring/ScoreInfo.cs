@@ -137,8 +137,6 @@ namespace osu.Game.Scoring
 
         #region Properties required to make things work with existing usages
 
-        public int RulesetID => Ruleset.OnlineID;
-
         [Ignored]
         public List<HitEvent> HitEvents { get; set; } = new List<HitEvent>();
 

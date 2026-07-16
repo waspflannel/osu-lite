@@ -89,13 +89,8 @@ namespace osu.Game.Database
                     var deletedSet = detachedBeatmapSets[changes.DeletedIndices[0]];
                     var insertedSet = sender[changes.InsertedIndices[0]];
 
-                    // this handles beatmap updates using a heuristic that a beatmap update will preserve the online ID.
-                    // it relies on the fact that updates are performed by removing the old set and adding a new one, in a single transaction.
-                    // instead of removing the old set and adding a new one to the collection too, which would trigger consumers' logic related to set removals,
-                    // move the deleted set to the index occupied by the new one and then replace it in-place.
-                    // due to this, the operation can be presented to consumer in a manner that permits them to actually handle this as a replace operation
-                    // and not trigger any set removal logic that may result in selections changing or similar undesirable side effects.
-                    if (deletedSet.OnlineID == insertedSet.OnlineID)
+                    // replace the deleted set with the inserted set in-place for an update operation.
+                    if (deletedSet.Hash == insertedSet.Hash)
                     {
                         pendingOperations.Enqueue(new OperationArgs
                         {

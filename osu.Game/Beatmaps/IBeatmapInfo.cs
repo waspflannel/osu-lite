@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps
@@ -10,7 +9,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A single beatmap difficulty.
     /// </summary>
-    public interface IBeatmapInfo : IHasOnlineID<int>, IEquatable<IBeatmapInfo>
+    public interface IBeatmapInfo : IEquatable<IBeatmapInfo>
     {
         /// <summary>
         /// The user-specified name given to this beatmap.

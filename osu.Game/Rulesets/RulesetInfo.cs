@@ -14,9 +14,6 @@ namespace osu.Game.Rulesets
         [PrimaryKey]
         public string ShortName { get; set; } = string.Empty;
 
-        [Indexed]
-        public int OnlineID { get; set; } = -1;
-
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
@@ -41,16 +38,10 @@ namespace osu.Game.Rulesets
 
         public int CompareTo(RulesetInfo? other)
         {
-            if (OnlineID >= 0 && other?.OnlineID >= 0)
-                return OnlineID.CompareTo(other.OnlineID);
-
-            // Official rulesets are always given precedence for the time being.
-            if (OnlineID >= 0)
-                return -1;
-            if (other?.OnlineID >= 0)
+            if (other == null)
                 return 1;
 
-            return string.Compare(ShortName, other?.ShortName, StringComparison.Ordinal);
+            return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
         }
 
         public int CompareTo(IRulesetInfo? other)
@@ -74,7 +65,6 @@ namespace osu.Game.Rulesets
 
         public RulesetInfo Clone() => new RulesetInfo
         {
-            OnlineID = OnlineID,
             Name = Name,
             ShortName = ShortName,
             LastAppliedDifficultyVersion = LastAppliedDifficultyVersion,

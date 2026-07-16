@@ -109,11 +109,7 @@ namespace osu.Game.Beatmaps.Formats
         private static void applyDifficultyRestrictions(BeatmapDifficulty difficulty, Beatmap beatmap)
         {
             difficulty.DrainRate = Math.Clamp(difficulty.DrainRate, 0, 10);
-
-            // mania uses "circle size" for key count, thus different allowable range
-            difficulty.CircleSize = beatmap.BeatmapInfo.Ruleset.OnlineID != 3
-                ? Math.Clamp(difficulty.CircleSize, 0, 10)
-                : Math.Clamp(difficulty.CircleSize, 1, MAX_MANIA_KEY_COUNT);
+            difficulty.CircleSize = Math.Clamp(difficulty.CircleSize, 0, 10);
 
             difficulty.OverallDifficulty = Math.Clamp(difficulty.OverallDifficulty, 0, 10);
             difficulty.ApproachRate = Math.Clamp(difficulty.ApproachRate, 0, 10);
@@ -379,11 +375,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.OnlineID = Parsing.ParseInt(pair.Value);
+                    Parsing.ParseInt(pair.Value); // parsed and discarded; osu! lite does not persist online IDs
                     break;
 
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineID = Parsing.ParseInt(pair.Value) };
+                    Parsing.ParseInt(pair.Value); // parsed and discarded; osu! lite does not persist online IDs
                     break;
             }
         }
@@ -531,24 +527,17 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
-
+            // osu! lite is osu!standard only; scroll speed is handled via difficulty control points.
             addControlPoint(time, new DifficultyControlPoint
             {
                 GenerateTicks = !double.IsNaN(beatLength),
                 SliderVelocity = speedMultiplier,
             }, timingChange);
 
-            var effectPoint = new EffectControlPoint
+            addControlPoint(time, new EffectControlPoint
             {
                 KiaiMode = kiaiMode,
-            };
-
-            // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.
-            if (onlineRulesetID == 1 || onlineRulesetID == 3)
-                effectPoint.ScrollSpeed = speedMultiplier;
-
-            addControlPoint(time, effectPoint, timingChange);
+            }, timingChange);
 
             addControlPoint(time, new LegacySampleControlPoint
             {
