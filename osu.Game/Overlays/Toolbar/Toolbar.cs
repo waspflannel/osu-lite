@@ -129,7 +129,6 @@ namespace osu.Game.Overlays.Toolbar
                                         Children = new Drawable[]
                                         {
                                             new ToolbarMusicButton(),
-                                            new ToolbarClock(),
                                         }
                                     },
                                 }

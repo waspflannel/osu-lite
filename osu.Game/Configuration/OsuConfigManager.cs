@@ -43,8 +43,6 @@ namespace osu.Game.Configuration
 
 
 
-            SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
-
             SetDefault(OsuSetting.SongSelectBackgroundBlur, false);
 
             SetDefault(OsuSetting.LocalPlayerName, @"Player");
