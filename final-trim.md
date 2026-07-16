@@ -81,6 +81,18 @@ The remaining material work is:
 6. replace `ppy.osu.Game.Resources` with the embedded allowlisted payload and trim Kanna; this remains the largest and highest-risk phase;
 7. remove stale local-resource scripts and lazer project metadata, then record final evidence here.
 
+> **Trim 1 completed 2026-07-16** ([`trim-1-online-persistence`](https://github.com/waspflannel/osu-lite/tree/trim-1-online-persistence)):
+> Deleted `IHasOnlineID<T>`, `BeatmapSetHypeStatus`, `BeatmapSetNominationStatus`, `BeatmapSetNominationStatusRequiredMeta`.
+> Removed `OnlineID` from `BeatmapInfo`, `BeatmapSetInfo`, `RulesetInfo`, `IRulesetInfo`, `IBeatmapInfo`, `IBeatmapSetInfo`.
+> Removed `OnlineMD5Hash`, `LastOnlineUpdate`, `LastLocalUpdate`, `EditorTimestamp`, `MatchesOnlineVersion`, `ResetOnlineInfo`.
+> Removed `AllBeatmapsUpToDate`, `MatchesOnlineID`, `IsLegacyRuleset`, `ForOnlineId`.
+> Rewrote `BeatmapImporter` to remove all online-ID-based import/dedup/update logic.
+> Removed `ImportAsUpdate` from `IModelImporter`, `RealmArchiveModelImporter`, `BeatmapManager`, `ScoreManager`.
+> Removed `CreateNew` and `QueryOnlineBeatmapId` from `BeatmapManager`.
+> Replaced `OnlineID`-based score legacy logic with hardcoded osu!standard (0) constants.
+> Parsed and discarded `BeatmapID`/`BeatmapSetID` in `LegacyBeatmapDecoder`.
+> Cleaned up `BeatmapCarousel`, `PanelBeatmapSet`, `SpreadDisplay`, `DifficultyIcon`, `RealmDetachedBeatmapStore`, `OsuGame`, `WorkingBeatmap`, `FlatWorkingBeatmap`.
+
 ## Unfinished business
 
 This is the authoritative post-merge audit remainder, not a statement of the current branch. The merge checkpoint above records which broad items have since landed; the detailed ledger below remains binding for the portions that are still incomplete. **CI configuration, CI workflow repair, and CI matrix coverage are explicitly out of scope and do not block completion.** Builds and smoke tests may be run manually.
