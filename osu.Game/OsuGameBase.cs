@@ -572,14 +572,8 @@ namespace osu.Game
                 case MouseHandler mh:
                     return new MouseSettings(mh);
 
-                case JoystickHandler jh:
-                    return new JoystickSettings(jh);
-
                 case PenHandler ph:
                     return new PenSettings(ph);
-
-                case MidiHandler:
-                    return new InputSubsection(handler);
 
                 // return null for handlers that shouldn't have settings.
                 default:
