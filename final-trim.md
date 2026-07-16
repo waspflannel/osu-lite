@@ -90,6 +90,10 @@ The remaining material work is:
 > Stripped `Notification`, `SimpleNotification`, `SimpleErrorNotification`, `ProgressNotification` to bare essentials.
 > Created `INotificationSink` + `NotificationSink` with minimal bottom-right toast tray and ongoing-operation tracking.
 > Updated all consumers (`OsuGame`, `ConfirmExitDialog`, `ScreenshotManager`, `HUDOverlay`, `PlayerLoader`, etc.).
+>
+> **Trim 3 completed 2026-07-16** ([`trim-3-settings-cleanup`](https://github.com/waspflannel/osu-lite/tree/trim-3-settings-cleanup)):
+> Culled `OsuSetting` enum from 67 to 36 allowlisted entries. Renamed `MaintenanceSection` → `DataSection`.
+> Removed joystick support from input chain and keybinding. Deleted settings UI for Scaling, SafeArea, 24h time, ScoreDisplayMode.
 
 ## Unfinished business
 
