@@ -51,7 +51,8 @@ namespace osu.Game.Database
 
         private readonly SynchronizationContext? updateThreadSyncContext;
 
-        private const int schema_version = 1;
+        // Version 2 removes retired online metadata and introduces the local creator field.
+        private const int schema_version = 2;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
