@@ -35,7 +35,6 @@ namespace osu.Game.Screens.Select
             protected override Colour4 DimColour => Colour4.White;
 
             private readonly IBindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
-            private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
             private const double transition_duration = 200;
 
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Select
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private RulesetStore rulesets { get; set; } = null!;
+            private IRulesetStore rulesets { get; set; } = null!;
 
             private FillFlowContainer flow = null!;
             private SpriteIcon icon = null!;
@@ -62,7 +61,7 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager configManager)
+            private void load()
             {
                 Add(new FillFlowContainer
                 {
@@ -96,7 +95,6 @@ namespace osu.Game.Screens.Select
                 if (songSelect != null)
                     scopedBeatmapSet.BindTo(songSelect.ScopedBeatmapSet);
 
-                configManager.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmaps);
             }
 
             protected override void LoadComplete()
@@ -105,7 +103,6 @@ namespace osu.Game.Screens.Select
 
                 BeatmapSet.BindValueChanged(_ => updateBeatmapSet());
                 VisibleBeatmaps.BindValueChanged(_ => updateBeatmapSet());
-                showConvertedBeatmaps.BindValueChanged(_ => updateBeatmapSet(), true);
                 Expanded.BindValueChanged(_ => updateEnabled());
                 scopedBeatmapSet.BindValueChanged(_ => updateEnabled(), true);
                 scopedBeatmapSet.BindDisabledChanged(_ => updateEnabled(), true);
@@ -126,7 +123,7 @@ namespace osu.Game.Screens.Select
                 const int max_difficulties_before_collapsing = 12;
 
                 var beatmaps = BeatmapSet.Value.Beatmaps
-                                         .Where(b => b.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value))
+                                         .Where(b => b.AllowGameplayWithRuleset(ruleset.Value))
                                          .ToList();
                 this.FadeTo(beatmaps.Count > 0 ? 1 : 0, transition_duration, Easing.OutQuint);
 

@@ -17,8 +17,6 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -31,14 +29,7 @@ namespace osu.Game.Configuration
 
         protected override void InitialiseDefaults()
         {
-            // UI/selection defaults
-            SetDefault(OsuSetting.Ruleset, string.Empty);
-            SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
-
-            SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
-            SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
-
-            SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
+            
             SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
             SetDefault(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
 
@@ -49,32 +40,9 @@ namespace osu.Game.Configuration
 
 
 
-            SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
-
             SetDefault(OsuSetting.SongSelectBackgroundBlur, false);
 
-            // Online settings
-            SetDefault(OsuSetting.Username, string.Empty);
-            SetDefault(OsuSetting.Token, string.Empty);
-
-            SetDefault(OsuSetting.SavePassword, true).ValueChanged += enabled =>
-            {
-                if (enabled.NewValue)
-                    SetValue(OsuSetting.SaveUsername, true);
-                else
-                    GetBindable<string>(OsuSetting.Token).SetDefault();
-            };
-
-            SetDefault(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
-            {
-                if (!enabled.NewValue)
-                {
-                    GetBindable<string>(OsuSetting.Username).SetDefault();
-                    SetValue(OsuSetting.SavePassword, false);
-                }
-            };
-
-            SetDefault(OsuSetting.ExternalLinkWarning, true);
+            SetDefault(OsuSetting.LocalPlayerName, @"Player");
             SetDefault(OsuSetting.PreferNoVideo, false);
 
             // Audio
@@ -166,17 +134,6 @@ namespace osu.Game.Configuration
 
         }
 
-        protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
-        {
-            switch (lookup)
-            {
-                case OsuSetting.Token:
-                    return true;
-            }
-
-            return false;
-        }
-
         public override TrackedSettings CreateTrackedSettings()
         {
             return new TrackedSettings
@@ -225,7 +182,6 @@ namespace osu.Game.Configuration
             };
         }
 
-        public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
         public Func<GlobalAction, LocalisableString> LookupKeyBindings { private get; set; } = _ => @"unknown";
 
         IBindable<float> IGameplaySettings.ComboColourNormalisationAmount => GetOriginalBindable<float>(OsuSetting.ComboColourNormalisationAmount);
@@ -234,8 +190,7 @@ namespace osu.Game.Configuration
 
         public enum OsuSetting
     {
-        Ruleset,
-        Token,
+        LocalPlayerName,
         MenuCursorSize,
         GameplayCursorSize,
         AutoCursorSize,
@@ -272,9 +227,6 @@ namespace osu.Game.Configuration
         Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
-        Username,
-        SavePassword,
-        SaveUsername,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
         SongSelectGroupMode,
@@ -283,8 +235,6 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
-        ShowConvertedBeatmaps,
-        Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
         BeatmapSkins,
@@ -292,7 +242,6 @@ namespace osu.Game.Configuration
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
-        ExternalLinkWarning,
         PreferNoVideo,
         Scaling,
         ScalingPositionX,

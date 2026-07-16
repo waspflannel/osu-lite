@@ -14,7 +14,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -63,9 +62,7 @@ namespace osu.Game.Beatmaps
 
         private class DummyRuleset : Ruleset
         {
-            public override IEnumerable<Mod> GetModsFor(ModType type) => Array.Empty<Mod>();
-
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap)
             {
                 throw new NotImplementedException();
             }

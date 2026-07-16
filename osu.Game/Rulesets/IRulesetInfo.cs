@@ -21,11 +21,6 @@ namespace osu.Game.Rulesets
         /// </summary>
         string ShortName { get; }
 
-        /// <summary>
-        /// A string representation of this ruleset, to be used with reflection to instantiate the ruleset represented by this metadata.
-        /// </summary>
-        string InstantiationInfo { get; }
-
         Ruleset CreateInstance();
     }
 }

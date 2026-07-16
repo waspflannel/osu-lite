@@ -26,14 +26,8 @@ namespace osu.Game.Database
             c.ShouldMapField = _ => false;
             c.ShouldMapProperty = pi => pi.SetMethod?.IsPublic == true;
 
-            c.CreateMap<BeatmapMetadata, BeatmapMetadata>()
-             .ForMember(s => s.Author, cc => cc.Ignore())
-             .AfterMap((s, d) =>
-             {
-                 copyChangesToRealm(s.Author, d.Author);
-             });
+            c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
-            c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
             c.CreateMap<BeatmapInfo, BeatmapInfo>()
@@ -175,10 +169,8 @@ namespace osu.Game.Database
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
             c.CreateMap<RulesetInfo, RulesetInfo>();
             c.CreateMap<ScoreInfo, ScoreInfo>();
-            c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
-            c.CreateMap<SkinInfo, SkinInfo>();
         }
 
         /// <summary>

@@ -14,11 +14,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -27,10 +23,6 @@ namespace osu.Game.Screens.Backgrounds
         private Background background;
 
         private int currentDisplay;
-        private const int background_count = 8;
-        private IBindable<APIUser> user;
-        private Bindable<Skin> skin;
-        private Bindable<BackgroundSource> source;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -40,24 +32,12 @@ namespace osu.Game.Screens.Backgrounds
 
         protected virtual bool AllowStoryboardBackground => true;
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
-        {
-            user = api.LocalUser.GetBoundCopy();
-            skin = skinManager.CurrentSkin.GetBoundCopy();
-            source = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            user.ValueChanged += _ => Scheduler.AddOnce(next);
-            skin.ValueChanged += _ => Scheduler.AddOnce(next);
-            source.ValueChanged += _ => Scheduler.AddOnce(next);
             beatmap.ValueChanged += _ => Scheduler.AddOnce(next);
 
-            currentDisplay = RNG.Next(0, background_count);
             Next();
 
             // helper function required for AddOnce usage.
@@ -133,52 +113,20 @@ namespace osu.Game.Screens.Backgrounds
 
         private Background createBackground()
         {
-            Background newBackground = null;
-
-            if (user.Value?.IsSupporter == true)
-            {
-                switch (source.Value)
-                {
-                    case BackgroundSource.Beatmap:
-                    case BackgroundSource.BeatmapWithStoryboard:
-                    {
-                        if (source.Value == BackgroundSource.BeatmapWithStoryboard && AllowStoryboardBackground)
-                            newBackground = new BeatmapBackgroundWithStoryboard(beatmap.Value, getBackgroundTextureName());
-                        newBackground ??= new BeatmapBackground(beatmap.Value, getBackgroundTextureName());
-
-                        break;
-                    }
-
-                    case BackgroundSource.Skin:
-                        switch (skin.Value)
-                        {
-                            case TrianglesSkin:
-                            case ArgonSkin:
-                            case DefaultLegacySkin:
-                            case RetroSkin:
-                                // default skins should use the default background rotation, which won't be the case if a SkinBackground is created for them.
-                                break;
-
-                            default:
-                                newBackground = new SkinBackground(skin.Value, getBackgroundTextureName());
-                                break;
-                        }
-
-                        break;
-                }
-            }
+            Background newBackground = AllowStoryboardBackground
+                ? new BeatmapBackgroundWithStoryboard(beatmap.Value, getBackgroundTextureName())
+                : new BeatmapBackground(beatmap.Value, getBackgroundTextureName());
 
             // this method is called in many cases where the background might not necessarily need to change.
             // if an equivalent background is currently being shown, we don't want to load it again.
-            if (newBackground?.Equals(background) == true)
+            if (newBackground.Equals(background))
                 return background;
 
-            newBackground ??= new Background(getBackgroundTextureName());
             newBackground.Depth = currentDisplay;
 
             return newBackground;
         }
 
-        private string getBackgroundTextureName() => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
+        private string getBackgroundTextureName() => @"Menu/menu-background-1";
     }
 }

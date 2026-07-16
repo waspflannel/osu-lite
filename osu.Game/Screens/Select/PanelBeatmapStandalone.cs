@@ -22,7 +22,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK;
 
 namespace osu.Game.Screens.Select
@@ -33,9 +32,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -57,7 +53,6 @@ namespace osu.Game.Screens.Select
 
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
-        private BeatmapSetOnlineStatusPill statusPill = null!;
 
         private ConstrainedIconContainer difficultyIcon = null!;
         private StarRatingDisplay starRatingDisplay = null!;
@@ -138,14 +133,6 @@ namespace osu.Game.Screens.Select
                                     Padding = new MarginPadding { Top = 2, Bottom = 2 },
                                     Children = new Drawable[]
                                     {
-                                        statusPill = new BeatmapSetOnlineStatusPill
-                                        {
-                                            Animated = false,
-                                            Origin = Anchor.BottomLeft,
-                                            Anchor = Anchor.BottomLeft,
-                                            TextSize = OsuFont.Style.Caption2.Size,
-                                            Margin = new MarginPadding { Right = 4f },
-                                        },
                                         keyCountText = new OsuSpriteText
                                         {
                                             Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
@@ -202,7 +189,7 @@ namespace osu.Game.Screens.Select
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateKeyCount());
-            mods.BindValueChanged(_ => updateKeyCount(), true);
+            updateKeyCount();
 
             Selected.BindValueChanged(s =>
             {
@@ -220,14 +207,13 @@ namespace osu.Game.Screens.Select
 
             titleText.Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title);
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);
-            statusPill.Status = beatmap.Status;
 
             difficultyIcon.Icon = beatmap.Ruleset.CreateInstance().CreateIcon();
             difficultyIcon.Show();
 
             localRank.Beatmap = beatmap;
             difficultyText.Text = beatmap.DifficultyName;
-            authorText.Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmap.Metadata.Author.Username);
+            authorText.Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmap.Metadata.Creator);
 
             computeStarRating();
             spreadDisplay.Beatmap.Value = beatmap;
@@ -296,7 +282,7 @@ namespace osu.Game.Screens.Select
 
             if (rulesetInstance.AvailableVariants.Count() > 1)
             {
-                int variant = rulesetInstance.GetVariantForBeatmap(beatmap, mods.Value);
+                int variant = rulesetInstance.GetVariantForBeatmap(beatmap);
                 var variantName = rulesetInstance.GetVariantName(variant);
 
                 keyCountText.Alpha = 1;

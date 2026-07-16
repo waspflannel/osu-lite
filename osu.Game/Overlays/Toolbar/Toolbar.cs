@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
@@ -33,8 +32,6 @@ namespace osu.Game.Overlays.Toolbar
         private bool hiddenByUser;
 
         public Action OnHome;
-
-        private ToolbarRulesetSelector rulesetSelector;
 
         private const double transition_time = 500;
 
@@ -58,9 +55,6 @@ namespace osu.Game.Overlays.Toolbar
             AlwaysPresent = false;
         }
 
-        [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
-
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame)
         {
@@ -76,7 +70,6 @@ namespace osu.Game.Overlays.Toolbar
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(),
                         new Dimension(GridSizeMode.AutoSize)
                     },
                     Content = new[]
@@ -114,32 +107,6 @@ namespace osu.Game.Overlays.Toolbar
                             },
                             new Container
                             {
-                                Name = "Ruleset selector",
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
-                                {
-                                    new OsuScrollContainer(Direction.Horizontal)
-                                    {
-                                        ScrollbarVisible = false,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Masking = false,
-                                        Children = new Drawable[]
-                                        {
-                                            rulesetSelector = new ToolbarRulesetSelector()
-                                        }
-                                    },
-                                    new Box
-                                    {
-                                        Colour = ColourInfo.GradientHorizontal(OsuColour.Gray(0.1f).Opacity(0), OsuColour.Gray(0.1f)),
-                                        Width = 50,
-                                        RelativeSizeAxes = Axes.Y,
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                    },
-                                }
-                            },
-                            new Container
-                            {
                                 Name = "Right buttons",
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
@@ -162,7 +129,6 @@ namespace osu.Game.Overlays.Toolbar
                                         Children = new Drawable[]
                                         {
                                             new ToolbarMusicButton(),
-                                            new ToolbarClock(),
                                         }
                                     },
                                 }
@@ -180,13 +146,6 @@ namespace osu.Game.Overlays.Toolbar
 
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            rulesetSelector.Current.BindTo(ruleset);
         }
 
         public partial class ToolbarBackground : Container

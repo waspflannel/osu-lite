@@ -10,7 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
 
@@ -24,8 +23,6 @@ namespace osu.Game.Screens.Play
         public Container OverlayLayerContainer { get; private set; }
 
         private readonly Storyboard storyboard;
-        private readonly IReadOnlyList<Mod> mods;
-
         /// <summary>
         /// In certain circumstances, the storyboard cannot be hidden entirely even if it is fully dimmed. Such circumstances include:
         /// <list type="bullet">
@@ -51,10 +48,9 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public IBindable<bool> HasStoryboardEnded = new BindableBool(true);
 
-        public DimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods)
+        public DimmableStoryboard(Storyboard storyboard)
         {
             this.storyboard = storyboard;
-            this.mods = mods;
 
             storyboardMustAlwaysBePresent = new Lazy<bool>(() => storyboard.GetLayer(@"Overlay").Elements.Any() || storyboard.Layers.Any(l => l.Elements.OfType<StoryboardSampleInfo>().Any()));
         }
@@ -98,7 +94,7 @@ namespace osu.Game.Screens.Play
             if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
-            drawableStoryboard = storyboard.CreateDrawable(mods);
+            drawableStoryboard = storyboard.CreateDrawable();
             HasStoryboardEnded.BindTo(drawableStoryboard.HasStoryboardEnded);
 
             if (async)

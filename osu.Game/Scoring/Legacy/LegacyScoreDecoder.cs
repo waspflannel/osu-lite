@@ -9,17 +9,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -67,7 +66,8 @@ namespace osu.Game.Scoring.Legacy
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException(beatmapHash);
 
-                scoreInfo.User = new APIUser { Username = sr.ReadString() };
+                // Replays are always imported as local scores.
+                sr.ReadString();
 
                 // MD5Hash
                 sr.ReadString();
@@ -85,13 +85,10 @@ namespace osu.Game.Scoring.Legacy
                 /* score.Perfect = */
                 sr.ReadBoolean();
 
-                scoreInfo.Mods = currentRuleset.ConvertFromLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
+                if (sr.ReadInt32() != 0)
+                    throw new ReplayHasModsException();
 
-                // lazer replays get a really high version number.
-                if (version < LegacyScoreEncoder.FIRST_LAZER_VERSION)
-                    scoreInfo.Mods = scoreInfo.Mods.Append(currentRuleset.CreateMod<ModClassic>()).ToArray();
-
-                currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
+                currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
@@ -105,12 +102,9 @@ namespace osu.Game.Scoring.Legacy
                 byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    scoreInfo.LegacyOnlineID = sr.ReadInt64();
+                    sr.ReadInt64();
                 else if (version >= 20121008)
-                    scoreInfo.LegacyOnlineID = sr.ReadInt32();
-
-                if (scoreInfo.LegacyOnlineID == 0)
-                    scoreInfo.LegacyOnlineID = -1;
+                    sr.ReadInt32();
 
                 byte[] compressedScoreInfo = null;
 
@@ -124,24 +118,19 @@ namespace osu.Game.Scoring.Legacy
                 {
                     readCompressedData(compressedScoreInfo, reader =>
                     {
-                        LegacyReplaySoloScoreInfo readScore = JsonConvert.DeserializeObject<LegacyReplaySoloScoreInfo>(reader.ReadToEnd());
+                        var payload = JObject.Parse(reader.ReadToEnd());
+
+                        if (payload["mods"] is JArray { Count: > 0 })
+                            throw new ReplayHasModsException();
+
+                        LegacyReplaySoloScoreInfo readScore = payload.ToObject<LegacyReplaySoloScoreInfo>()!;
 
                         Debug.Assert(readScore != null);
 
-                        score.ScoreInfo.OnlineID = readScore.OnlineID;
                         score.ScoreInfo.Statistics = readScore.Statistics;
                         score.ScoreInfo.MaximumStatistics = readScore.MaximumStatistics;
-                        score.ScoreInfo.Mods = readScore.Mods.Select(m => m.ToMod(currentRuleset)).ToArray();
                         score.ScoreInfo.ClientVersion = readScore.ClientVersion;
                         decodedRank = readScore.Rank;
-                        if (readScore.UserID > 1)
-                            score.ScoreInfo.RealmUser.OnlineID = readScore.UserID;
-
-                        if (readScore.TotalScoreWithoutMods is long totalScoreWithoutMods)
-                            score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
-                        else
-                            PopulateTotalScoreWithoutMods(score.ScoreInfo);
-
                         score.ScoreInfo.Pauses.AddRange(readScore.Pauses);
                     });
                 }
@@ -151,8 +140,6 @@ namespace osu.Game.Scoring.Legacy
 
             if (score.ScoreInfo.IsLegacyScore)
                 score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
-
-            StandardisedScoreMigrationTools.UpdateToLatestScoring(score.ScoreInfo, workingBeatmap);
 
             if (decodedRank != null)
                 score.ScoreInfo.Rank = decodedRank.Value;
@@ -246,23 +233,12 @@ namespace osu.Game.Scoring.Legacy
             // In osu! and osu!mania, some judgements affect combo but aren't stored to scores.
             // A special hit result is used to pad out the combo value to match, based on the max combo from the difficulty attributes.
             var calculator = rulesetInstance.CreateDifficultyCalculator(workingBeatmap);
-            var attributes = calculator.Calculate(score.Mods);
+            var attributes = calculator.Calculate();
 
             int maxComboFromStatistics = score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Select(kvp => kvp.Value).DefaultIfEmpty(0).Sum();
             if (attributes.MaxCombo > maxComboFromStatistics)
                 score.MaximumStatistics[HitResult.LegacyComboIncrease] = attributes.MaxCombo - maxComboFromStatistics;
 #pragma warning restore CS0618
-        }
-
-        public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
-        {
-            Debug.Assert(score.BeatmapInfo != null);
-
-            var ruleset = score.Ruleset.CreateInstance();
-            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score.BeatmapInfo.Difficulty, score));
-            double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
-
-            score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
@@ -386,6 +362,14 @@ namespace osu.Game.Scoring.Legacy
             public BeatmapNotFoundException(string hash)
             {
                 Hash = hash;
+            }
+        }
+
+        public class ReplayHasModsException : Exception
+        {
+            public ReplayHasModsException()
+                : base("osu! lite accepts unmodded replays only.")
+            {
             }
         }
     }

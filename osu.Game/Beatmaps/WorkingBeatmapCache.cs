@@ -353,10 +353,13 @@ namespace osu.Game.Beatmaps
 
             private string getMainStoryboardFilename(IBeatmapMetadataInfo metadata)
             {
-                // Matches stable implementation, because it's probably simpler than trying to do anything else.
-                // This may need to be reconsidered after we begin storing storyboards in the new editor.
-                string baseFilename = (metadata.Artist.Length > 0 ? metadata.Artist + @" - " + metadata.Title : Path.GetFileNameWithoutExtension(metadata.AudioFile))
-                                      + (metadata.Author.Username.Length > 0 ? @" (" + metadata.Author.Username + @")" : string.Empty)
+                string artist = metadata?.Artist ?? string.Empty;
+                string title = metadata?.Title ?? string.Empty;
+                string audioFile = metadata?.AudioFile ?? string.Empty;
+                string creator = metadata?.Creator ?? string.Empty;
+
+                string baseFilename = (artist.Length > 0 ? artist + @" - " + title : Path.GetFileNameWithoutExtension(audioFile))
+                                       + (creator.Length > 0 ? @" (" + creator + @")" : string.Empty)
                                       + @".osb";
                 return baseFilename.GetValidFilename();
             }

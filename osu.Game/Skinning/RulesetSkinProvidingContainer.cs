@@ -55,9 +55,9 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager)
+        private void load(FixedSkinProvider skinProvider)
         {
-            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin), GetRulesetTransformedSkin(skinManager.DefaultClassicSkin))
+            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin), GetRulesetTransformedSkin(skinProvider.DefaultClassicSkin))
             {
                 Child = Content,
                 BeatmapSkins = BeatmapSkins,
@@ -97,16 +97,9 @@ namespace osu.Game.Skinning
                 }
             }
 
-            // TODO: check
-            int lastDefaultSkinIndex = sources.IndexOf(sources.OfType<TrianglesSkin>().LastOrDefault());
-
             // Ruleset resources should be given the ability to override game-wide defaults
-            // This is achieved by placing them before the last instance of DefaultSkin.
-            // Note that DefaultSkin may not be present in some test scenes.
-            if (lastDefaultSkinIndex >= 0)
-                sources.Insert(lastDefaultSkinIndex, rulesetResourcesSkin);
-            else
-                sources.Add(rulesetResourcesSkin);
+            // while preserving Kanna and the classic fallback as the final lookup layers.
+            sources.Insert(sources.Count > 0 ? sources.Count - 1 : 0, rulesetResourcesSkin);
 
             SetSources(sources);
         }

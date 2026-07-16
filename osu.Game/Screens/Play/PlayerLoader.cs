@@ -27,7 +27,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
@@ -38,7 +37,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Skinning;
-using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -69,8 +67,6 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => true;
 
         // We show the previous screen status
-        protected override UserActivity? InitialActivity => null;
-
         protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 
         /// <summary>
@@ -191,7 +187,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, OsuConfigManager config, IAPIProvider api)
+        private void load(SessionStatics sessionStatics, OsuConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
@@ -208,7 +204,7 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                 }).WithChildren(new Drawable[]
                 {
-                    MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
+                    MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, content.LogoFacade)
                     {
                         Alpha = 0,
                         Anchor = Anchor.Centre,
@@ -303,28 +299,6 @@ namespace osu.Game.Screens.Play
                 disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
             }
 
-            if (!string.IsNullOrEmpty(api.ScoreProcessingNoticeUrl))
-            {
-                disclaimers.Add(new PlayerLoaderDisclaimer(
-                    UsersStrings.ShowScoreProcessingTitle(UsersStrings.ShowScoreProcessingTitleLink),
-                    UsersStrings.ShowScoreProcessingMessage
-                )
-                {
-                    Action = () => (Game as OsuGame)?.OpenUrlExternally(api.ScoreProcessingNoticeUrl),
-                    IsImportant = true,
-                });
-            }
-
-            switch (Beatmap.Value.BeatmapInfo.Status)
-            {
-                case BeatmapOnlineStatus.Loved:
-                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.LovedBeatmapDisclaimerTitle, PlayerLoaderStrings.LovedBeatmapDisclaimerContent));
-                    break;
-
-                case BeatmapOnlineStatus.Qualified:
-                    disclaimers.Add(new PlayerLoaderDisclaimer(PlayerLoaderStrings.QualifiedBeatmapDisclaimerTitle, PlayerLoaderStrings.QualifiedBeatmapDisclaimerContent));
-                    break;
-            }
         }
 
         protected override void LoadComplete()

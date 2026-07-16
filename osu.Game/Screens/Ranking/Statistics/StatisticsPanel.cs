@@ -19,8 +19,6 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -48,9 +46,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         private readonly Container content;
         private readonly LoadingSpinner spinner;
@@ -111,7 +106,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             var workingBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo);
 
             // Todo: The placement of this is temporary. Eventually we'll both generate the playable beatmap _and_ run through it in a background task to generate the hit events.
-            Task.Run(() => workingBeatmap.GetPlayableBeatmap(newScore.Ruleset, newScore.Mods), loadCancellation.Token).ContinueWith(task => Schedule(() =>
+            Task.Run(() => workingBeatmap.GetPlayableBeatmap(newScore.Ruleset), loadCancellation.Token).ContinueWith(task => Schedule(() =>
             {
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
                 Container<Drawable> container;

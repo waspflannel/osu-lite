@@ -26,7 +26,6 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Audio;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
@@ -245,9 +244,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
 
             if (!score.NewValue.BeatmapInfo.AsNonNull().Equals(beatmap.Value.BeatmapInfo))
-                return;
-
-            if (score.NewValue.Mods.Any(m => !m.UserPlayable || m is IHasNoTimedInputs))
                 return;
 
             var hitEvents = score.NewValue.HitEvents;

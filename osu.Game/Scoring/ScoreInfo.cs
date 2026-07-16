@@ -10,13 +10,9 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
 
@@ -26,7 +22,7 @@ namespace osu.Game.Scoring
     /// A realm model containing metadata for a single score.
     /// </summary>
     [MapTo("Score")]
-    public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
+    public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>
     {
         [PrimaryKey]
         public Guid ID { get; set; }
@@ -72,14 +68,6 @@ namespace osu.Game.Scoring
         public long TotalScore { get; set; }
 
         /// <summary>
-        /// The total number of points awarded for the score without including mod multipliers.
-        /// </summary>
-        /// <remarks>
-        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
-        /// </remarks>
-        public long TotalScoreWithoutMods { get; set; }
-
-        /// <summary>
         /// The version of processing applied to calculate total score as stored in the database.
         /// If this does not match <see cref="LegacyScoreEncoder.LATEST_VERSION"/>,
         /// the total score has not yet been updated to reflect the current scoring values.
@@ -112,43 +100,9 @@ namespace osu.Game.Scoring
 
         public double Accuracy { get; set; }
 
-        [Ignored]
-        public bool HasOnlineReplay { get; set; }
-
         public DateTimeOffset Date { get; set; }
 
         public double? PP { get; set; }
-
-        /// <summary>
-        /// Whether the performance points in this score is awarded to the player. This is used for online display purposes (see <see cref="SoloScoreInfo.Ranked"/>).
-        /// </summary>
-        [Ignored]
-        public bool Ranked { get; set; }
-
-        /// <summary>
-        /// The online ID of this score.
-        /// </summary>
-        /// <remarks>
-        /// In the osu-web database, this ID (if present) comes from the new <c>solo_scores</c> table.
-        /// </remarks>
-        [Indexed]
-        public long OnlineID { get; set; } = -1;
-
-        /// <summary>
-        /// The legacy online ID of this score.
-        /// </summary>
-        /// <remarks>
-        /// In the osu-web database, this ID (if present) comes from the legacy <c>osu_scores_*_high</c> tables.
-        /// This ID is also stored to replays set on osu!stable.
-        /// </remarks>
-        [Indexed]
-        public long LegacyOnlineID { get; set; } = -1;
-
-        [MapTo("User")]
-        public RealmUser RealmUser { get; set; } = null!;
-
-        [MapTo("Mods")]
-        public string ModsJson { get; set; } = string.Empty;
 
         [MapTo("Statistics")]
         public string StatisticsJson { get; set; } = string.Empty;
@@ -158,44 +112,17 @@ namespace osu.Game.Scoring
 
         public IList<int> Pauses { get; } = null!;
 
-        public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
+        public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null)
         {
             Ruleset = ruleset ?? new RulesetInfo();
             BeatmapInfo = beatmap ?? new BeatmapInfo();
             BeatmapHash = BeatmapInfo.Hash;
-            RealmUser = realmUser ?? new RealmUser();
             ID = Guid.NewGuid();
         }
 
         [UsedImplicitly] // Realm
         protected ScoreInfo()
         {
-        }
-
-        // TODO: this is a bit temporary to account for the fact that this class is used to ferry API user data to certain UI components.
-        // Eventually we should either persist enough information to realm to not require the API lookups, or perform the API lookups locally.
-        private APIUser? user;
-
-        [Ignored]
-        public APIUser User
-        {
-            get => user ??= new APIUser
-            {
-                Id = RealmUser.OnlineID,
-                Username = RealmUser.Username,
-                CountryCode = RealmUser.CountryCode,
-            };
-            set
-            {
-                user = value;
-
-                RealmUser = new RealmUser
-                {
-                    OnlineID = user.OnlineID,
-                    Username = user.Username,
-                    CountryCode = user.CountryCode,
-                };
-            }
         }
 
         [Ignored]
@@ -208,13 +135,7 @@ namespace osu.Game.Scoring
         [MapTo(nameof(Rank))]
         public int RankInt { get; set; }
 
-        IRulesetInfo IScoreInfo.Ruleset => Ruleset;
-        IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
-        IUser IScoreInfo.User => User;
-
         #region Properties required to make things work with existing usages
-
-        public int UserID => RealmUser.OnlineID;
 
         public int RulesetID => Ruleset.OnlineID;
 
@@ -228,17 +149,6 @@ namespace osu.Game.Scoring
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
             clone.HitEvents = new List<HitEvent>(clone.HitEvents);
-
-            // Ensure we have fresh mods to avoid any references (ie. after gameplay).
-            clone.clearAllMods();
-            clone.ModsJson = ModsJson;
-
-            clone.RealmUser = new RealmUser
-            {
-                OnlineID = RealmUser.OnlineID,
-                Username = RealmUser.Username,
-                CountryCode = RealmUser.CountryCode,
-            };
 
             return clone;
         }
@@ -296,68 +206,6 @@ namespace osu.Game.Scoring
                 return maximumStatistics ??= new Dictionary<HitResult, int>();
             }
             set => maximumStatistics = value;
-        }
-
-        private Mod[]? mods;
-
-        [Ignored]
-        public Mod[] Mods
-        {
-            get
-            {
-                if (mods != null)
-                    return mods;
-
-                return APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
-            }
-            set
-            {
-                clearAllMods();
-                mods = value;
-                updateModsJson();
-            }
-        }
-
-        private APIMod[]? apiMods;
-
-        // Used for API serialisation/deserialisation.
-        [Ignored]
-        public APIMod[] APIMods
-        {
-            get
-            {
-                if (apiMods != null) return apiMods;
-
-                // prioritise reading from realm backing
-                if (!string.IsNullOrEmpty(ModsJson))
-                    apiMods = JsonConvert.DeserializeObject<APIMod[]>(ModsJson);
-
-                // then check mods set via Mods property.
-                if (mods != null)
-                    apiMods ??= mods.Select(m => new APIMod(m)).ToArray();
-
-                return apiMods ?? Array.Empty<APIMod>();
-            }
-            set
-            {
-                clearAllMods();
-                apiMods = value;
-                updateModsJson();
-            }
-        }
-
-        private void clearAllMods()
-        {
-            ModsJson = string.Empty;
-            mods = null;
-            apiMods = null;
-        }
-
-        private void updateModsJson()
-        {
-            ModsJson = APIMods.Length > 0
-                ? JsonConvert.SerializeObject(APIMods)
-                : string.Empty;
         }
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()

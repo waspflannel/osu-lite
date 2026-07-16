@@ -8,10 +8,8 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -23,8 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
-        public Aim(Mod[] mods, bool includeSliders)
-            : base(mods)
+        public Aim(bool includeSliders)
         {
             IncludeSliders = includeSliders;
         }
@@ -51,9 +48,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            if (Mods.Any(m => m is OsuModAutopilot))
-                return 0;
-
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             currentStrain *= decay;
@@ -77,12 +71,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
-            if (Mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = Mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                totalDifficulty *= 1.0 - magnetisedStrength;
-            }
-
             totalDifficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
 
             return totalDifficulty;
@@ -100,19 +88,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double pSnap = calculateSnapFlowProbability(flowDifficulty / combinedSnapDifficulty);
             double pFlow = 1 - pSnap;
-
-            if (Mods.Any(m => m is OsuModTouchDevice))
-            {
-                // we don't adjust agility here since agility represents TD difficulty in a decent enough way
-                snapDifficulty = DiffUtils.Pow(snapDifficulty, 0.89);
-                combinedSnapDifficulty = DiffUtils.Norm(combined_snap_norm_exponent, snapDifficulty, agilityDifficulty);
-            }
-
-            if (Mods.Any(m => m is OsuModRelax))
-            {
-                combinedSnapDifficulty *= 0.75;
-                flowDifficulty *= 0.6;
-            }
 
             double totalDifficulty = combinedSnapDifficulty * pSnap + flowDifficulty * pFlow;
 

@@ -18,7 +18,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -240,7 +239,6 @@ namespace osu.Game.Beatmaps
                     b.BeatmapInfo.ID = BeatmapInfo.ID;
                     b.BeatmapInfo.UserSettings = BeatmapInfo.UserSettings;
                     b.BeatmapInfo.BeatmapSet = BeatmapInfo.BeatmapSet;
-                    b.BeatmapInfo.Status = BeatmapInfo.Status;
                     b.BeatmapInfo.OnlineID = BeatmapInfo.OnlineID;
                     b.BeatmapInfo.OnlineMD5Hash = BeatmapInfo.OnlineMD5Hash;
                     b.BeatmapInfo.LastLocalUpdate = BeatmapInfo.LastLocalUpdate;
@@ -258,14 +256,14 @@ namespace osu.Game.Beatmaps
 
         #region Playable beatmap
 
-        public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
+        public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset)
         {
             try
             {
                 using (var cancellationTokenSource = new CancellationTokenSource(10_000))
                 {
                     // don't apply the default timeout when debugger is attached (may be breakpointing / debugging).
-                    return GetPlayableBeatmap(ruleset, mods ?? Array.Empty<Mod>(), Debugger.IsAttached ? CancellationToken.None : cancellationTokenSource.Token);
+                    return GetPlayableBeatmap(ruleset, Debugger.IsAttached ? CancellationToken.None : cancellationTokenSource.Token);
                 }
             }
             catch (OperationCanceledException)
@@ -274,7 +272,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        public virtual IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken token)
+        public virtual IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, CancellationToken token)
         {
             var rulesetInstance = ruleset.CreateInstance();
 
@@ -285,42 +283,15 @@ namespace osu.Game.Beatmaps
 
             // Check if the beatmap can be converted
             if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
-                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
-
-            // Apply conversion mods
-            foreach (var mod in mods.OfType<IApplicableToBeatmapConverter>())
-            {
-                token.ThrowIfCancellationRequested();
-                mod.ApplyToBeatmapConverter(converter);
-            }
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.ShortName}, converter: {converter}).");
 
             // Convert
             IBeatmap converted = converter.Convert(token);
-
-            // Apply conversion mods to the result
-            foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
-            {
-                token.ThrowIfCancellationRequested();
-                mod.ApplyToBeatmap(converted);
-            }
-
-            // Apply difficulty mods
-            if (mods.Any(m => m is IApplicableToDifficulty))
-            {
-                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
-                {
-                    token.ThrowIfCancellationRequested();
-                    mod.ApplyToDifficulty(converted.Difficulty);
-                }
-            }
 
             var processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
             if (processor != null)
             {
-                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
-                    mod.ApplyToBeatmapProcessor(processor);
-
                 processor.PreProcess();
             }
 
@@ -331,22 +302,7 @@ namespace osu.Game.Beatmaps
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, token);
             }
 
-            foreach (var mod in mods.OfType<IApplicableToHitObject>())
-            {
-                foreach (var obj in converted.HitObjects)
-                {
-                    token.ThrowIfCancellationRequested();
-                    mod.ApplyToHitObject(obj);
-                }
-            }
-
             processor?.PostProcess();
-
-            foreach (var mod in mods.OfType<IApplicableToBeatmap>())
-            {
-                token.ThrowIfCancellationRequested();
-                mod.ApplyToBeatmap(converted);
-            }
 
             return converted;
         }

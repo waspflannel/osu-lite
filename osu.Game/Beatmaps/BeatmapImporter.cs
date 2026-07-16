@@ -373,7 +373,7 @@ namespace osu.Game.Beatmaps
 
                     var ruleset = realm.All<RulesetInfo>().FirstOrDefault(r => r.OnlineID == decodedInfo.Ruleset.OnlineID);
 
-                    if (ruleset?.Available != true)
+                    if (ruleset == null)
                     {
                         LogForModel(beatmapSet, $"Skipping import of {file.Filename} due to missing local ruleset {decodedInfo.Ruleset.OnlineID}.");
                         continue;
@@ -395,11 +395,7 @@ namespace osu.Game.Beatmaps
                         TitleUnicode = decoded.Metadata.TitleUnicode,
                         Artist = decoded.Metadata.Artist,
                         ArtistUnicode = decoded.Metadata.ArtistUnicode,
-                        Author =
-                        {
-                            OnlineID = decoded.Metadata.Author.OnlineID,
-                            Username = decoded.Metadata.Author.Username
-                        },
+                        Creator = decoded.Metadata.Creator,
                         Source = decoded.Metadata.Source,
                         Tags = decoded.Metadata.Tags,
                         PreviewTime = decoded.Metadata.PreviewTime,

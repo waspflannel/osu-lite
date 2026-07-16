@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps
                 {
                     Artist = @"Unknown",
                     Title = @"Unknown",
-                    Author = { Username = @"Unknown Creator" },
+                    Creator = @"Unknown Creator",
                 },
                 DifficultyName = @"Normal",
                 Difficulty = Difficulty,
@@ -148,7 +148,7 @@ namespace osu.Game.Beatmaps
 
         public double[] SliderVelocityPresets { get; set; } = [0.75, 1, 1.5];
 
-        public int BeatmapVersion { get; set; } = LegacyBeatmapEncoder.FIRST_LAZER_VERSION;
+        public int BeatmapVersion { get; set; } = 128;
 
         IBeatmap IBeatmap.Clone() => Clone();
 

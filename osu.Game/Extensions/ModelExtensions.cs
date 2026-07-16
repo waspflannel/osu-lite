@@ -5,10 +5,8 @@ using System.IO;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Extensions
 {
@@ -51,7 +49,7 @@ namespace osu.Game.Extensions
                     result = metadataInfo.GetDisplayTitle();
                     break;
 
-                case IScoreInfo scoreInfo:
+                case ScoreInfo scoreInfo:
                     result = scoreInfo.GetDisplayTitle();
                     break;
 
@@ -59,9 +57,6 @@ namespace osu.Game.Extensions
                     result = rulesetInfo.Name;
                     break;
 
-                case IUser user:
-                    result = user.Username;
-                    break;
             }
 
             // fallback in case none of the above happens to match.
@@ -97,38 +92,6 @@ namespace osu.Game.Extensions
         /// <param name="other">The other instance to compare against.</param>
         /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
         public static bool MatchesOnlineID(this IRulesetInfo? instance, IRulesetInfo? other) => matchesOnlineID(instance, other);
-
-        /// <summary>
-        /// Check whether the online ID of two <see cref="APIUser"/>s match.
-        /// </summary>
-        /// <param name="instance">The instance to compare.</param>
-        /// <param name="other">The other instance to compare against.</param>
-        /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
-        public static bool MatchesOnlineID(this APIUser? instance, APIUser? other) => matchesOnlineID(instance, other);
-
-        /// <summary>
-        /// Check whether the online ID of two <see cref="IScoreInfo"/>s match.
-        /// </summary>
-        /// <param name="instance">The instance to compare.</param>
-        /// <param name="other">The other instance to compare against.</param>
-        /// <returns>
-        /// Whether online IDs match.
-        /// Both <see cref="IHasOnlineID{T}.OnlineID"/> and <see cref="IScoreInfo.LegacyOnlineID"/> are checked, in that order.
-        /// If either instance is missing an online ID, this will return false.
-        /// </returns>
-        public static bool MatchesOnlineID(this IScoreInfo? instance, IScoreInfo? other)
-        {
-            if (matchesOnlineID(instance, other))
-                return true;
-
-            if (instance == null || other == null)
-                return false;
-
-            if (instance.LegacyOnlineID < 0 || other.LegacyOnlineID < 0)
-                return false;
-
-            return instance.LegacyOnlineID.Equals(other.LegacyOnlineID);
-        }
 
         private static bool matchesOnlineID(this IHasOnlineID<long>? instance, IHasOnlineID<long>? other)
         {

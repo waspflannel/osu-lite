@@ -9,7 +9,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
-using osu.Game.Users;
 
 namespace osu.Game.Screens
 {
@@ -85,11 +84,6 @@ namespace osu.Game.Screens
         IBindable<bool> BackButtonVisibility { get; }
 
         /// <summary>
-        /// The current <see cref="UserActivity"/> for this screen.
-        /// </summary>
-        Bindable<UserActivity> Activity { get; }
-
-        /// <summary>
         /// The amount of parallax to be applied while this screen is displayed.
         /// </summary>
         float BackgroundParallaxAmount { get; }
@@ -102,12 +96,6 @@ namespace osu.Game.Screens
         /// Buttons to be added to the game's footer toolbar.
         /// </summary>
         IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
-
-        /// <summary>
-        /// Whether mod track adjustments should be applied on entering this screen.
-        /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
-        /// </summary>
-        bool? ApplyModTrackAdjustments { get; }
 
         /// <summary>
         /// Whether control of the global track should be allowed via the music controller / now playing overlay.

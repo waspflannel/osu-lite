@@ -13,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Game.IPC;
 using osu.Game.Performance;
 using osu.Game.Utils;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Desktop
 {
@@ -24,7 +25,7 @@ namespace osu.Desktop
         private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
 
         public OsuGameDesktop(string[]? args = null)
-            : base(args)
+            : base(() => new OsuRuleset(), args)
         {
         }
 

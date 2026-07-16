@@ -48,15 +48,12 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
-using osu.Game.Online;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
@@ -96,11 +93,6 @@ namespace osu.Game
         /// The maximum volume at which audio tracks should play back at. This can be set lower than 1 to create some head-room for sound effects.
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
-
-        public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
-
-        public virtual EndpointConfiguration CreateEndpoints() =>
-            UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -147,9 +139,9 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager { get; private set; }
 
-        protected SkinManager SkinManager { get; private set; }
+        protected FixedSkinProvider SkinProvider { get; private set; }
 
-        protected RealmRulesetStore RulesetStore { get; private set; }
+        protected FixedRulesetStore RulesetStore { get; private set; }
 
         protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
@@ -157,7 +149,7 @@ namespace osu.Game
 
         protected MusicController MusicController { get; private set; }
 
-        protected IAPIProvider API { get; set; }
+        protected ExternalBrowser ExternalBrowser { get; private set; }
 
         protected Storage Storage { get; set; }
 
@@ -175,25 +167,7 @@ namespace osu.Game
         [Cached(typeof(IBindable<RulesetInfo>))]
         protected internal readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        /// <summary>
-        /// The current mod selection for the local user.
-        /// </summary>
-        /// <remarks>
-        /// If a mod select overlay is present, mod instances set to this value are not guaranteed to remain as the provided instance and will be overwritten by a copy.
-        /// In such a case, changes to settings of a mod will *not* propagate after a mod is added to this collection.
-        /// As such, all settings should be finalised before adding a mod to this collection.
-        /// </remarks>
-        [Cached]
-        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        /// <summary>
-        /// Mods available for the current <see cref="Ruleset"/>.
-        /// </summary>
-        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>(new Dictionary<ModType, IReadOnlyList<Mod>>());
-
         private BeatmapDifficultyCache difficultyCache;
-        private IBeatmapUpdater beatmapUpdater;
 
         private RulesetConfigCache rulesetConfigCache;
 
@@ -231,8 +205,11 @@ namespace osu.Game
         /// </remarks>
         protected virtual int UnhandledExceptionsBeforeCrash => DebugUtils.IsDebugBuild ? 0 : 1;
 
-        public OsuGameBase()
+        private readonly Func<Ruleset> createRuleset;
+
+        protected OsuGameBase(Func<Ruleset> createRuleset)
         {
+            this.createRuleset = createRuleset ?? throw new ArgumentNullException(nameof(createRuleset));
             Name = GAME_NAME;
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
@@ -257,8 +234,9 @@ namespace osu.Game
 
             dependencies.Cache(realm = new RealmAccess(Storage, CLIENT_DATABASE_FILENAME, Host.UpdateThread));
 
-            dependencies.CacheAs<RulesetStore>(RulesetStore = new RealmRulesetStore(realm, Storage));
+dependencies.Cache(RulesetStore = new FixedRulesetStore(realm, createRuleset));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
+            dependencies.Cache(Ruleset);
 
             Decoder.RegisterDependencies(RulesetStore);
 
@@ -269,6 +247,8 @@ namespace osu.Game
 
             dependencies.CacheAs(LocalConfig);
             dependencies.CacheAs<IGameplaySettings>(LocalConfig);
+            dependencies.Cache(new LocalPlayerName(LocalConfig));
+            dependencies.Cache(ExternalBrowser = new ExternalBrowser(Host));
 
             InitialiseFonts();
 
@@ -276,12 +256,8 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
-            dependencies.CacheAs<ISkinSource>(SkinManager);
-
-            EndpointConfiguration endpoints = CreateEndpoints();
-
-            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
+            dependencies.Cache(SkinProvider = new FixedSkinProvider(realm, Host, Resources, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinProvider);
 
             // Initialise localisation
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
@@ -292,15 +268,12 @@ namespace osu.Game
 
             CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
 
-            // osu! lite is fully offline: use a dummy API that never contacts any server.
-            dependencies.CacheAs(API ??= new DummyAPIAccess());
-
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, LocalConfig));
 
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, Audio, Resources, Host, defaultBeatmap));
             dependencies.CacheAs<IWorkingBeatmapCache>(BeatmapManager);
@@ -308,12 +281,7 @@ namespace osu.Game
             // Add after all the above cache operations as it depends on them.
             base.Content.Add(difficultyCache);
 
-            // TODO: OsuGame or OsuGameBase?
-            dependencies.CacheAs(beatmapUpdater = CreateBeatmapUpdater());
-
-            BeatmapManager.ProcessBeatmap = beatmapUpdater.Process;
-
-            dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
+dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
             dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(hitErrorTracker = new SessionAverageHitErrorTracker());
@@ -321,7 +289,6 @@ namespace osu.Game
 
             RegisterImportHandler(BeatmapManager);
             RegisterImportHandler(ScoreManager);
-            // osu! lite is locked to the Argon skin; user skin import is not supported.
 
             // drop track volume game-wide to leave some head-room for UI effects / samples.
             // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
@@ -332,10 +299,6 @@ namespace osu.Game
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
-
-            // add api components to hierarchy.
-            if (API is Drawable apiDrawable)
-                base.Content.Add(apiDrawable);
 
             base.Content.Add(rulesetConfigCache);
 
@@ -378,12 +341,8 @@ namespace osu.Game
 
             dependencies.Cache(globalBindings);
 
-            Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
 
-            // make config aware of how to lookup skins for on-screen display purposes.
-            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
-            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
             LocalConfig.LookupKeyBindings = l => KeyBindingStore.GetBindingsStringFor(l);
         }
 
@@ -407,8 +366,7 @@ namespace osu.Game
                     textWriter.WriteLine(@"To be very clear, the ""files/"" directory inside this directory stores all the raw pieces of your beatmaps, skins, and replays.");
                     textWriter.WriteLine(@"Importantly, it is NOT the only directory you need a backup of to avoid losing data. If you copy only the ""files/"" directory, YOU WILL LOSE DATA.");
                     textWriter.WriteLine();
-                    textWriter.WriteLine(@"For more information on how these files are organised,");
-                    textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");
+                    textWriter.WriteLine(@"For more information, consult the application logs and storage documentation.");
                 }
             }
         }
@@ -487,9 +445,7 @@ namespace osu.Game
             // may be non-null for certain tests
             Storage ??= host.Storage;
 
-            LocalConfig ??= UseDevelopmentServer
-                ? new DevelopmentOsuConfigManager(Storage)
-                : new OsuConfigManager(Storage);
+            LocalConfig ??= new OsuConfigManager(Storage);
 
             host.ExceptionThrown += onExceptionThrown;
         }
@@ -578,8 +534,6 @@ namespace osu.Game
             }
         }
 
-        protected virtual IBeatmapUpdater CreateBeatmapUpdater() => new BeatmapUpdater(BeatmapManager, difficultyCache);
-
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
@@ -611,14 +565,8 @@ namespace osu.Game
                 case MouseHandler mh:
                     return new MouseSettings(mh);
 
-                case JoystickHandler jh:
-                    return new JoystickSettings(jh);
-
                 case PenHandler ph:
                     return new PenSettings(ph);
-
-                case MidiHandler:
-                    return new InputSubsection(handler);
 
                 // return null for handlers that shouldn't have settings.
                 default:
@@ -634,72 +582,6 @@ namespace osu.Game
             Logger.Log($"Game-wide working beatmap updated to {beatmap.NewValue}");
         }
 
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
-        {
-            if (IsLoaded && !ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException("Global ruleset bindable must be changed from update thread.");
-
-            Ruleset instance = null;
-
-            if (r.NewValue?.Available == true)
-            {
-                try
-                {
-                    instance = r.NewValue.CreateInstance();
-                }
-                catch (Exception e)
-                {
-                    Rulesets.RulesetStore.LogRulesetFailure(r.NewValue, e);
-                }
-            }
-
-            if (instance == null)
-            {
-                // reject the change if the ruleset is not available.
-                revertRulesetChange();
-                return;
-            }
-
-            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
-
-            try
-            {
-                foreach (ModType type in Enum.GetValues<ModType>())
-                {
-                    dict[type] = instance.GetModsFor(type)
-                                         // Rulesets should never return null mods, but let's be defensive just in case.
-                                         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                                         .Where(mod => mod != null)
-                                         .ToList();
-                }
-            }
-            catch (Exception e)
-            {
-                Rulesets.RulesetStore.LogRulesetFailure(r.NewValue, e);
-                revertRulesetChange();
-                return;
-            }
-
-            AvailableMods.Value = dict;
-
-            if (SelectedMods.Disabled)
-                return;
-
-            var convertedMods = SelectedMods.Value.Select(mod =>
-            {
-                var newMod = instance.CreateModFromAcronym(mod.Acronym);
-                newMod?.CopyCommonSettingsFrom(mod);
-                return newMod;
-            }).Where(newMod => newMod != null).ToList();
-
-            if (!ModUtils.CheckValidForGameplay(convertedMods, out var invalid))
-                invalid.ForEach(newMod => convertedMods.Remove(newMod));
-
-            SelectedMods.Value = convertedMods;
-
-            void revertRulesetChange() => Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
-        }
-
         private int allowableExceptions;
 
         /// <summary>
@@ -711,7 +593,6 @@ namespace osu.Game
             if (Interlocked.Decrement(ref allowableExceptions) < 0)
             {
                 Logger.Log("Too many unhandled exceptions, crashing out.");
-                RulesetStore?.TryDisableCustomRulesetsCausing(ex);
                 return false;
             }
 
@@ -726,10 +607,7 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
 
-            RulesetStore?.Dispose();
-            LocalConfig?.Dispose();
-
-            beatmapUpdater?.Dispose();
+LocalConfig?.Dispose();
 
             realm?.Dispose();
 

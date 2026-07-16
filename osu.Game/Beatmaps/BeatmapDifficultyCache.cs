@@ -20,7 +20,6 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -30,7 +29,7 @@ using osu.Game.Storyboards;
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A component which performs and acts as a central cache for difficulty calculations of beatmap/ruleset/mod combinations.
+    /// A component which performs and acts as a central cache for difficulty calculations of beatmap/ruleset combinations.
     /// Currently not persisted between game sessions.
     /// </summary>
     public partial class BeatmapDifficultyCache : MemoryCachingComponent<BeatmapDifficultyCache.DifficultyCacheLookup, StarDifficulty?>
@@ -39,7 +38,7 @@ namespace osu.Game.Beatmaps
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));
 
         /// <summary>
-        /// All bindables that should be updated along with the current ruleset + mods.
+        /// All bindables that should be updated along with the current ruleset.
         /// </summary>
         private readonly WeakList<BindableStarDifficulty> trackedBindables = new WeakList<BindableStarDifficulty>();
 
@@ -61,41 +60,12 @@ namespace osu.Game.Beatmaps
         [Resolved]
         private Bindable<RulesetInfo> currentRuleset { get; set; } = null!;
 
-        [Resolved]
-        private Bindable<IReadOnlyList<Mod>> currentMods { get; set; } = null!;
-
-        private ModSettingChangeTracker? modSettingChangeTracker;
-        private ScheduledDelegate? debouncedModSettingsChange;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             currentRuleset.BindValueChanged(_ => Scheduler.AddOnce(updateTrackedBindables));
 
-            currentMods.BindValueChanged(mods =>
-            {
-                // A change in bindable here doesn't guarantee that mods have actually changed.
-                // However, we *do* want to make sure that the mod *references* are the same;
-                // `SequenceEqual()` without a comparer would fall back to `IEquatable`.
-                // Failing to ensure reference equality can cause setting change tracking to fail later.
-                if (mods.OldValue.SequenceEqual(mods.NewValue, ReferenceEqualityComparer.Instance))
-                    return;
-
-                modSettingChangeTracker?.Dispose();
-
-                Scheduler.AddOnce(updateTrackedBindables);
-
-                modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-                modSettingChangeTracker.SettingChanged += _ =>
-                {
-                    lock (bindableUpdateLock)
-                    {
-                        debouncedModSettingsChange?.Cancel();
-                        debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
-                    }
-                };
-            }, true);
         }
 
         /// <summary>
@@ -123,7 +93,7 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset and mods.
+        /// Retrieves a bindable containing the star difficulty of a <see cref="BeatmapInfo"/> that follows the currently-selected ruleset.
         /// </summary>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
@@ -142,7 +112,7 @@ namespace osu.Game.Beatmaps
                 var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, cancellationToken);
                 linkedCancellationSources.Add(linkedSource);
 
-                updateBindable(bindable, currentRuleset.Value, currentMods.Value, linkedSource, computationDelay);
+                updateBindable(bindable, currentRuleset.Value, linkedSource, computationDelay);
 
                 trackedBindables.Add(bindable);
             }
@@ -155,7 +125,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapInfo">The <see cref="IBeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="rulesetInfo">The <see cref="IRulesetInfo"/> to get the difficulty with.</param>
-        /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops computing the star difficulty.</param>
         /// <param name="computationDelay">In the case a cached lookup was not possible, a value in milliseconds of to wait until performing potentially intensive lookup.</param>
         /// <returns>
@@ -163,8 +132,8 @@ namespace osu.Game.Beatmaps
         /// A <see langword="null"/> return value indicates that the difficulty process failed or was interrupted early,
         /// and as such there is no usable star difficulty value to be returned.
         /// </returns>
-        public virtual Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo? rulesetInfo = null, IEnumerable<Mod>? mods = null,
-                                                                CancellationToken cancellationToken = default, int computationDelay = 0)
+        public virtual Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo? rulesetInfo = null,
+                                                                 CancellationToken cancellationToken = default, int computationDelay = 0)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             rulesetInfo ??= beatmapInfo.Ruleset;
@@ -175,11 +144,10 @@ namespace osu.Game.Beatmaps
             // Difficulty can only be computed if the beatmap and ruleset are locally available.
             if (localBeatmapInfo == null || localRulesetInfo == null)
             {
-                // If not, fall back to the existing star difficulty (e.g. from an online source).
-                return Task.FromResult<StarDifficulty?>(new StarDifficulty(beatmapInfo.StarRating, (beatmapInfo as IBeatmapOnlineInfo)?.MaxCombo ?? 0));
+                return Task.FromResult<StarDifficulty?>(null);
             }
 
-            return GetAsync(new DifficultyCacheLookup(localBeatmapInfo, localRulesetInfo, mods), cancellationToken, computationDelay);
+            return GetAsync(new DifficultyCacheLookup(localBeatmapInfo, localRulesetInfo), cancellationToken, computationDelay);
         }
 
         protected override Task<StarDifficulty?> ComputeValueAsync(DifficultyCacheLookup lookup, CancellationToken cancellationToken = default)
@@ -195,16 +163,16 @@ namespace osu.Game.Beatmaps
 
         protected override bool CacheNullValues => false;
 
-        public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(IWorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken cancellationToken = default)
+        public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(IWorkingBeatmap beatmap, Ruleset ruleset, CancellationToken cancellationToken = default)
         {
-            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods, cancellationToken),
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
                 updateScheduler);
         }
 
         /// <summary>
-        /// Updates all tracked <see cref="BindableStarDifficulty"/> using the current ruleset and mods.
+        /// Updates all tracked <see cref="BindableStarDifficulty"/> using the current ruleset.
         /// </summary>
         private void updateTrackedBindables()
         {
@@ -217,7 +185,7 @@ namespace osu.Game.Beatmaps
                     var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
                     linkedCancellationSources.Add(linkedSource);
 
-                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource);
+                    updateBindable(b, currentRuleset.Value, linkedSource);
                 }
             }
         }
@@ -229,9 +197,6 @@ namespace osu.Game.Beatmaps
         {
             lock (bindableUpdateLock)
             {
-                debouncedModSettingsChange?.Cancel();
-                debouncedModSettingsChange = null;
-
                 trackedUpdateCancellationSource.Cancel();
                 trackedUpdateCancellationSource = new CancellationTokenSource();
 
@@ -243,11 +208,10 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Updates the value of a <see cref="BindableStarDifficulty"/> with a given ruleset + mods.
+        /// Updates the value of a <see cref="BindableStarDifficulty"/> with a given ruleset.
         /// </summary>
         /// <param name="bindable">The <see cref="BindableStarDifficulty"/> to update.</param>
         /// <param name="rulesetInfo">The <see cref="IRulesetInfo"/> to update with.</param>
-        /// <param name="mods">The <see cref="Mod"/>s to update with.</param>
         /// <param name="linkedCancellationTokenSource">
         /// A cancellation token source that may be used to cancel this update.
         /// This token will be cancelled in one of two scenarios:
@@ -257,11 +221,11 @@ namespace osu.Game.Beatmaps
         /// </list>
         /// </param>
         /// <param name="computationDelay">In the case a cached lookup was not possible, a value in milliseconds of to wait until performing potentially intensive lookup.</param>
-        private void updateBindable(BindableStarDifficulty bindable, IRulesetInfo? rulesetInfo, IEnumerable<Mod>? mods, CancellationTokenSource linkedCancellationTokenSource, int computationDelay = 0)
+        private void updateBindable(BindableStarDifficulty bindable, IRulesetInfo? rulesetInfo, CancellationTokenSource linkedCancellationTokenSource, int computationDelay = 0)
         {
             // GetDifficultyAsync will fall back to existing data from IBeatmapInfo if not locally available
             // (contrary to GetAsync)
-            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, linkedCancellationTokenSource.Token, computationDelay)
+            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, linkedCancellationTokenSource.Token, computationDelay)
                 .ContinueWith(task =>
                     {
                         // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
@@ -307,9 +271,9 @@ namespace osu.Game.Beatmaps
                 Debug.Assert(ruleset != null);
 
                 PlayableCachedWorkingBeatmap workingBeatmap = new PlayableCachedWorkingBeatmap(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
-                IBeatmap playableBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, key.OrderedMods, cancellationToken);
+                IBeatmap playableBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, cancellationToken);
 
-                var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(key.OrderedMods, cancellationToken);
+                var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var performanceCalculator = ruleset.CreatePerformanceCalculator();
@@ -317,7 +281,6 @@ namespace osu.Game.Beatmaps
                     return new StarDifficulty(difficulty, new PerformanceAttributes());
 
                 ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
-                scoreProcessor.Mods.Value = key.OrderedMods;
                 scoreProcessor.ApplyBeatmap(playableBeatmap);
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -325,7 +288,6 @@ namespace osu.Game.Beatmaps
                 {
                     Passed = true,
                     Accuracy = 1,
-                    Mods = key.OrderedMods,
                     MaxCombo = scoreProcessor.MaximumCombo,
                     Combo = scoreProcessor.MaximumCombo,
                     TotalScore = scoreProcessor.MaximumTotalScore,
@@ -362,8 +324,6 @@ namespace osu.Game.Beatmaps
         {
             base.Dispose(isDisposing);
 
-            modSettingChangeTracker?.Dispose();
-
             cancelTrackedBindableUpdate();
             updateScheduler.Dispose();
         }
@@ -372,20 +332,16 @@ namespace osu.Game.Beatmaps
         {
             public readonly BeatmapInfo BeatmapInfo;
             public readonly RulesetInfo Ruleset;
-            public readonly Mod[] OrderedMods;
-
-            public DifficultyCacheLookup(BeatmapInfo beatmapInfo, RulesetInfo? ruleset, IEnumerable<Mod>? mods)
+            public DifficultyCacheLookup(BeatmapInfo beatmapInfo, RulesetInfo? ruleset)
             {
                 BeatmapInfo = beatmapInfo;
                 // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
                 Ruleset = ruleset ?? BeatmapInfo.Ruleset;
-                OrderedMods = mods?.OrderBy(m => m.Acronym).Select(mod => mod.DeepClone()).ToArray() ?? Array.Empty<Mod>();
             }
 
             public bool Equals(DifficultyCacheLookup other)
                 => BeatmapInfo.Equals(other.BeatmapInfo)
-                   && Ruleset.Equals(other.Ruleset)
-                   && OrderedMods.SequenceEqual(other.OrderedMods);
+                   && Ruleset.Equals(other.Ruleset);
 
             public override int GetHashCode()
             {
@@ -393,9 +349,6 @@ namespace osu.Game.Beatmaps
 
                 hashCode.Add(BeatmapInfo.ID);
                 hashCode.Add(Ruleset.ShortName);
-
-                foreach (var mod in OrderedMods)
-                    hashCode.Add(mod);
 
                 return hashCode.ToHashCode();
             }
@@ -427,11 +380,11 @@ namespace osu.Game.Beatmaps
                 this.working = working;
             }
 
-            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods)
-                => playable ??= working.GetPlayableBeatmap(ruleset, mods);
+            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset)
+                => playable ??= working.GetPlayableBeatmap(ruleset);
 
-            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken cancellationToken)
-                => playable ??= working.GetPlayableBeatmap(ruleset, mods, cancellationToken);
+            public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, CancellationToken cancellationToken)
+                => playable ??= working.GetPlayableBeatmap(ruleset, cancellationToken);
 
             IBeatmapInfo IWorkingBeatmap.BeatmapInfo => working.BeatmapInfo;
             bool IWorkingBeatmap.BeatmapLoaded => working.BeatmapLoaded;

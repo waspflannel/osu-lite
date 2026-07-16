@@ -20,7 +20,6 @@ using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays
 {
@@ -60,9 +59,6 @@ namespace osu.Game.Overlays
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
@@ -98,7 +94,7 @@ namespace osu.Game.Overlays
                 if (b.NewValue != null)
                     changeBeatmap(b.NewValue);
             }, true);
-            mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+            ResetTrackAdjustments();
         }
 
         /// <summary>
@@ -545,32 +541,9 @@ namespace osu.Game.Overlays
                 NextTrack(allowProtectedTracks: true);
         }
 
-        private bool applyModTrackAdjustments;
-
         /// <summary>
-        /// Whether mod track adjustments are allowed to be applied.
+        /// Resets the adjustments currently applied on <see cref="CurrentTrack"/>.
         /// </summary>
-        public bool ApplyModTrackAdjustments
-        {
-            get => applyModTrackAdjustments;
-            set
-            {
-                if (applyModTrackAdjustments == value)
-                    return;
-
-                applyModTrackAdjustments = value;
-                ResetTrackAdjustments();
-            }
-        }
-
-        private AudioAdjustments? modTrackAdjustments;
-
-        /// <summary>
-        /// Resets the adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="ApplyModTrackAdjustments"/> is <c>true</c>.
-        /// </summary>
-        /// <remarks>
-        /// Does not reset any adjustments applied directly to the beatmap track.
-        /// </remarks>
         public void ResetTrackAdjustments()
         {
             // todo: we probably want a helper method rather than this.
@@ -579,13 +552,6 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
 
-            if (applyModTrackAdjustments)
-            {
-                CurrentTrack.BindAdjustments(modTrackAdjustments = new AudioAdjustments());
-
-                foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
-                    mod.ApplyToTrack(modTrackAdjustments);
-            }
         }
     }
 

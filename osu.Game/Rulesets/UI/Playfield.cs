@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
@@ -104,10 +103,6 @@ namespace osu.Game.Rulesets.UI
         /// should retarget this to the ScreenSpaceDrawQuad of the appropriate container.
         /// </remarks>
         public virtual Quad SkinnableComponentScreenSpaceDrawQuad => ScreenSpaceDrawQuad;
-
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        protected IReadOnlyList<Mod> Mods { get; private set; }
 
         private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
 
@@ -247,13 +242,9 @@ namespace osu.Game.Rulesets.UI
             nestedPlayfields.Add(otherPlayfield);
         }
 
-        private Mod[] mods;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            mods = Mods?.ToArray();
 
             // in the case a consumer forgets to add the HitObjectContainer, we will add it here.
             if (HitObjectContainer.Parent == null)
@@ -263,15 +254,6 @@ namespace osu.Game.Rulesets.UI
         protected override void Update()
         {
             base.Update();
-
-            if (!IsNested && mods != null)
-            {
-                foreach (Mod mod in mods)
-                {
-                    if (mod is IUpdatableByPlayfield updatable)
-                        updatable.Update(this);
-                }
-            }
 
             // When rewinding, revert future judgements in the reverse order.
             while (judgedEntries.Count > 0)
@@ -405,16 +387,6 @@ namespace osu.Game.Rulesets.UI
                 {
                     onNewDrawableHitObject(dho);
 
-                    // If this is the first time this DHO is being used, then apply the DHO mods.
-                    // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                    if (mods != null)
-                    {
-                        foreach (Mod mod in mods)
-                        {
-                            if (mod is IApplicableToDrawableHitObject applicable)
-                                applicable.ApplyToDrawableHitObject(dho);
-                        }
-                    }
                 }
 
                 if (!entryManager.TryGet(hitObject, out var entry))

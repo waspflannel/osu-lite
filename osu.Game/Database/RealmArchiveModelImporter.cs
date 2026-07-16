@@ -197,50 +197,6 @@ namespace osu.Game.Database
 
         public virtual Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original) => throw new NotImplementedException();
 
-        public async Task<ExternalEditOperation<TModel>> BeginExternalEditing(TModel model)
-        {
-            string mountedPath = Path.Join(Path.GetTempPath(), model.Hash);
-
-            if (Directory.Exists(mountedPath))
-                Directory.Delete(mountedPath, true);
-
-            Directory.CreateDirectory(mountedPath);
-
-            foreach (var realmFile in model.Files)
-            {
-                string sourcePath = Files.Storage.GetFullPath(realmFile.File.GetStoragePath());
-                // there are edge cases where externalising an imported model to the filesystem could fail due to invalid filenames.
-                // one scenario where this happens goes something like this:
-                // - stable user exports an archive, which contains filenames that get mangled by stable's default zip encoding codepage (Shift-JIS)
-                // - said archive is imported to lazer, but the invalid filename is not actually an issue due to lazer file store structure
-                //   (the file is stored under a filename correspondent to its SHA instead, and its real filename is only stored in realm)
-                // - however attempts to externally edit the model fail as the external edit attempts and fails to produce the file's "real" filename in the mounted path
-                // to prevent this bricking external edit, strip invalid characters on external edit.
-                // the presumption here is that whatever produced the mangled archive is primarily at fault here, and we're just trying to trudge on locally as best as possible.
-                // if there are further troubles related to similar issues, reevaluate moving this sort of check to the import side instead (sanitising filenames on import from archive).
-                string destinationPath = mountedPath;
-                foreach (string piece in realmFile.Filename.Split('/').Select(f => f.GetValidFilename()))
-                    destinationPath = Path.Combine(destinationPath, piece);
-
-                string destinationDirectory = Path.GetDirectoryName(destinationPath)!;
-
-                if (!FilesystemSanityCheckHelpers.IsSubDirectory(parent: mountedPath, child: destinationDirectory))
-                {
-                    Logger.Log($@"Skipping attempt to mount {realmFile.Filename} due to detected escape out of mounted path.", LoggingTarget.Database);
-                    continue;
-                }
-
-                Directory.CreateDirectory(destinationDirectory);
-
-                // Consider using hard links here to make this instant.
-                using (var inStream = Files.Storage.GetStream(sourcePath))
-                using (var outStream = File.Create(destinationPath))
-                    await inStream.CopyToAsync(outStream).ConfigureAwait(false);
-            }
-
-            return new ExternalEditOperation<TModel>(this, model, mountedPath);
-        }
-
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// Note that this bypasses the UI flow and should only be used for special cases or testing.
@@ -400,7 +356,7 @@ namespace osu.Game.Database
                     // TODO: we may want to run this outside of the transaction.
                     Populate(item, archive, realm, cancellationToken);
 
-                    // Populate() may have adjusted file content (see SkinImporter.updateSkinIniMetadata), so regardless of whether a fast check was done earlier, let's
+                    // Populate() may have adjusted file content, so regardless of whether a fast check was done earlier, let's
                     // check for existing items a second time.
                     //
                     // If this is ever a performance issue, the fast-check hash can be compared and trigger a skip of this second check if it still matches.

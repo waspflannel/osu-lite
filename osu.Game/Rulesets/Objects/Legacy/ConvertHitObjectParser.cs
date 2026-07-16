@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = text.Split(',');
 
             Vector2 pos =
-                formatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
+                formatVersion >= 128
                     ? new Vector2(Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE))
                     : new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
 
@@ -339,7 +339,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 string[] vertexSplit = value.Split(':');
 
-                Vector2 pos = formatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
+                Vector2 pos = formatVersion >= 128
                     ? new Vector2(Parsing.ParseFloat(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), Parsing.ParseFloat(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE))
                     : new Vector2((int)Parsing.ParseFloat(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE));
                 pos -= startPos;
@@ -367,7 +367,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 int endPointLength = endPoint == null ? 0 : 1;
 
-                if (formatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                if (formatVersion < 128)
                 {
                     if (vertices.Length + endPointLength != 3)
                         type = PathType.BEZIER;
@@ -403,7 +403,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 // Legacy CATMULL sliders don't support multiple segments, so adjacent CATMULL segments should be treated as a single one.
                 // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
                 // resulting in a duplicate (0,0) control point in the resultant list.
-                if (type == PathType.CATMULL && endIndex > 1 && formatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                if (type == PathType.CATMULL && endIndex > 1 && formatVersion < 128)
                     continue;
 
                 // The last control point of each segment is not allowed to start a new implicit segment.

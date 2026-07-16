@@ -13,8 +13,6 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables
@@ -114,14 +112,8 @@ namespace osu.Game.Beatmaps.Drawables
             difficultyFillFlowContainer.Show();
             miscFillFlowContainer.Show();
 
-            double rate = 1;
-            if (displayedContent.Mods != null)
-                rate = ModUtils.CalculateRateWithMods(displayedContent.Mods);
-
-            double bpmAdjusted = displayedContent.BeatmapInfo.BPM * rate;
-
             Ruleset ruleset = displayedContent.Ruleset.CreateInstance();
-            var beatmapAttributes = ruleset.GetBeatmapAttributesForDisplay(displayedContent.BeatmapInfo, displayedContent.Mods ?? [])
+            var beatmapAttributes = ruleset.GetBeatmapAttributesForDisplay(displayedContent.BeatmapInfo)
                                            .Select(attr => new OsuSpriteText
                                            {
                                                Font = OsuFont.Style.Caption1,
@@ -131,9 +123,9 @@ namespace osu.Game.Beatmaps.Drawables
             difficultyFillFlowContainer.Clear();
             difficultyFillFlowContainer.AddRange(beatmapAttributes);
 
-            TimeSpan lengthTimeSpan = TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length / rate);
+            TimeSpan lengthTimeSpan = TimeSpan.FromMilliseconds(displayedContent.BeatmapInfo.Length);
             length.Text = "Length: " + lengthTimeSpan.ToFormattedDuration();
-            bpm.Text = " BPM: " + Math.Round(bpmAdjusted, 0);
+            bpm.Text = " BPM: " + Math.Round(displayedContent.BeatmapInfo.BPM, 0);
         }
 
         public void Move(Vector2 pos) => Position = pos;
@@ -148,10 +140,9 @@ namespace osu.Game.Beatmaps.Drawables
         public readonly IBeatmapInfo BeatmapInfo;
         public readonly IBindable<StarDifficulty> Difficulty;
         public readonly IRulesetInfo Ruleset;
-        public readonly Mod[]? Mods;
         public readonly DifficultyIconTooltipType TooltipType;
 
-        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, Mod[]? mods, DifficultyIconTooltipType tooltipType)
+        public DifficultyIconTooltipContent(IBeatmapInfo beatmapInfo, IBindable<StarDifficulty> difficulty, IRulesetInfo rulesetInfo, DifficultyIconTooltipType tooltipType)
         {
             if (tooltipType == DifficultyIconTooltipType.None)
                 throw new ArgumentOutOfRangeException(nameof(tooltipType), tooltipType, "Cannot instantiate a tooltip without a type");
@@ -159,7 +150,6 @@ namespace osu.Game.Beatmaps.Drawables
             BeatmapInfo = beatmapInfo;
             Difficulty = difficulty;
             Ruleset = rulesetInfo;
-            Mods = mods;
             TooltipType = tooltipType;
         }
     }

@@ -63,7 +63,7 @@ namespace osu.Game.Input.Bindings
         {
         }
 
-        public object GetAction(RulesetStore rulesets)
+        public object GetAction(IRulesetStore rulesets)
         {
             if (string.IsNullOrEmpty(RulesetName))
                 return (GlobalAction)ActionInt;

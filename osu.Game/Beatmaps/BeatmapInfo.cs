@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Database;
 using osu.Game.Models;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using Realms;
@@ -67,16 +66,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public RealmNamedFileUsage? File => BeatmapSet?.Files.FirstOrDefault(f => f.File.Hash == Hash);
 
-        [Ignored]
-        public BeatmapOnlineStatus Status
-        {
-            get => (BeatmapOnlineStatus)StatusInt;
-            set => StatusInt = (int)value;
-        }
-
-        [MapTo(nameof(Status))]
-        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
-
         [Indexed]
         public int OnlineID { get; set; } = -1;
 
@@ -129,8 +118,6 @@ namespace osu.Game.Beatmaps
                 OnlineID = -1;
             LastOnlineUpdate = null;
             OnlineMD5Hash = string.Empty;
-            if (Status != BeatmapOnlineStatus.LocallyModified)
-                Status = BeatmapOnlineStatus.None;
         }
 
         /// <summary>
@@ -207,9 +194,6 @@ namespace osu.Game.Beatmaps
 
         [Ignored]
         public string? Path => File?.Filename;
-
-        [Ignored]
-        public APIBeatmap? OnlineInfo { get; set; }
 
         /// <summary>
         /// The maximum achievable combo on this beatmap, populated for online info purposes only.

@@ -20,10 +20,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Input;
@@ -40,7 +37,6 @@ namespace osu.Game.Screens.Select
         public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
         private SongSelectSearchTextBox searchTextBox = null!;
-        private ShearedToggleButton showConvertedBeatmapsButton = null!;
         private DifficultyRangeSlider difficultyRangeSlider = null!;
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupModeDropdownItem> groupDropdown = null!;
@@ -57,13 +53,10 @@ namespace osu.Game.Screens.Select
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
-        [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private IBindable<APIUser> localUser = null!;
-        private readonly IBindableList<int> localUserFavouriteBeatmapSets = new BindableList<int>();
+        [Resolved]
+        private LocalPlayerName localPlayerName { get; set; } = null!;
 
         public LocalisableString StatusText
         {
@@ -76,7 +69,7 @@ namespace osu.Game.Screens.Select
         private FilterCriteria currentCriteria = null!;
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -134,8 +127,6 @@ namespace osu.Game.Screens.Select
                                     ColumnDimensions = new[]
                                     {
                                         new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute), // can probably be removed?
-                                        new Dimension(GridSizeMode.AutoSize),
                                     },
                                     Content = new[]
                                     {
@@ -145,15 +136,6 @@ namespace osu.Game.Screens.Select
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 MinRange = 0.1f,
-                                            },
-                                            Empty(),
-                                            showConvertedBeatmapsButton = new ShearedToggleButton
-                                            {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                AutoSizeAxes = Axes.X,
-                                                Text = UserInterfaceStrings.ShowConverts,
-                                                Height = 30f,
                                             },
                                         },
                                     }
@@ -199,8 +181,6 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            localUser = api.LocalUser.GetBoundCopy();
-            localUserFavouriteBeatmapSets.BindTo(api.LocalUserState.FavouriteBeatmapSets);
         }
 
         protected override void LoadComplete()
@@ -209,26 +189,9 @@ namespace osu.Game.Screens.Select
 
             difficultyRangeSlider.LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
             difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
-            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
 
             ruleset.BindValueChanged(_ => updateCriteria());
-            mods.BindValueChanged(m =>
-            {
-                // The following is a note carried from old song select and may not be a valid reason anymore:
-                // // Mods are updated once by the mod select overlay when song select is entered,
-                // // regardless of if there are any mods or any changes have taken place.
-                // // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
-                // // Todo: Investigate/fix and potentially remove this.
-                // TODO: this might be simply removable with the new song select & carousel code.
-                if (m.NewValue.SequenceEqual(m.OldValue))
-                    return;
-
-                var rulesetCriteria = currentCriteria.RulesetCriteria;
-                if (rulesetCriteria?.FilterMayChangeFromMods(currentCriteria, m) == true)
-                    updateCriteria();
-            });
-
             searchTextBox.Current.BindValueChanged(_ => updateCriteria());
 
             ScheduledDelegate? sliderDebounce = null;
@@ -244,12 +207,10 @@ namespace osu.Game.Screens.Select
             difficultyRangeSlider.LowerBound.BindValueChanged(_ => debouncedUpdateCriteria());
             difficultyRangeSlider.UpperBound.BindValueChanged(_ => debouncedUpdateCriteria());
 
-            showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
 
-            localUser.BindValueChanged(_ => updateCriteria());
-            localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
+            localPlayerName.Value.BindValueChanged(_ => updateCriteria());
             ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
             updateCriteria();
@@ -261,18 +222,13 @@ namespace osu.Game.Screens.Select
         public FilterCriteria CreateCriteria()
         {
             string query = searchTextBox.Current.Value;
-            bool isValidUser = localUser.Value.Id > 1;
-
             var criteria = new FilterCriteria
             {
                 SelectedBeatmapSet = ScopedBeatmapSet.Value,
                 Sort = sortDropdown.Current.Value,
                 Group = groupDropdown.Current.Value?.Value ?? GroupMode.None,
-                AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
-                Mods = mods.Value,
-                LocalUserId = isValidUser ? localUser.Value.Id : null,
-                LocalUserUsername = isValidUser ? localUser.Value.Username : null,
+                LocalCreator = localPlayerName.Value.Value,
             };
 
             if (!difficultyRangeSlider.LowerBound.IsDefault)

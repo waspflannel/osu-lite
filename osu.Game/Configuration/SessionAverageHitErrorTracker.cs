@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -35,9 +34,6 @@ namespace osu.Game.Configuration
         private void calculateAverageHitError(ScoreInfo? newScore)
         {
             if (newScore == null)
-                return;
-
-            if (newScore.Mods.Any(m => !m.UserPlayable || m is IHasNoTimedInputs))
                 return;
 
             if (newScore.HitEvents.Count < 50)

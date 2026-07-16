@@ -37,12 +37,9 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
@@ -124,8 +121,6 @@ namespace osu.Game.Screens.Select
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
-        public override bool? ApplyModTrackAdjustments => true;
-
         public override bool ShowFooter => true;
 
         private Sample? errorSample;
@@ -140,9 +135,6 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
@@ -152,7 +144,6 @@ namespace osu.Game.Screens.Select
 
 
         private Bindable<bool> configBackgroundBlur = null!;
-        private Bindable<bool> showConvertedBeatmaps = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -302,7 +293,6 @@ namespace osu.Game.Screens.Select
                 updateBackgroundDim();
             });
 
-            showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
@@ -589,7 +579,7 @@ namespace osu.Game.Screens.Select
 
         private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
         {
-            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value))
+            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value))
                 return false;
 
             if (beatmap.Hidden)
@@ -1042,10 +1032,7 @@ namespace osu.Game.Screens.Select
 
             var beatmapInfo = workingBeatmap.BeatmapInfo;
 
-            // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps.
-            // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
-            bool requiresRulesetSwitch = !beatmapInfo.Ruleset.Equals(Ruleset.Value)
-                                         && (beatmapInfo.Ruleset.OnlineID > 0 || !showConvertedBeatmaps.Value);
+            bool requiresRulesetSwitch = !beatmapInfo.Ruleset.Equals(Ruleset.Value);
 
             if (requiresRulesetSwitch)
             {

@@ -35,12 +35,10 @@ namespace osu.Game.Overlays
             {
                 new GeneralSection(),
                 new InputSection(createSubPanel(new KeyBindingPanel())),
-                new UserInterfaceSection(),
                 new GameplaySection(),
                 new AudioSection(),
                 new GraphicsSection(),
-                new MaintenanceSection(),
-                new DebugSection()
+                new MaintenanceSection()
             };
 
             return sections;

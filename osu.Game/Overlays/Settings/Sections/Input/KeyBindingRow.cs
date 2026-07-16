@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
+        private IRulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
         private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;

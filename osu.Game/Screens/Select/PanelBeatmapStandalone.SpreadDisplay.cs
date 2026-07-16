@@ -31,7 +31,6 @@ namespace osu.Game.Screens.Select
             protected override Colour4 DimColour => Colour4.White;
 
             private readonly IBindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
-            private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
             private const double transition_duration = 200;
 
@@ -65,7 +64,7 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager configManager)
+            private void load()
             {
                 Add(new FillFlowContainer
                 {
@@ -130,7 +129,6 @@ namespace osu.Game.Screens.Select
                 if (songSelect != null)
                     scopedBeatmapSet.BindTo(songSelect.ScopedBeatmapSet);
 
-                configManager.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmaps);
             }
 
             protected override void LoadComplete()
@@ -139,7 +137,6 @@ namespace osu.Game.Screens.Select
 
                 Beatmap.BindValueChanged(_ => updateBeatmap());
                 StarDifficulty.BindValueChanged(_ => updateBeatmap());
-                showConvertedBeatmaps.BindValueChanged(_ => updateBeatmap());
                 scopedBeatmapSet.BindValueChanged(_ => updateBeatmap(), true);
                 Selected.BindValueChanged(_ => updateEnabled());
                 scopedBeatmapSet.BindDisabledChanged(_ => updateEnabled(), true);
@@ -160,7 +157,7 @@ namespace osu.Game.Screens.Select
 
                 var otherStarDifficulties = Beatmap.Value.BeatmapSet!.Beatmaps
                                                    .Except([Beatmap.Value])
-                                                   .Where(b => b.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value))
+                                                   .Where(b => b.AllowGameplayWithRuleset(ruleset.Value))
                                                    .OrderBy(b => b.StarRating)
                                                    .Select(b => b.StarRating)
                                                    .ToList();

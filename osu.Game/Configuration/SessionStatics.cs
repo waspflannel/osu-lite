@@ -7,7 +7,6 @@ using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Configuration
 {
@@ -21,10 +20,8 @@ namespace osu.Game.Configuration
             SetDefault(Static.MutedAudioNotificationShownOnce, false);
             SetDefault(Static.FeaturedArtistDisclaimerShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
-            SetDefault(Static.LastRankChangeSamplePlaybackTime, (double?)null);
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
             SetDefault<ScoreInfo?>(Static.LastAppliedOffsetScore, null);
-            SetDefault<UserActivity?>(Static.UserOnlineActivity, null);
         }
 
         /// <summary>
@@ -51,12 +48,6 @@ namespace osu.Game.Configuration
         LastHoverSoundPlaybackTime,
 
         /// <summary>
-        /// The last playback time in milliseconds of a rank up/down sample (in <see cref="DefaultRankDisplay"/> and <see cref="LegacyRankDisplay"/>).
-        /// Used to debounce rank change sounds game-wide to avoid potential volume saturation from multiple simultaneous playback.
-        /// </summary>
-        LastRankChangeSamplePlaybackTime,
-
-        /// <summary>
         /// Stores the local user's last score (can be completed or aborted).
         /// </summary>
         LastLocalUserScore,
@@ -71,11 +62,6 @@ namespace osu.Game.Configuration
         /// This is reset when a new challenge is up.
         /// </summary>
         DailyChallengeIntroPlayed,
-
-        /// <summary>
-        /// The activity for the current user to broadcast to other players.
-        /// </summary>
-        UserOnlineActivity,
 
     }
 }

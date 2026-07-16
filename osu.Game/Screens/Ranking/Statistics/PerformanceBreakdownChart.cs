@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             if (performanceCalculator == null)
                 return null;
 
-            var starsTask = difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, token).ConfigureAwait(false);
+            var starsTask = difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, token).ConfigureAwait(false);
             if (await starsTask is not StarDifficulty stars)
                 return null;
 

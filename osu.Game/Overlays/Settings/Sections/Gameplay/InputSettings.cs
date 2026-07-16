@@ -27,11 +27,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.01f,
                     LabelFormat = v => $"{v:0.##}x"
                 }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = SkinSettingsStrings.AutoCursorSize,
-                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
-                }),
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)

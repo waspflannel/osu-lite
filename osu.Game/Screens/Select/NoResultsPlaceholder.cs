@@ -14,7 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
-using osu.Game.Online;
 
 namespace osu.Game.Screens.Select
 {
@@ -173,15 +172,6 @@ namespace osu.Game.Screens.Select
                     textFlow.AddText($" the {lowerStar} - {upperStar} star difficulty filter.");
                 }
 
-                // TODO: Add realm queries to hint at which ruleset results are available in (and allow clicking to switch).
-                // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
-                if (filter?.Ruleset?.OnlineID != 0 && filter?.AllowConvertedBeatmaps == false)
-                {
-                    addBulletPoint();
-                    textFlow.AddText("Try ");
-                    textFlow.AddLink("enabling", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
-                    textFlow.AddText(" automatic conversion!");
-                }
             }
 
             // TODO: add clickable link to reset criteria.

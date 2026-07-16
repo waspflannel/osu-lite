@@ -10,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -30,7 +29,6 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> Length;
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
-        public OptionalSet<BeatmapOnlineStatus> OnlineStatus = new OptionalSet<BeatmapOnlineStatus>();
         public OptionalRange<DateTimeOffset> LastPlayed;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
@@ -46,12 +44,6 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter[] SearchTerms = Array.Empty<OptionalTextFilter>();
 
         public RulesetInfo? Ruleset;
-        public IReadOnlyList<Mod>? Mods;
-        public bool AllowConvertedBeatmaps;
-        public int? BeatmapSetId;
-
-        public bool? HasOnlineID;
-
         private string searchText = string.Empty;
 
         /// <summary>
@@ -110,16 +102,9 @@ namespace osu.Game.Screens.Select
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 
         /// <summary>
-        /// The user ID of the current local user, used to filter to own maps when <see cref="GroupMode.MyMaps"/> is selected.
-        /// Or null if the user is not logged in.
+        /// The configured local creator name, used to filter to own maps when <see cref="GroupMode.MyMaps"/> is selected.
         /// </summary>
-        public int? LocalUserId { get; set; }
-
-        /// <summary>
-        /// The username of the current local user, used to filter to own maps when <see cref="GroupMode.MyMaps"/> is selected.
-        /// Or null if the user is not logged in.
-        /// </summary>
-        public string? LocalUserUsername { get; set; }
+        public string? LocalCreator { get; set; }
 
         public readonly struct OptionalSet<T> : IEquatable<OptionalSet<T>>
             where T : struct, Enum

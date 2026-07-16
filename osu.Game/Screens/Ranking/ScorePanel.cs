@@ -17,7 +17,6 @@ using osu.Framework.Utils;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -172,12 +171,6 @@ namespace osu.Game.Screens.Ranking
                                 Children = new[]
                                 {
                                     middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
-                                    new UserCoverBackground
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        User = Score.User,
-                                        Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                    }
                                 }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
@@ -251,7 +244,7 @@ namespace osu.Game.Screens.Ranking
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
                     bool firstLoad = topLayerContent == null;
-                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User, firstLoad) { Alpha = 0 });
+                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(firstLoad) { Alpha = 0 });
                     middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair) { Alpha = 0 });
 
                     // only the first expanded display should happen with flair.

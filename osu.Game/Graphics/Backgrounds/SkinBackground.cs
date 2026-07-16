@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Backgrounds
             if (ReferenceEquals(this, other)) return true;
 
             return other.GetType() == GetType()
-                   && ((SkinBackground)other).skin.SkinInfo.Equals(skin.SkinInfo);
+                   && ReferenceEquals(((SkinBackground)other).skin, skin);
         }
     }
 }

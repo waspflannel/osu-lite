@@ -28,21 +28,11 @@ namespace osu.Game.Beatmaps
         public DateTimeOffset DateAdded { get; set; }
 
         [JsonIgnore]
-        public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
+        public IBeatmapMetadataInfo Metadata => Beatmaps?.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 
         public IList<BeatmapInfo> Beatmaps { get; } = null!;
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
-
-        [Ignored]
-        public BeatmapOnlineStatus Status
-        {
-            get => (BeatmapOnlineStatus)StatusInt;
-            set => StatusInt = (int)value;
-        }
-
-        [MapTo(nameof(Status))]
-        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
         public bool DeletePending { get; set; }
 

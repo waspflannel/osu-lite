@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -38,25 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Caption = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
                 }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = GameplaySettingsStrings.AlwaysRequireHoldForMenu,
-                    Current = config.GetBindable<bool>(OsuSetting.AlwaysRequireHoldingForPause),
-                }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = GameplaySettingsStrings.AlwaysShowHoldForMenuButton,
-                    Current = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton),
-                }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
-                    Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
-                })
-                {
-                    Keywords = new[] { "hp", "bar" },
-                    ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
-                },
+                
             };
         }
     }

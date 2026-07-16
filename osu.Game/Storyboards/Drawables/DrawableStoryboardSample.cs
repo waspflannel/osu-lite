@@ -1,11 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 
 namespace osu.Game.Storyboards.Drawables
@@ -26,23 +23,6 @@ namespace osu.Game.Storyboards.Drawables
         {
             this.sampleInfo = sampleInfo;
             LifetimeStart = sampleInfo.StartTime;
-        }
-
-        [Resolved]
-        private IReadOnlyList<Mod>? mods { get; set; }
-
-        protected override void SkinChanged(ISkinSource skin)
-        {
-            base.SkinChanged(skin);
-
-            if (mods != null)
-            {
-                foreach (var mod in mods.OfType<IApplicableToSample>())
-                {
-                    foreach (var sample in DrawableSamples)
-                        mod.ApplyToSample(sample);
-                }
-            }
         }
 
         protected override void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)

@@ -20,7 +20,6 @@ using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Skinning.Components
@@ -38,9 +37,6 @@ namespace osu.Game.Skinning.Components
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
-
-        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
@@ -49,7 +45,6 @@ namespace osu.Game.Skinning.Components
         private readonly OsuSpriteText text;
         private IBindable<StarDifficulty>? difficultyBindable;
         private CancellationTokenSource? difficultyCancellationSource;
-        private ModSettingChangeTracker? modSettingTracker;
         private StarDifficulty? starDifficulty;
 
         public BeatmapAttributeText()
@@ -85,17 +80,6 @@ namespace osu.Game.Skinning.Components
                     starDifficulty = d.NewValue;
                     updateText();
                 });
-
-                updateText();
-            }, true);
-
-            mods.BindValueChanged(m =>
-            {
-                modSettingTracker?.Dispose();
-                modSettingTracker = new ModSettingChangeTracker(m.NewValue)
-                {
-                    SettingChanged = _ => updateText()
-                };
 
                 updateText();
             }, true);
@@ -170,9 +154,6 @@ namespace osu.Game.Skinning.Components
                 case BeatmapAttribute.Length:
                     return ArtistStrings.TracklistLength.ToTitle();
 
-                case BeatmapAttribute.RankedStatus:
-                    return BeatmapDiscussionsStrings.IndexFormBeatmapsetStatusDefault;
-
                 case BeatmapAttribute.BPM:
                     return BeatmapsetsStrings.ShowStatsBpm;
 
@@ -198,19 +179,16 @@ namespace osu.Game.Skinning.Components
                     return beatmap.Value.BeatmapInfo.DifficultyName;
 
                 case BeatmapAttribute.Creator:
-                    return beatmap.Value.BeatmapInfo.Metadata.Author.Username;
+                    return beatmap.Value.BeatmapInfo.Metadata.Creator;
 
                 case BeatmapAttribute.Source:
                     return beatmap.Value.BeatmapInfo.Metadata.Source;
 
                 case BeatmapAttribute.Length:
-                    return Math.Round(beatmap.Value.BeatmapInfo.Length / ModUtils.CalculateRateWithMods(mods.Value)).ToFormattedDuration();
-
-                case BeatmapAttribute.RankedStatus:
-                    return beatmap.Value.BeatmapInfo.Status.GetLocalisableDescription();
+                    return Math.Round(beatmap.Value.BeatmapInfo.Length).ToFormattedDuration();
 
                 case BeatmapAttribute.BPM:
-                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM, ModUtils.CalculateRateWithMods(mods.Value)).ToLocalisableString(@"0.##");
+                    return FormatUtils.RoundBPM(beatmap.Value.BeatmapInfo.BPM).ToLocalisableString(@"0.##");
 
                 case BeatmapAttribute.CircleSize:
                     return computeDifficulty().CircleSize.ToLocalisableString(@"0.##");
@@ -236,9 +214,7 @@ namespace osu.Game.Skinning.Components
 
             BeatmapDifficulty computeDifficulty()
             {
-                return ruleset.Value is RulesetInfo rulesetInfo
-                    ? rulesetInfo.CreateInstance().GetAdjustedDisplayDifficulty(beatmap.Value.BeatmapInfo, mods.Value)
-                    : new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
+                return new BeatmapDifficulty(beatmap.Value.BeatmapInfo.Difficulty);
             }
         }
 
@@ -254,7 +230,6 @@ namespace osu.Game.Skinning.Components
             difficultyCancellationSource?.Dispose();
             difficultyCancellationSource = null;
 
-            modSettingTracker?.Dispose();
         }
     }
 
@@ -272,7 +247,6 @@ namespace osu.Game.Skinning.Components
         DifficultyName,
         Creator,
         Length,
-        RankedStatus,
         BPM,
         Source,
         MaxPP

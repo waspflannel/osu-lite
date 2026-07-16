@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -15,14 +14,12 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,13 +28,8 @@ namespace osu.Game.Screens.Play
     {
         public const double BASE_SEEK_AMOUNT = 1000;
 
-        private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
-
-        protected override UserActivity? InitialActivity =>
-            // score may be null if LoadedBeatmapSuccessfully is false.
-            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo);
-
-        private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
+        private readonly Func<IBeatmap, Score> createScore;
+        private readonly bool autoplayPlayback;
 
         private double? lastFrameTime;
 
@@ -51,7 +43,7 @@ namespace osu.Game.Screens.Play
         protected override bool CheckModsAllowFailure()
         {
             // autoplay should be able to fail if the beatmap is not humanly beatable
-            if (isAutoplayPlayback)
+            if (autoplayPlayback)
                 return base.CheckModsAllowFailure();
 
             // non-autoplay replays should be able to fail, but only after they've exhausted their frames.
@@ -65,15 +57,16 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public ReplayPlayer(Score score, PlayerConfiguration? configuration = null)
-            : this((_, _) => score, configuration)
+        public ReplayPlayer(Score score, PlayerConfiguration? configuration = null, bool autoplayPlayback = false)
+            : this(_ => score, configuration, autoplayPlayback)
         {
         }
 
-        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
+        public ReplayPlayer(Func<IBeatmap, Score> createScore, PlayerConfiguration? configuration = null, bool autoplayPlayback = false)
             : base(configuration)
         {
             this.createScore = createScore;
+            this.autoplayPlayback = autoplayPlayback;
             Configuration.ShowLeaderboard = true;
         }
 
@@ -84,7 +77,7 @@ namespace osu.Game.Screens.Play
         public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => ReplayOverlay.Settings.Add(settings));
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, LocalPlayerName playerName)
         {
             if (!LoadedBeatmapSuccessfully)
                 return;
@@ -100,7 +93,7 @@ namespace osu.Game.Screens.Play
 
             OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
             message.AddText("Watching ");
-            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(playerName.Value.Value, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
             message.AddText(" play ");
             message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
             message.AddText(" on ");
@@ -142,7 +135,7 @@ namespace osu.Game.Screens.Play
             lastFrameTime = Score.Replay.Frames.LastOrDefault()?.Time;
         }
 
-        protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
+        protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap);
 
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
@@ -150,8 +143,8 @@ namespace osu.Game.Screens.Play
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
         {
             // Only show the relevant button otherwise things look silly.
-            AllowWatchingReplay = !isAutoplayPlayback,
-            AllowRetry = isAutoplayPlayback,
+            AllowWatchingReplay = !autoplayPlayback,
+            AllowRetry = autoplayPlayback,
         };
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

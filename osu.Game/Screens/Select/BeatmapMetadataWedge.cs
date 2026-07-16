@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Select
             var metadata = beatmap.Value.Metadata;
 
             // osu! lite is offline: mapper identity is plain local metadata, not a clickable profile link.
-            creator.Data = (metadata.Author.Username, null);
+            creator.Data = (metadata.Creator, null);
 
             if (!string.IsNullOrEmpty(metadata.Source))
                 source.Data = (metadata.Source, () => songSelect?.Search(metadata.Source));

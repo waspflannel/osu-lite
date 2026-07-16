@@ -29,7 +29,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 new BackgroundSettings(),
                 new HUDSettings(),
                 new InputSettings(),
-                new ModsSettings(),
             };
         }
     }

@@ -6,7 +6,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Utils;
@@ -140,78 +139,6 @@ namespace osu.Game.Graphics
 
                 default:
                     return BlueLight;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a colour for the given <see cref="BeatmapOnlineStatus"/>.
-        /// A <see langword="null"/> value indicates that a "background" shade from the local <see cref="OverlayColourProvider"/>
-        /// (or another fallback colour) should be used.
-        /// </summary>
-        /// <remarks>
-        /// Sourced from web: https://github.com/ppy/osu-web/blob/007eebb1916ed5cb6a7866d82d8011b1060a945e/resources/assets/less/layout.less#L36-L50
-        /// </remarks>
-        public static Color4? ForBeatmapSetOnlineStatus(BeatmapOnlineStatus status)
-        {
-            switch (status)
-            {
-                case BeatmapOnlineStatus.None:
-                    return Color4.RosyBrown;
-
-                case BeatmapOnlineStatus.LocallyModified:
-                    return Color4.OrangeRed;
-
-                case BeatmapOnlineStatus.Ranked:
-                case BeatmapOnlineStatus.Approved:
-                    return Color4Extensions.FromHex(@"b3ff66");
-
-                case BeatmapOnlineStatus.Loved:
-                    return Color4Extensions.FromHex(@"ff66ab");
-
-                case BeatmapOnlineStatus.Qualified:
-                    return Color4Extensions.FromHex(@"66ccff");
-
-                case BeatmapOnlineStatus.Pending:
-                    return Color4Extensions.FromHex(@"ffd966");
-
-                case BeatmapOnlineStatus.WIP:
-                    return Color4Extensions.FromHex(@"ff9966");
-
-                case BeatmapOnlineStatus.Graveyard:
-                    return Color4.Black;
-
-                default:
-                    return null;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the main accent colour for a <see cref="ModType"/>.
-        /// </summary>
-        public Color4 ForModType(ModType modType)
-        {
-            switch (modType)
-            {
-                case ModType.Automation:
-                    return Blue1;
-
-                case ModType.DifficultyIncrease:
-                    return Red1;
-
-                case ModType.DifficultyReduction:
-                    return Lime1;
-
-                case ModType.Conversion:
-                    return Purple1;
-
-                case ModType.Fun:
-                    return Pink1;
-
-                case ModType.System:
-                    return Yellow;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
             }
         }
 

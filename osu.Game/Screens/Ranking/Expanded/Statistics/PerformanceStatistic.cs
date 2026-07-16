@@ -16,7 +16,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Localisation;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             {
                 Task.Run(async () =>
                 {
-                    var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                    var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
                     var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
 
                     // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
@@ -69,17 +68,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             {
                 performance.Value = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
 
-                if (!scoreInfo.BeatmapInfo!.Status.GrantsPerformancePoints())
-                {
-                    Alpha = 0.5f;
-                    TooltipText = ResultsScreenStrings.NoPPForUnrankedBeatmaps;
-                }
-                else if (hasUnrankedMods(scoreInfo))
-                {
-                    Alpha = 0.5f;
-                    TooltipText = ResultsScreenStrings.NoPPForUnrankedMods;
-                }
-                else if (scoreInfo.Rank == ScoreRank.F)
+                if (scoreInfo.Rank == ScoreRank.F)
                 {
                     Alpha = 0.5f;
                     TooltipText = ResultsScreenStrings.NoPPForFailedScores;
@@ -90,16 +79,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     TooltipText = default;
                 }
             }
-        }
-
-        private static bool hasUnrankedMods(ScoreInfo scoreInfo)
-        {
-            IEnumerable<Mod> modsToCheck = scoreInfo.Mods;
-
-            if (scoreInfo.IsLegacyScore)
-                modsToCheck = modsToCheck.Where(m => m is not ModClassic);
-
-            return modsToCheck.Any(m => !m.Ranked);
         }
 
         public override void Appear()

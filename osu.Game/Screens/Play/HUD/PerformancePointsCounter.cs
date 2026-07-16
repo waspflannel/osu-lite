@@ -19,7 +19,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -46,20 +45,16 @@ namespace osu.Game.Screens.Play.HUD
         private PerformanceCalculator performanceCalculator;
         private ScoreInfo scoreInfo;
 
-        private Mod[] clonedMods;
-
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache difficultyCache)
         {
             if (gameplayState != null)
             {
                 performanceCalculator = gameplayState.Ruleset.CreatePerformanceCalculator();
-                clonedMods = gameplayState.Mods.Select(m => m.DeepClone()).ToArray();
-
-                scoreInfo = new ScoreInfo(gameplayState.Score.ScoreInfo.BeatmapInfo, gameplayState.Score.ScoreInfo.Ruleset) { Mods = clonedMods };
+                scoreInfo = new ScoreInfo(gameplayState.Score.ScoreInfo.BeatmapInfo, gameplayState.Score.ScoreInfo.Ruleset);
 
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
-                difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
+                difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, loadCancellationSource.Token)
                                .ContinueWith(task => Schedule(() =>
                                {
                                    timedAttributes = task.GetResultSafely();
@@ -142,7 +137,7 @@ namespace osu.Game.Screens.Play.HUD
                 this.gameplayBeatmap = gameplayBeatmap;
             }
 
-            public override IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken cancellationToken)
+            public override IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, CancellationToken cancellationToken)
                 => gameplayBeatmap;
 
             protected override IBeatmap GetBeatmap() => gameplayBeatmap;

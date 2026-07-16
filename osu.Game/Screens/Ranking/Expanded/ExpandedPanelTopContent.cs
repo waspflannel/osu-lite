@@ -8,8 +8,9 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Users.Drawables;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded
@@ -19,8 +20,6 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public partial class ExpandedPanelTopContent : CompositeDrawable
     {
-        private readonly APIUser user;
-
         private Sample appearanceSample;
 
         private readonly bool playAppearanceSound;
@@ -28,11 +27,9 @@ namespace osu.Game.Screens.Ranking.Expanded
         /// <summary>
         /// Creates a new <see cref="ExpandedPanelTopContent"/>.
         /// </summary>
-        /// <param name="user">The <see cref="APIUser"/> to display.</param>
         /// <param name="playAppearanceSound">Whether the appearance sample should play</param>
-        public ExpandedPanelTopContent(APIUser user, bool playAppearanceSound = false)
+        public ExpandedPanelTopContent(bool playAppearanceSound = false)
         {
-            this.user = user;
             this.playAppearanceSound = playAppearanceSound;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
@@ -41,7 +38,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, LocalPlayerName playerName)
         {
             appearanceSample = audio.Samples.Get(@"Results/score-panel-top-appear");
 
@@ -51,19 +48,12 @@ namespace osu.Game.Screens.Ranking.Expanded
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    new UpdateableAvatar(user)
+                    new OsuSpriteText
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Size = new Vector2(80),
-                        CornerRadius = 20,
-                        CornerExponent = 2.5f,
-                        Masking = true,
-                    },
-                    new ClickableUsername(user)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
+                        Text = playerName.Value.Value,
                     }
                 }
             };

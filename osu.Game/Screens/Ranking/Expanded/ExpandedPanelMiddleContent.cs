@@ -62,14 +62,14 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             var beatmap = score.BeatmapInfo!;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
-            string creator = metadata.Author.Username;
+            string creator = metadata.Creator;
 
             StarDifficulty starDifficulty = new StarDifficulty(beatmap.StarRating, 0);
 
             // In some cases, the beatmap ferried through ScoreInfo actually represents an online beatmap.
             // If it isn't, we may be able to compute a more accurate difficulty from the ruleset and mods.
             if (realmAccess.Run(r => r.Find<BeatmapInfo>(score.BeatmapInfo!.ID)) != null)
-                starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods).GetResultSafely() ?? starDifficulty;
+                starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset).GetResultSafely() ?? starDifficulty;
 
             var topStatistics = new List<StatisticDisplay>
             {
@@ -144,14 +144,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         Origin = Anchor.CentreLeft,
                                         Size = new Vector2(20),
                                         TooltipType = DifficultyIconTooltipType.Extended,
-                                    },
-                                    new ModDisplay
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                        Scale = new Vector2(0.5f),
-                                        Current = { Value = score.Mods }
                                     }
                                 }
                             },
@@ -266,9 +258,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         internal partial class ClickableMetadata : OsuHoverContainer
         {
-            [Resolved]
-            private OsuGame? game { get; set; }
-
             public ClickableMetadata(int beatmapId, IBeatmapMetadataInfo metadata)
             {
                 AutoSizeAxes = Axes.Both;
@@ -301,8 +290,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                     }
                 };
 
-                if (beatmapId > 0)
-                    Action = () => game?.ShowBeatmap(beatmapId);
             }
         }
     }

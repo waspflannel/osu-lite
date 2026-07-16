@@ -26,7 +26,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osuTK;
 
 namespace osu.Game.Screens.Select
@@ -60,9 +59,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
-
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         [Resolved]
         private ISongSelect? songSelect { get; set; }
@@ -197,7 +193,7 @@ namespace osu.Game.Screens.Select
             base.LoadComplete();
 
             ruleset.BindValueChanged(_ => updateKeyCount());
-            mods.BindValueChanged(_ => updateKeyCount(), true);
+            updateKeyCount();
         }
 
         protected override void PrepareForUse()
@@ -208,7 +204,7 @@ namespace osu.Game.Screens.Select
 
             localRank.Beatmap = beatmap;
             difficultyText.Text = beatmap.DifficultyName;
-            authorText.Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmap.Metadata.Author.Username);
+            authorText.Text = BeatmapsetsStrings.ShowDetailsMappedBy(beatmap.Metadata.Creator);
 
             computeStarRating();
             updateKeyCount();
@@ -292,7 +288,7 @@ namespace osu.Game.Screens.Select
 
             if (rulesetInstance.AvailableVariants.Count() > 1)
             {
-                int variant = rulesetInstance.GetVariantForBeatmap(beatmap, mods.Value);
+                int variant = rulesetInstance.GetVariantForBeatmap(beatmap);
                 var variantName = rulesetInstance.GetVariantName(variant);
 
                 variantText.Alpha = 1;

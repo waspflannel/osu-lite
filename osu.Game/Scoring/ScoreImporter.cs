@@ -14,9 +14,6 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Utils;
 using Realms;
 
@@ -28,17 +25,14 @@ namespace osu.Game.Scoring
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
-        private readonly RulesetStore rulesets;
+        private readonly IRulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        private readonly IAPIProvider api;
-
-        public ScoreImporter(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, IAPIProvider api)
+        public ScoreImporter(IRulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
             : base(storage, realm)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
-            this.api = api;
         }
 
         protected override ScoreInfo? CreateModel(ArchiveReader archive, ImportParameters parameters)
@@ -54,6 +48,11 @@ namespace osu.Game.Scoring
                 catch (LegacyScoreDecoder.BeatmapNotFoundException notFound)
                 {
                     Logger.Log($@"Score '{archive.Name}' failed to import: no corresponding beatmap with the hash '{notFound.Hash}' could be found.", LoggingTarget.Database);
+                    return null;
+                }
+                catch (LegacyScoreDecoder.ReplayHasModsException e)
+                {
+                    Logger.Log(e.Message, LoggingTarget.Database);
                     return null;
                 }
                 catch (Exception e)
@@ -82,9 +81,6 @@ namespace osu.Game.Scoring
             ArgumentNullException.ThrowIfNull(model.BeatmapInfo);
             ArgumentNullException.ThrowIfNull(model.Ruleset);
 
-            if (!ModUtils.CheckCompatibleSet(model.Mods))
-                throw new InvalidOperationException(@"The score specifies an incompatible set of mods!");
-
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
 
@@ -92,55 +88,15 @@ namespace osu.Game.Scoring
                 model.MaximumStatisticsJson = JsonConvert.SerializeObject(model.MaximumStatistics);
         }
 
-        // Very naive local caching to improve performance of large score imports (where the username is usually the same for most or all scores).
-
-        // TODO: `UserLookupCache` cannot currently be used here because of async foibles.
-        // It only supports lookups by user ID (username would require web changes), and even then the ID lookups cannot be used.
-        // That is because that component provides an async interface, and async functions cannot be consumed safely here due to the rigid structure of `RealmArchiveModelImporter`.
-        // The importer has two paths, one async and one sync; the async path runs the sync path in a task.
-        // This means that sometimes `PostImport()` is called from a sync context, and sometimes from an async one, whilst itself being a sync method.
-        // That in turn makes `.GetResultSafely()` not callable inside `PostImport()`, as it will throw when called from an async context,
-        private readonly Dictionary<int, APIUser> idLookupCache = new Dictionary<int, APIUser>();
-        private readonly Dictionary<string, APIUser> usernameLookupCache = new Dictionary<string, APIUser>();
-
         protected override void PostImport(ScoreInfo model, Realm realm, ImportParameters parameters)
         {
             base.PostImport(model, realm, parameters);
 
-            populateUserDetails(model);
-
             Debug.Assert(model.BeatmapInfo != null);
 
-            // This needs to be run after user detail population to ensure we have a valid user id.
-            // Update LastPlayed for the local player's own scores (the offline API never reports logged-in).
-            if (api.LocalUser.Value.OnlineID == model.UserID && (model.BeatmapInfo.LastPlayed == null || model.Date > model.BeatmapInfo.LastPlayed))
+            // Every stored replay belongs to the local player.
+            if (model.BeatmapInfo.LastPlayed == null || model.Date > model.BeatmapInfo.LastPlayed)
                 model.BeatmapInfo.LastPlayed = model.Date;
         }
-
-        /// <summary>
-        /// Legacy replays only store a username.
-        /// This will populate a user ID during import.
-        /// </summary>
-        private void populateUserDetails(ScoreInfo model)
-        {
-            if (model.RealmUser.OnlineID == APIUser.SYSTEM_USER_ID)
-                return;
-
-            if (model.RealmUser.OnlineID > 1)
-            {
-                model.User = lookupUserById(model.RealmUser.OnlineID) ?? model.User;
-                return;
-            }
-
-            if (model.OnlineID < 0 && model.LegacyOnlineID <= 0)
-                return;
-
-            model.User = lookupUserByName(model.RealmUser.Username) ?? model.User;
-        }
-
-        // osu! lite is offline, so users referenced by imported scores cannot be resolved online.
-        private APIUser? lookupUserById(int id) => idLookupCache.GetValueOrDefault(id);
-
-        private APIUser? lookupUserByName(string username) => usernameLookupCache.GetValueOrDefault(username);
     }
 }

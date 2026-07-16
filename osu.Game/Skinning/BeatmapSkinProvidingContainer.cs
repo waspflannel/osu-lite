@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skins)
+        private void load(FixedSkinProvider skins)
         {
             BeatmapSkins.BindValueChanged(_ => TriggerSourceChanged());
             BeatmapColours.BindValueChanged(_ => TriggerSourceChanged());
@@ -48,20 +48,9 @@ namespace osu.Game.Skinning
             currentSkin = skins.CurrentSkin.GetBoundCopy();
             currentSkin.BindValueChanged(_ =>
             {
-                bool userSkinIsLegacy = skins.CurrentSkin.Value is LegacySkin;
                 bool beatmapProvidingResources = skin is LegacySkinTransformer legacySkin && legacySkin.IsProvidingLegacyResources;
 
-                // Some beatmaps provide a limited selection of skin elements to add some visual flair.
-                // In stable, these elements will take lookup priority over the selected skin (whether that be a user skin or default).
-                //
-                // To replicate this we need to pay special attention to the fallback order.
-                // If a user has a non-legacy skin (argon, triangles) selected, the game won't normally fall back to a legacy skin.
-                // In turn this can create an unexpected visual experience.
-                //
-                // So here, check what skin the user has selected. If it's already a legacy skin then we don't need to do anything special.
-                // If it isn't, we insert the classic default. Note that this is only done if the beatmap seems to be providing skin elements,
-                // as we only want to override the user's (non-legacy) skin choice when required for beatmap skin visuals.
-                if (!userSkinIsLegacy && beatmapProvidingResources && classicFallback != null)
+                if (beatmapProvidingResources && classicFallback != null)
                     SetSources(new[] { skin, classicFallback });
                 else
                     SetSources(new[] { skin });

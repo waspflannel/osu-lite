@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Utils;
@@ -45,7 +44,6 @@ namespace osu.Game.Screens.Select
 
         public required Func<FilterCriteria> GetCriteria { get; init; }
         public required Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> GetLocalUserTopRanks { get; init; }
-        public required Func<HashSet<int>> GetFavouriteBeatmapSets { get; init; }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
@@ -175,7 +173,7 @@ namespace osu.Game.Screens.Select
                     return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Artist), items);
 
                 case GroupMode.Author:
-                    return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Author.Username), items);
+                    return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Creator), items);
 
                 case GroupMode.Title:
                     return getGroupsBy(b => defineGroupAlphabetically(b.BeatmapSet!.Metadata.Title), items);
@@ -194,9 +192,6 @@ namespace osu.Game.Screens.Select
                         return defineGroupByDate(date.Value);
                     }, items);
 
-                case GroupMode.RankedStatus:
-                    return getGroupsBy(b => defineGroupByStatus(b.BeatmapSet!.Status), items);
-
                 case GroupMode.BPM:
                     return getGroupsBy(b => defineGroupByBPM(FormatUtils.RoundBPM(b.BPM)), items);
 
@@ -210,18 +205,12 @@ namespace osu.Game.Screens.Select
                     return getGroupsBy(b => defineGroupBySource(b.BeatmapSet!.Metadata.Source), items);
 
                 case GroupMode.MyMaps:
-                    return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalUserId, criteria.LocalUserUsername), items);
+                    return getGroupsBy(b => defineGroupByOwnMaps(b, criteria.LocalCreator), items);
 
                 case GroupMode.RankAchieved:
                 {
                     var topRankMapping = GetLocalUserTopRanks(criteria);
                     return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
-                }
-
-                case GroupMode.Favourites:
-                {
-                    var favouriteBeatmapSets = GetFavouriteBeatmapSets();
-                    return getGroupsBy(b => defineGroupByFavourites(b, favouriteBeatmapSets), items);
                 }
 
                 case GroupMode.Variant:
@@ -231,7 +220,7 @@ namespace osu.Game.Screens.Select
                     if (rulesetInstance == null || rulesetInstance.AvailableVariants.Count() <= 1)
                         goto case GroupMode.None;
 
-                    return getGroupsBy(b => defineGroupByVariant(rulesetInstance, b, criteria.Mods), items);
+                    return getGroupsBy(b => defineGroupByVariant(rulesetInstance, b), items);
                 }
 
                 default:
@@ -299,40 +288,6 @@ namespace osu.Game.Screens.Select
             return new GroupDefinition(151, BeatmapCarouselFilterGroupingStrings.OverMonthsAgo(5)).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByStatus(BeatmapOnlineStatus status)
-        {
-            switch (status)
-            {
-                case BeatmapOnlineStatus.Ranked:
-                case BeatmapOnlineStatus.Approved:
-                    return new RankedStatusGroupDefinition(0, BeatmapOnlineStatus.Ranked).Yield();
-
-                case BeatmapOnlineStatus.Qualified:
-                    return new RankedStatusGroupDefinition(1, status).Yield();
-
-                case BeatmapOnlineStatus.WIP:
-                    return new RankedStatusGroupDefinition(2, status).Yield();
-
-                case BeatmapOnlineStatus.Pending:
-                    return new RankedStatusGroupDefinition(3, status).Yield();
-
-                case BeatmapOnlineStatus.Graveyard:
-                    return new RankedStatusGroupDefinition(4, status).Yield();
-
-                case BeatmapOnlineStatus.LocallyModified:
-                    return new RankedStatusGroupDefinition(5, status).Yield();
-
-                case BeatmapOnlineStatus.None:
-                    return new RankedStatusGroupDefinition(6, status).Yield();
-
-                case BeatmapOnlineStatus.Loved:
-                    return new RankedStatusGroupDefinition(7, status).Yield();
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
-            }
-        }
-
         private IEnumerable<GroupDefinition> defineGroupByBPM(double bpm)
         {
             if (bpm < 60)
@@ -384,11 +339,9 @@ namespace osu.Game.Screens.Select
             return new GroupDefinition(0, source).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
+        private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, string? localCreator)
         {
-            var author = beatmap.BeatmapSet!.Metadata.Author;
-
-            if (author.OnlineID == localUserId || (author.OnlineID <= 1 && author.Username == localUserUsername))
+            if (beatmap.BeatmapSet!.Metadata.Creator == localCreator)
                 return new GroupDefinition(0, BeatmapCarouselFilterGroupingStrings.MyMaps).Yield();
 
             // discard beatmaps not owned by the user.
@@ -403,17 +356,9 @@ namespace osu.Game.Screens.Select
             return new GroupDefinition(int.MaxValue, BeatmapCarouselFilterGroupingStrings.Unplayed).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByFavourites(BeatmapInfo beatmap, HashSet<int> favouriteBeatmapSets)
+        private IEnumerable<GroupDefinition> defineGroupByVariant(Ruleset rulesetInstance, BeatmapInfo beatmap)
         {
-            if (beatmap.BeatmapSet?.OnlineID > 0 && favouriteBeatmapSets.Contains(beatmap.BeatmapSet.OnlineID))
-                return new GroupDefinition(0, BeatmapCarouselFilterGroupingStrings.Favourites).Yield();
-
-            return [];
-        }
-
-        private IEnumerable<GroupDefinition> defineGroupByVariant(Ruleset rulesetInstance, BeatmapInfo beatmap, IReadOnlyList<Mod>? mods = null)
-        {
-            int variant = rulesetInstance.GetVariantForBeatmap(beatmap, mods);
+            int variant = rulesetInstance.GetVariantForBeatmap(beatmap);
             var name = rulesetInstance.GetVariantName(variant);
             return new GroupDefinition(variant, name).Yield();
         }
