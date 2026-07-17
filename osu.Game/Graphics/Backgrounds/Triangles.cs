@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
-using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Bindables;
 
@@ -188,10 +187,12 @@ namespace osu.Game.Graphics.Backgrounds
 
             if (parts.Count == AimCount)
             {
-                var span = parts.AsSpan();
-
-                for (int i = 0; i < span.Length; i++)
-                    span[i].Position = getRandomPosition(true, span[i].Scale);
+                for (int i = 0; i < parts.Count; i++)
+                {
+                    var p = parts[i];
+                    p.Position = getRandomPosition(true, p.Scale);
+                    parts[i] = p;
+                }
             }
             else
             {

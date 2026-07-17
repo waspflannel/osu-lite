@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using Humanizer;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Extensions;
@@ -37,7 +36,12 @@ namespace osu.Game.Utils
         /// Formats the supplied rank/leaderboard position in a consistent, simplified way.
         /// </summary>
         /// <param name="rank">The rank/position to be formatted.</param>
-        public static string FormatRank(this int rank) => rank.ToMetric(decimals: rank < 10_000 ? 1 : 0);
+        public static string FormatRank(this int rank)
+        {
+            if (rank >= 1_000_000) return $"{(rank / 1_000_000.0):0.#}M";
+            if (rank >= 10_000) return $"{(rank / 1000.0):0.#}K";
+            return rank.ToString();
+        }
 
         /// <summary>
         /// Formats the supplied star rating in a consistent, simplified way.

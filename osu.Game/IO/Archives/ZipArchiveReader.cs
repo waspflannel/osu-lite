@@ -3,12 +3,10 @@
 
 #nullable disable
 
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using SharpCompress.Archives;
@@ -64,9 +62,9 @@ namespace osu.Game.IO.Archives
             {
                 if (entry.Size > 0)
                 {
-                    var owner = MemoryAllocator.Default.Allocate<byte>((int)entry.Size);
-                    s.ReadExactly(owner.Memory.Span);
-                    return new MemoryOwnerMemoryStream(owner);
+                    var buffer = new byte[entry.Size];
+                    s.ReadExactly(buffer);
+                    return new MemoryStream(buffer);
                 }
 
                 // due to a sharpcompress bug (https://github.com/adamhathcock/sharpcompress/issues/88),
@@ -85,48 +83,5 @@ namespace osu.Game.IO.Archives
         }
 
         public override IEnumerable<string> Filenames => archive.Entries.Where(e => !e.IsDirectory).Select(e => e.Key).ExcludeSystemFileNames();
-
-        private class MemoryOwnerMemoryStream : Stream
-        {
-            private readonly IMemoryOwner<byte> owner;
-            private readonly Stream stream;
-
-            public MemoryOwnerMemoryStream(IMemoryOwner<byte> owner)
-            {
-                this.owner = owner;
-
-                stream = owner.Memory.AsStream();
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                owner?.Dispose();
-                base.Dispose(disposing);
-            }
-
-            public override void Flush() => stream.Flush();
-
-            public override int Read(byte[] buffer, int offset, int count) => stream.Read(buffer, offset, count);
-
-            public override long Seek(long offset, SeekOrigin origin) => stream.Seek(offset, origin);
-
-            public override void SetLength(long value) => stream.SetLength(value);
-
-            public override void Write(byte[] buffer, int offset, int count) => stream.Write(buffer, offset, count);
-
-            public override bool CanRead => stream.CanRead;
-
-            public override bool CanSeek => stream.CanSeek;
-
-            public override bool CanWrite => stream.CanWrite;
-
-            public override long Length => stream.Length;
-
-            public override long Position
-            {
-                get => stream.Position;
-                set => stream.Position = value;
-            }
-        }
     }
 }

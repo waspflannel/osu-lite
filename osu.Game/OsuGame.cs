@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -845,7 +844,7 @@ namespace osu.Game
 
             if (generalLogRecentCount < short_term_display_limit)
             {
-                LocalisableString message = entry.Message.Truncate(256);
+                LocalisableString message = entry.Message.Length > 256 ? entry.Message[..256] : entry.Message;
 
                 Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Humanizer;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
@@ -79,11 +78,11 @@ namespace osu.Game.Extensions
                 return CommonStrings.TimeNow.ToString();
 
             if (difference.TotalMinutes < 1)
-                return "sec".ToQuantity((int)difference.TotalSeconds);
+                return $"{(int)difference.TotalSeconds} sec";
             if (difference.TotalHours < 1)
-                return "min".ToQuantity((int)difference.TotalMinutes);
+                return $"{(int)difference.TotalMinutes} min";
             if (difference.TotalDays < 1)
-                return "hr".ToQuantity((int)difference.TotalHours);
+                return $"{(int)difference.TotalHours} hr";
 
             // this is where this gets more complicated because of how the calendar works.
             // since there's no `TotalMonths` / `TotalYears`, we have to iteratively add months/years

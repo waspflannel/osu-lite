@@ -103,9 +103,23 @@ namespace osu.Game.Graphics
             /// </remarks>
             public bool Equals(ILocalisableStringData? other) => false;
 
-            public string GetLocalised(LocalisationParameters parameters) => HumanizerUtils.Humanize(Date);
+            public string GetLocalised(LocalisationParameters parameters) => relativeTime(Date);
 
             public override string ToString() => GetLocalised(LocalisationParameters.DEFAULT);
+        }
+
+        private static string relativeTime(DateTimeOffset input)
+        {
+            var now = DateTimeOffset.Now;
+            var diff = now - input;
+
+            if (diff.TotalSeconds < 0) return "now";
+            if (diff.TotalSeconds < 5) return "now";
+            if (diff.TotalSeconds < 60) return $"{(int)diff.TotalSeconds} seconds ago";
+            if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes} minute{((int)diff.TotalMinutes != 1 ? "s" : "")} ago";
+            if (diff.TotalHours < 24) return $"{(int)diff.TotalHours} hour{((int)diff.TotalHours != 1 ? "s" : "")} ago";
+            if (diff.TotalDays < 7) return $"{(int)diff.TotalDays} day{((int)diff.TotalDays != 1 ? "s" : "")} ago";
+            return input.ToString("d MMM yyyy");
         }
     }
 }

@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Humanizer;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
@@ -113,7 +112,7 @@ namespace osu.Game.Database
 
             parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
 
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
+            notification.Text = $"{capitalise(HumanisedModelName)} import is initialising...";
             notification.State = ProgressNotificationState.Active;
 
             await pauseIfNecessaryAsync(parameters, notification, notification.CancellationToken).ConfigureAwait(false);
@@ -165,7 +164,7 @@ namespace osu.Game.Database
                     }
                     else
                     {
-                        notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
+                        notification.Text = $"{capitalise(HumanisedModelName)} import failed! Check logs for more information.";
                         notification.State = ProgressNotificationState.Cancelled;
                     }
                 }
@@ -579,7 +578,7 @@ namespace osu.Game.Database
 
             // A paused state could obviously be entered mid-import (during the `Task.WhenAll` below),
             // but in order to keep things simple let's focus on the most common scenario.
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
+            notification.Text = $"{capitalise(HumanisedModelName)} import is paused due to gameplay...";
             notification.State = ProgressNotificationState.Queued;
 
             while (PauseImports)
@@ -591,7 +590,7 @@ namespace osu.Game.Database
             cancellationToken.ThrowIfCancellationRequested();
             Logger.Log($@"{GetType().Name} is being resumed.");
 
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is resuming...";
+            notification.Text = $"{capitalise(HumanisedModelName)} import is resuming...";
             notification.State = ProgressNotificationState.Active;
         }
 
@@ -608,5 +607,7 @@ namespace osu.Game.Database
         }
 
         public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
+
+        private static string capitalise(string s) => string.IsNullOrEmpty(s) ? s : char.ToUpperInvariant(s[0]) + s[1..];
     }
 }
