@@ -94,6 +94,9 @@ The remaining material work is:
 > **Trim 3 completed 2026-07-16** ([`trim-3-settings-cleanup`](https://github.com/waspflannel/osu-lite/tree/trim-3-settings-cleanup)):
 > Culled `OsuSetting` enum from 67 to 36 allowlisted entries. Renamed `MaintenanceSection` → `DataSection`.
 > Removed joystick support from input chain and keybinding. Deleted settings UI for Scaling, SafeArea, 24h time, ScoreDisplayMode.
+>
+> **Trim 4 completed 2026-07-16** ([`trim-4-dead-code`](https://github.com/waspflannel/osu-lite/tree/trim-4-dead-code)):
+> Removed 80+ mod icon entries from `OsuIcon.cs`. All other section-18 dead types, mod directories, and extensions were already removed in prior passes.
 
 ## Unfinished business
 
