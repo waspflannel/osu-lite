@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Menu
         private void load(SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
         {
             holdDelay = new BindableDouble(200);
-            new BindableBool(false);
+            showMobileDisclaimer = new BindableBool(false);
 
             if (host.CanExit)
             {
