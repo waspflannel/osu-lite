@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
-        private FillFlowContainer<SettingsItemV2> scalingSettings = null!;
+        private FillFlowContainer<SettingsItemV2> scalingSettings = new FillFlowContainer<SettingsItemV2>();
 
         private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
 
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private FormDropdown<Display> displayDropdown = null!;
         private FormDropdown<WindowMode> windowModeDropdown = null!;
 
-        private FormSliderBar<float> dimSlider = null!;
+        private FormSliderBar<float> dimSlider = new FormSliderBar<float>();
 
         private readonly Bindable<SettingsNote.Data?> windowModeDropdownNote = new Bindable<SettingsNote.Data?>();
 
@@ -243,36 +243,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     windowedResolution.Value = size.NewValue;
             });
 
-            scalingMode.BindValueChanged(_ =>
-            {
-                scalingSettings.ClearTransforms();
-                scalingSettings.AutoSizeDuration = transition_duration;
-                scalingSettings.AutoSizeEasing = Easing.OutQuint;
-
-                updateScalingModeVisibility();
-            });
-            updateScalingModeVisibility();
-
-            void updateScalingModeVisibility()
-            {
-                if (scalingMode.Value == ScalingMode.Off)
-                    scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-
-                scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
-
-                foreach (SettingsItemV2 item in scalingSettings)
-                {
-                    FormSliderBar<float> slider = (FormSliderBar<float>)item.Control;
-
-                    if (slider == dimSlider)
-                        item.CanBeShown.Value = scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays;
-                    else
-                    {
-                        slider.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
-                        item.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
-                    }
-                }
-            }
+            scalingMode.BindValueChanged(_ => { });
         }
 
         private void onDisplaysChanged(IEnumerable<Display> displays)
