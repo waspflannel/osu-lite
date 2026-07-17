@@ -97,6 +97,9 @@ The remaining material work is:
 >
 > **Trim 4 completed 2026-07-16** ([`trim-4-dead-code`](https://github.com/waspflannel/osu-lite/tree/trim-4-dead-code)):
 > Removed 80+ mod icon entries from `OsuIcon.cs`. All other section-18 dead types, mod directories, and extensions were already removed in prior passes.
+>
+> **Trim 5 completed 2026-07-16** ([`trim-5-dependencies`](https://github.com/waspflannel/osu-lite/tree/trim-5-dependencies)):
+> Removed `AutoMapper` (manual detach/copy), `Humanizer` (inline formatting, deleted `HumanizerUtils`), `Microsoft.Toolkit.HighPerformance` (BCL equivalents).
 
 ## Unfinished business
 
