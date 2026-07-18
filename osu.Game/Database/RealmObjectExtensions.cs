@@ -105,7 +105,7 @@ namespace osu.Game.Database
 
             foreach (var b in source.Beatmaps)
             {
-                var detachedBeatmap = detachBeatmap(b);
+                var detachedBeatmap = detachBeatmap(b, false);
                 detachedBeatmap.BeatmapSet = result;
                 result.Beatmaps.Add(detachedBeatmap);
             }
@@ -116,7 +116,7 @@ namespace osu.Game.Database
             return result;
         }
 
-        private static BeatmapInfo detachBeatmap(BeatmapInfo source)
+        private static BeatmapInfo detachBeatmap(BeatmapInfo source, bool detachParent = true)
         {
             var result = new BeatmapInfo(
                 detachRuleset(source.Ruleset),
@@ -140,6 +140,22 @@ namespace osu.Game.Database
             var userSettings = new BeatmapUserSettings();
             copyProperties(source.UserSettings, userSettings);
             result.UserSettings = userSettings;
+
+            if (detachParent && source.BeatmapSet != null)
+            {
+                var set = detachBeatmapSet(source.BeatmapSet);
+
+                for (int i = 0; i < set.Beatmaps.Count; i++)
+                {
+                    if (set.Beatmaps[i].Equals(result))
+                    {
+                        set.Beatmaps[i] = result;
+                        break;
+                    }
+                }
+
+                result.BeatmapSet = set;
+            }
 
             return result;
         }
