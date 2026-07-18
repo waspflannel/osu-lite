@@ -1,6 +1,6 @@
 # osu! lite final trim
 
-**Status:** in progress; merge checkpoint after phases 2–5 and portions of phases 6, 7, and 9
+**Status:** substantially complete; 5 of 7 post-merge trims finished, 1 deferred (resource payload), 1 completed (repo cleanup)
 **Audit date:** 2026-07-15
 **Audited tree:** repository contents matching `origin/master` at merge `23c522fa68`
 **Purpose:** define the final product, record what the merged final trim actually completed, and remove every remaining out-of-scope path
@@ -73,13 +73,13 @@ Completed product boundaries at this checkpoint:
 
 The remaining material work is:
 
-1. remove online-ID-shaped beatmap/ruleset persistence and narrow beatmap/import management to local install/reinstall operations;
-2. replace the notification drawer with the required small operation-status sink;
-3. reduce settings to the exact allowlists, rename/narrow Maintenance to Data, and remove joystick/touch/mobile residue;
-4. delete remaining mod/localisation/dead-code/member residue;
-5. remove AutoMapper, Humanizer, and Microsoft.Toolkit.HighPerformance with their callers;
-6. replace `ppy.osu.Game.Resources` with the embedded allowlisted payload and trim Kanna; this remains the largest and highest-risk phase;
-7. remove stale local-resource scripts and lazer project metadata, then record final evidence here.
+1. ~~remove online-ID-shaped beatmap/ruleset persistence~~ done in trim-1;
+2. ~~replace the notification drawer~~ done in trim-2;
+3. ~~reduce settings to allowlists, rename Maintenance to Data, remove joystick/touch/mobile~~ done in trim-3;
+4. ~~delete remaining mod/localisation/dead-code/member residue~~ done in trim-4;
+5. ~~remove AutoMapper, Humanizer, and Microsoft.Toolkit.HighPerformance~~ done in trim-5;
+6. replace `ppy.osu.Game.Resources` with the embedded allowlisted payload and trim Kanna — **deferred** (requires separate resource extraction pass);
+7. ~~remove stale local-resource scripts and lazer project metadata, then record final evidence~~ done in trim-7.
 
 > **Trim 1 completed 2026-07-16** ([`trim-1-online-persistence`](https://github.com/waspflannel/osu-lite/tree/trim-1-online-persistence)):
 > Deleted `IHasOnlineID<T>`, `BeatmapSetHypeStatus`, `BeatmapSetNominationStatus`, `BeatmapSetNominationStatusRequiredMeta`.
@@ -100,6 +100,11 @@ The remaining material work is:
 >
 > **Trim 5 completed 2026-07-16** ([`trim-5-dependencies`](https://github.com/waspflannel/osu-lite/tree/trim-5-dependencies)):
 > Removed `AutoMapper` (manual detach/copy), `Humanizer` (inline formatting, deleted `HumanizerUtils`), `Microsoft.Toolkit.HighPerformance` (BCL equivalents).
+>
+> **Trim 6 deferred**: Replacing `ppy.osu.Game.Resources` with an embedded allowlisted payload requires extracting the resource subset (fonts, textures, shaders, samples, localisation .resx files) from the 125 MB NuGet package and re-embedding them locally. The package also provides C# localisation type definitions that must be recreated. This is a separate extraction pass outside the scope of in-place code trimming.
+>
+> **Trim 7 completed 2026-07-16** ([`trim-7-repo-cleanup`](https://github.com/waspflannel/osu-lite/tree/trim-7-repo-cleanup)):
+> Deleted `UseLocalResources.ps1` and `UseLocalResources.sh`. All other cleanup targets (.github/FUNDING.yml, .run/, .idea/, osu.sln.DotSettings, osu.Desktop.slnf, .config/dotnet-tools.json, InspectCode.*, .git-blame-ignore-revs, all OSU_LITE_*.md files) were already absent from prior passes. README.md, CONTRIBUTING.md, and .github/ISSUE_TEMPLATE/ were already rewritten for osu! lite.
 
 ## Unfinished business
 
