@@ -101,7 +101,7 @@ The remaining material work is:
 > **Trim 5 completed 2026-07-16** ([`trim-5-dependencies`](https://github.com/waspflannel/osu-lite/tree/trim-5-dependencies)):
 > Removed `AutoMapper` (manual detach/copy), `Humanizer` (inline formatting, deleted `HumanizerUtils`), `Microsoft.Toolkit.HighPerformance` (BCL equivalents).
 >
-> **Trim 6 deferred**: Replacing `ppy.osu.Game.Resources` with an embedded allowlisted payload requires extracting the resource subset (fonts, textures, shaders, samples, localisation .resx files) from the 125 MB NuGet package and re-embedding them locally. The package also provides C# localisation type definitions that must be recreated. This is a separate extraction pass outside the scope of in-place code trimming.
+> **Trim 6 deferred — partial**: Package reference kept for C# localisation type definitions (`CommonStrings`, `BeatmapsStrings`, `BeatmapsetsStrings`, etc. in `osu.Game.Resources.Localisation.Web`). The 131MB resource DLL was extracted locally to `osu.Game/Resources/` for future embedding. Full removal requires migrating 22 files from `osu.Game.Resources.Localisation.Web` imports to game-local types. The local DLL path and `.gitignore` exclusion are staged.
 >
 > **Trim 7 completed 2026-07-16** ([`trim-7-repo-cleanup`](https://github.com/waspflannel/osu-lite/tree/trim-7-repo-cleanup)):
 > Deleted `UseLocalResources.ps1` and `UseLocalResources.sh`. All other cleanup targets (.github/FUNDING.yml, .run/, .idea/, osu.sln.DotSettings, osu.Desktop.slnf, .config/dotnet-tools.json, InspectCode.*, .git-blame-ignore-revs, all OSU_LITE_*.md files) were already absent from prior passes. README.md, CONTRIBUTING.md, and .github/ISSUE_TEMPLATE/ were already rewritten for osu! lite.
